@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+<table>
+   <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
+   {% for s in services %}
+        <tr id="{{ s.id }}">
+             <td>{{s.service_name}}</td>
+             <td>{{s.price}}</td>
+              <td>{{s.before}}</td>
+              <td>{{s.after}}</td>
+              <td>{{s.total}}</td>
+              <td>{{s.is_active}}</td>
+               <td><a href="{% url 'appointmentschduler:edit_service' s.id %}">Edit</a></td>
+               <td><a href="{% url 'appointmentschduler:delete_service' s.id %}">Delete</a></td>
+
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+

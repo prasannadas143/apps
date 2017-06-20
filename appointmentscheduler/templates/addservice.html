@@ -1,0 +1,147 @@
+﻿{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<script>
+    function listemployees() {
+           alert("employeed id select");
+              $.ajax({
+                    method:'get',
+                    url:"{% url 'appointmentschduler:getemployees'  %}",
+
+                    success:function(data){
+                        employeelist =eval(data.employeelist);
+                        if (employeelist.length > 0  ){
+                              for (var i = 0; i <  employeelist.length; i++)
+                              {
+                                $("#employeeid").append( $('option></option>').val( employeelist[i].id ).html( employeelist[i].emp_name ) );
+                             }
+                         $("#employeeid").multiselect('fast');
+                        }
+
+                    }
+              });
+
+        }
+
+
+
+
+</script>
+
+
+
+<span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
+<span  class="block">Fill in the form below to add a new service. You can add title, description,
+    price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
+<div ng-app="ServiceMod">
+     <form ng-controller="ServiceCtl" name="add_service" id="add_service" class="form pj-form" autocomplete="off" enctype="multipart/form-data"
+        novalidate="novalidate"   ng-submit="submitForm()" >
+
+            <label class="title">
+                Service name:</label>
+            <span class="inline_block">
+                   <input id="id_service_name" maxlength="100" name="service_name" ng-model="servicedata.service_name" type="text" />
+
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Service description:</label>
+            <span class="inline_block">
+                   <input id="id_service_desc" maxlength="100" name="service_desc" ng-model="servicedata.service_desc" type="text" />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Price</label>
+                <span class="inline_block">
+                    <input id="id_price" name="price" ng-model="servicedata.price" step="0.01" type="number" required />
+                </span>
+        </p>
+        <p>
+            <label class="title">
+                Image</label>
+            <span class="inline_block">
+            <input id="id_service_img" name="service_img" ng-model="service_img" type="file" />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Length (minutes)</label>
+            <span class="inline_block">
+                 <input id="id_length" name="length" ng-model="servicedata.length" type="number" required />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Before (minutes)</label>
+            <span>
+                <input id="id_before" name="before" ng-model="servicedata.before" type="number" required />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                After (minutes)</label>
+            <span>
+                          <input id="id_after" name="after" ng-model="servicedata.after" type="number" required />
+
+        </p>
+        <p>
+            <label class="title">
+                Total (minutes)
+            </label>
+                 <span class="inline_block">
+
+                 </span>
+        </p>
+        <p>
+            <label class="title">
+                Status</label>
+            <span class="inline_block">
+                  <select id="id_is_active" name="is_active" ng-model="servicedata.is_active">
+<option value="True" selected="selected">active</option>
+<option value="False">inactive</option>
+</select>
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Employees</label>
+            <span class="inline_block">
+            <select id="employeeid" onclick=listemployees() >
+                <option>new employee</option>
+            </select>
+
+             <button type="button" class="ui-multiselect ui-widget ui-state-default ui-corner-all"
+                    aria-haspopup="true" style="width: 231px;">
+                    <span class="ui-icon ui-icon-triangle-2-n-s"></span><span>Select options</span></button>
+                <a href="#" class="pj-form-langbar-tip listing-tip" original-title="Select employee(s) who can do this service.">
+                </a>
+                </span>
+            </p>
+            <p>
+            <label class="title">
+                &nbsp;</label>
+              <div class="fieldWrapper">
+
+
+
+            </div>
+            <input  type="submit" value="Submit" >
+        </p>
+        </form>
+</div>
+{% endblock %}
+
+
+
+
+
+{

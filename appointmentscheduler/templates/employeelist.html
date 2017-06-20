@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee List</title>
+</head>
+<body>
+<table>
+  {% for s in employees %}
+        <tr id="{{ s.id }}">
+             <td>{{s.emp_name}}</td>
+             <td>{{s.emp_notes}}</td>
+              <td>{{s.email}}</td>
+              <td>{{s.phone}}</td>
+              <td>{{s.total}}</td>
+              <td>{{s.is_active}}</td>
+               <td><a href="{% url 'appointmentschduler:editEmployee' s.id %}">Edit </a></td>
+
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

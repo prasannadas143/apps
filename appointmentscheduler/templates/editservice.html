@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <form action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}" method="post" enctype="multipart/form-data">
+
+      {% csrf_token %}
+
+    {% for field in form %}
+      {% if field.name == "service_img" %}
+           <div class="fieldWrapper">
+               <img src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
+                <p><label for="id_photo">service image</label>
+                </a> <br> <input type="file" name="photoname" id="id_photo"></p>
+                {% if appscheduleinst.service_img.name != defaultimg %}
+                        <button onclick="location.href={% url 'appointmentschduler:delete_service_image' appscheduleinst.id %};">Delete image</button>
+                {% endif %}
+
+               </div>
+
+      {% else %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+
+        </div>
+
+      {% endif %}
+   {% endfor %}
+        <div class="fieldWrapper">
+          <input type="text" name="firstname" value='{{ appscheduleinst.total }}'>
+        </div>
+        <input type="submit" value="submit" >
+
+  </form>
+
+</body>
+</html>

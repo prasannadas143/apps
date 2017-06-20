@@ -1,0 +1,21 @@
+{% load static from staticfiles %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ang</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="ang/src/favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+
+<script type="text/javascript" src="{% static 'ang/appointmentschd/dist/inline.bundle.js' %}"></script>
+<script type="text/javascript" src="{% static 'ang/appointmentschd/dist/polyfills.bundle.js' %}"></script>
+<script type="text/javascript" src="{% static 'ang/appointmentschd/dist/styles.bundle.css' %}"></script>
+<script type="text/javascript" src="{% static 'ang/appointmentschd/dist/vendor.bundle.js' %}"></script>
+<script type="text/javascript" src="{% static 'ang/appointmentschd/dist/main.bundle.js' %}"></script>
+</body>
+</html>

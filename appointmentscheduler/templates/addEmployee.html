@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static from staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee</title>
+    <link href="{% static "css/admin.css"  %}" rel="stylesheet" type="text/css" />
+    <link href="{% static "css/popup.css"  %}" rel="stylesheet" type="text/css" />
+    <link href="{% static "css/reset.css"  %}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+
+<div id="container">
+    <div id="header">
+        <div id="logo">
+            <a href="javascript:void();" target="_blank" rel="nofollow">
+                365 Plateform</a> <span>v1.0</span>
+        </div>
+    </div>
+    <div id="middle">
+
+
+        <div id="right">
+        <div class="PPPcontent-top">
+
+            <div class="content-middle" id="content">
+            <div class="notice-box">
+			<span class="notice-info">&nbsp;</span>
+			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
+
+         <form  action="{% url 'appointmentschduler:addemployee' %}" method="post"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
+		<input name="employee_create" value="1" type="hidden">
+		<input style="display:none">
+		<input style="display:none" type="password">
+					<p class="pj-multilang-wrap" data-index="1" style="display: ">
+				<label class="title">Employee name:</label>
+				<span class="inline_block">
+
+					{{ form.emp_name }}
+				</span>
+			</p>
+					<p>
+			<label class="title">Notes:</label>
+				{{ form.emp_notes }}
+		</p>
+		<p style="position: relative">
+			<label class="title">Email</label>
+			<span class="pj-form-field-custom pj-form-field-custom-before">
+				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
+				{{ form.email }}
+			</span>
+			<span style="position: absolute; top: 7px; left: 405px">
+				<label><input name="is_subscribed" id="is_subscribed" value="1" type="checkbox">
+				Send email when new booking is made</label>
+			</span>
+		</p>
+		<p>
+			<label class="title">Password</label>
+			<span class="pj-form-field-custom pj-form-field-custom-before">
+				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
+				{{ form.password }}
+			</span>
+		</p>
+		<p style="position: relative">
+			<label class="title">Phone</label>
+			<span class="pj-form-field-custom pj-form-field-custom-before">
+				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
+				{{ form.phone }}
+			</span>
+			<span style="position: absolute; top: 7px; left: 405px">
+				<label><input name="is_subscribed_sms" id="is_subscribed_sms" value="1" type="checkbox"> Send SMS when new booking is made</label>
+			</span>
+		</p>
+		<p>
+			<label class="title">Services</label>
+			<select name="service_id[]" class="pj-form-field" multiple="" style="display: none;">
+				<option value="1">Aromatherapy</option><option value="2">Face Therapies</option><option value="3">Hairstyle</option><option value="4">Makeup</option><option value="5">Massages</option><option value="6">Nails</option>			</select><button type="button" class="ui-multiselect ui-widget ui-state-default ui-corner-all" aria-haspopup="true" style="width: 231px;"><span class="ui-icon ui-icon-triangle-2-n-s"></span><span>Select options</span></button>
+		</p>
+		<p>
+			<label class="title">Status</label>
+			<span class="inline_block">
+				<select name="is_active" id="is_active" class="pj-form-field required valid" aria-required="true" aria-invalid="false">
+					<option value="">-- Choose--</option>
+					<option value="1">Active</option><option value="0">Inactive</option>				</select>
+			</span>
+		</p>
+		<p>
+			<label class="title">Picture</label>
+			<span class="float_left block">
+				<input name="avatar" id="avatar" type="file">
+			</span>
+		</p>
+		<p>
+			<label class="title">&nbsp;</label>
+			<input value="Save" class="pj-button" type="submit">
+			<input value="Cancel" class="pj-button" onclick="javascript.void();" type="button">
+		</p>
+	</form>
+     </div>
+        </div>
+        </div>
+
+    </div>
+    </div>
+
+
+</body>
+</html>
