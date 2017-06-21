@@ -11,6 +11,5 @@ urlpatterns = [
     url(r'^employeelist/$', employees.employee_List, name="employeelist"),
     url(r'^editemployee/(?P<id>\d+)/$', employees.edit_Employee, name="editEmployee"),
     url(r'^getemployees/$', employees.get_Employees, name="getemployees"),
-
-
+    url(r'^listemployeesname/$', employees.employee_List, name="listemployeesname"),
 ]

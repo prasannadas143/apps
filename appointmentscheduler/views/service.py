@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
-from appointmentscheduler.models  import AppschedulerServices
+from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees
 from  appointmentscheduler.form.serviceform import ServiceForm
 from django.http import JsonResponse
 import datetime,pdb,os,json
@@ -75,6 +75,13 @@ def delete_service(request,id):
     aservc.delete()
     return HttpResponseRedirect('/services/showservices/')
 
+@csrf_exempt
+def employee_List(request):
+    employees = AppschedulerEmployees.objects.all()
+    # DON'T USE
+    employeelist = [dict([("name",employee.emp_name), ("id",employee.id)]) for employee in employees ]
+
+    return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
 def instance_to_dict(instance, fields=None, exclude=None):
     """
