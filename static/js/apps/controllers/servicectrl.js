@@ -22,21 +22,26 @@ serviceapp.controller("ServiceCtl",['$scope', '$http','fileUpload',
             data = $scope.servicedata;
             url = $scope.url;
             fileUpload.uploadFileToUrl(file, url, data);
-        }
-    }
+        
+      }
 
       $scope.EmployeeList = null;
             //Declaring the function to load data from database
             $scope.fillEmployeeList = function () {
-                alert("list employees")
+                alert("list employees");
                 $http({
                     method: 'GET',
-                    url: 'services/listemployeesname/',
+                    url: '/services/listemployeesname/',
                     data: {}
-                }).success(function (result) {
-                    $scope.EmployeeList = result.employeelist;
+                }).then(function successCallback(response) {
+                    alert(JSON.stringify( response   ));
+
+                    $scope.EmployeeList = response.data;
+                    alert(JSON.stringify( $scope.EmployeeList ));
+
                 });
-            };
+           }
             //Calling the function to load the data on pageload
-            $scope.fillEmployeeList();
+           $scope.fillEmployeeList();
+    }
 ]);

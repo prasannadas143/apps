@@ -73,10 +73,10 @@ def deleteimage(request,id):
 def delete_service(request,id):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()
-    return HttpResponseRedirect('/services/showservices/')
+    return HttpResponseRedirect('/showservices/')
 
 @csrf_exempt
-def employee_List(request):
+def employee_names(request):
     employees = AppschedulerEmployees.objects.all()
     # DON'T USE
     employeelist = [dict([("name",employee.emp_name), ("id",employee.id)]) for employee in employees ]

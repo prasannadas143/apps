@@ -114,11 +114,23 @@
            <label class="title">Employees</label>
             <span class="inline_block">
                 <select name="employee_id[]" class="pj-form-field" multiple="" ng-model="EmployeeList" 
-                ng-options="employee.id for employee in EmployeeList  track by employee.name">>
+                ng-options="employee.name for employee in EmployeeList  track by employee.id" >
                                 </select><button type="button" class="ui-multiselect ui-widget ui-state-default ui-corner-all" aria-haspopup="true" style="width: 231px;"><span class="ui-icon ui-icon-triangle-2-n-s"></span><span>Select options</span></button>
                 <a href="#" class="pj-form-langbar-tip listing-tip" original-title="Select employee(s) who can do this service."></a>
             </span>
             </p>
+            <p>
+             <div id="list1" class="dropdown-check-list" tabindex="100">
+        <span class="anchor">Select Fruits</span>
+        <ul class="items"  ng-model="EmployeeList">
+                <li ng-repeat="employee in EmployeeList">
+                    <input type="checkbox" />
+                      {{ employee.name }}
+                </li>
+          
+        </ul>
+    </div>
+    </p>
             <p>
             <label class="title">
                     &nbsp;</label>
