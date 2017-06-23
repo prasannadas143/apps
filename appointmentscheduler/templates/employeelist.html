@@ -1,23 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Employee List</title>
-</head>
-<body>
-<table>
-  {% for s in employees %}
-        <tr id="{{ s.id }}">
-             <td>{{s.emp_name}}</td>
-             <td>{{s.emp_notes}}</td>
-              <td>{{s.email}}</td>
-              <td>{{s.phone}}</td>
-              <td>{{s.total}}</td>
-              <td>{{s.is_active}}</td>
-               <td><a href="{% url 'appointmentschduler:editEmployee' s.id %}">Edit </a></td>
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
 
+
+<div>Employee List</div>
+
+<table>
+   <input type="button" onclick="location.href='{% url 'appointmentschduler:addemployee' %}'"  value="Add Employee" />
+   {% for emp in employees %}
+        <tr id="{{ emp.id }}">
+             <td>{{emp.emp_name}}</td>
+             <td>{{emp.emp_notes}}</td>
+              <td>{{emp.email}}</td>
+              <td>{{emp.phone}}</td>
+              <td>{{emp.total}}</td>
+              <td>{{emp.is_active}}</td>
+               <td><a href="{% url 'appointmentschduler:editEmployee' emp.id %}">Edit </a></td>
         </tr>
     {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}
+
