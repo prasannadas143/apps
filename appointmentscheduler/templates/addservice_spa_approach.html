@@ -1,32 +1,21 @@
-﻿{% extends "base.html" %}
-{% load static from staticfiles %}
-{% load admin_urls %}
-{% load bootstrap3 %}
-{% block title %}Dashboard{% endblock %}
-{% block extraHeader %}
-{% endblock %}
-
-{% block content %}
+﻿<html>
+<head>
 
 <script>
-
-$(document).ready(function() {
-    listemployees();
-})
     function listemployees() {
+           alert("employeed id select");
               $.ajax({
                     method:'get',
-                    url:"{% url 'appointmentschduler:listemployeesname'  %}",
+                    url:"{% url 'appointmentschduler:getemployees'  %}",
 
-                    success:function(response){
-                        console.log(response);
-                        employeelist =eval(response);
-                        if (employeelist != null &&  employeelist.length > 0  ){
+                    success:function(data){
+                        employeelist =eval(data.employeelist);
+                        if (employeelist.length > 0  ){
                               for (var i = 0; i <  employeelist.length; i++)
-                                  {
-                                  employeename= "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id + " value=" + employeelist[i].id  + " />" + employeelist[i].name + " </label>";
-                                   $( "#checkboxes" ).append( employeename);
+                              {
+                                $("#employeeid").append( $('option></option>').val( employeelist[i].id ).html( employeelist[i].emp_name ) );
                              }
+                         $("#employeeid").multiselect('fast');
                         }
 
                     }
@@ -35,29 +24,18 @@ $(document).ready(function() {
         }
 
 
-var expanded = false;
-
-function showCheckboxes() {
-  var checkboxes = document.getElementById("checkboxes");
-  if (!expanded) {
-    checkboxes.style.display = "block";
-    expanded = true;
-  } else {
-    checkboxes.style.display = "none";
-    expanded = false;
-  }
-}
 
 
 </script>
-    <link type="text/css" href="{% static 'css/custom.css'  %}" rel="stylesheet" type="text/css" />
-
-
+</head>
+<body>
 
 <span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
-     <form class="form pj-form" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"   action="{% url 'appointmentschduler:addservice' %}" method="post" >
+<div ng-app="ServiceMod">
+     <form ng-controller="ServiceCtl" name="add_service" id="add_service" class="form pj-form" autocomplete="off" enctype="multipart/form-data"
+        novalidate="novalidate"   >
             <label class="title">
                 Service name:</label>
             <span class="inline_block">
@@ -125,28 +103,44 @@ function showCheckboxes() {
 </select>
             </span>
         </p>
-    <p>
-         <div class="multiselect">
-    <div class="selectBox" onclick="showCheckboxes()">
-      <select>
-        <option>Select an option</option>
-      </select>
-      <div class="overSelect"></div>
+        <p>
+           <label class="title">Employees</label>
+            <span class="inline_block">
+                <select name="employee_id[]" class="pj-form-field" multiple="" ng-model="EmployeeList" 
+                ng-options="employee.name for employee in EmployeeList  track by employee.id" >
+                                </select><button type="button" class="ui-multiselect ui-widget ui-state-default ui-corner-all" aria-haspopup="true" style="width: 231px;"><span class="ui-icon ui-icon-triangle-2-n-s"></span><span>Select options</span></button>
+                <a href="#" class="pj-form-langbar-tip listing-tip" original-title="Select employee(s) who can do this service."></a>
+            </span>
+            </p>
+            <p>
+             <div id="list1" class="dropdown-check-list" tabindex="100">
+        <span class="anchor">Select Fruits</span>
+        <ul class="items"  ng-model="EmployeeList">
+                <li ng-repeat="employee in EmployeeList">
+                    <input type="checkbox" />
+                      {{ employee.name }}
+                </li>
+          
+        </ul>
     </div>
-    <div id="checkboxes">
+    </p>
+            <p>
+            <label class="title">
+                    &nbsp;</label>
+              <div class="fieldWrapper">
 
-
-    </div>
-  </div></p>
 
 
             </div>
-            <input  type="submit" value="Submit"   >
+            <input  type="submit" value="Submit" ng-click="submitForm()"  >
         </p>
-        </form>
-{% endblock %}
-
-
+</div>
+</span>
+</p>
+</form>
+</div>
+</body>
+</html>
 
 
 

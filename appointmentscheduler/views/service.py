@@ -3,7 +3,7 @@ from django.shortcuts import  render, render_to_response,HttpResponseRedirect,Ht
 from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees
 from  appointmentscheduler.form.serviceform import ServiceForm
 from django.http import JsonResponse
-import datetime,pdb,os,json
+import datetime,pdb,os,json,re
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
 from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
@@ -33,6 +33,14 @@ def add_service(request):
         form = ServiceForm(request.POST or None, request.FILES or None)
         if form.is_valid():
             form.save()
+            service_instance = form.instance
+            for key, value in request.POST.items():
+                matchobj =  re.match(r'^check\d+', key)
+                if matchobj:
+                    fieldname = matchobj.group()
+                    empid= request.POST[fieldname]
+                    empinstance = AppschedulerEmployees.objects.get(id=int(empid))
+                    service_instance.emp_service.add(empinstance)
             return HttpResponseRedirect('/services/showservices/')
     else:
         form = ServiceForm()
