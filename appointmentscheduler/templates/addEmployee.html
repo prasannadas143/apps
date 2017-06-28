@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 {% load static from staticfiles %}
-<head>
-    <meta charset="UTF-8">
-    <title>Add Employee</title>
-    <link href="{% static "css/admin.css"  %}" rel="stylesheet" type="text/css" />
-    <link href="{% static "css/popup.css"  %}" rel="stylesheet" type="text/css" />
-    <link href="{% static "css/reset.css"  %}" rel="stylesheet" type="text/css" />
-</head>
-<body>
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
 
+{% block content %}
 
 <div id="container">
     <div id="header">
@@ -29,29 +26,30 @@
 			<span class="notice-info">&nbsp;</span>
 			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
 
-         <form  action="{% url 'appointmentschduler:addemployee' %}" method="post"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
+         <form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
 		<input name="employee_create" value="1" type="hidden">
 		<input style="display:none">
 		<input style="display:none" type="password">
 					<p class="pj-multilang-wrap" data-index="1" style="display: ">
 				<label class="title">Employee name:</label>
 				<span class="inline_block">
+                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="employeedata.emp_name" type="text" />
 
-					{{ form.emp_name }}
-				</span>
+            </span>
 			</p>
 					<p>
 			<label class="title">Notes:</label>
-				{{ form.emp_notes }}
+			   <input id="id_emp_notes" maxlength="100" name="emp_notes" ng-model="employeedata.emp_notes" type="text" />
+				
 		</p>
 		<p style="position: relative">
 			<label class="title">Email</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-				{{ form.email }}
+				 <input id="id_email" maxlength="100" name="email" ng-model="employeedata.email" type="text" />
 			</span>
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed" id="is_subscribed" value="1" type="checkbox">
+				<label><input name="is_subscribed" id="is_subscribed"  ng-model="employeedata.is_subscribed" value="1" type="checkbox">
 				Send email when new booking is made</label>
 			</span>
 		</p>
@@ -59,17 +57,17 @@
 			<label class="title">Password</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
-				{{ form.password }}
+				 <input id="id_password" maxlength="100" name="password" ng-model="employeedata.password" type="text" />
 			</span>
 		</p>
 		<p style="position: relative">
 			<label class="title">Phone</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
-				{{ form.phone }}
+				 <input id="id_phone" maxlength="100" name="phone" ng-model="employeedata.phone" type="text" />
 			</span>
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed_sms" id="is_subscribed_sms" value="1" type="checkbox"> Send SMS when new booking is made</label>
+				<label><input name="is_subscribed_sms" id="is_subscribed_sms"  ng-model="employeedata.is_subscribed_sms" value="1" type="checkbox"> Send SMS when new booking is made</label>
 			</span>
 		</p>
 		<p>
@@ -80,21 +78,22 @@
 		<p>
 			<label class="title">Status</label>
 			<span class="inline_block">
-				<select name="is_active" id="is_active" class="pj-form-field required valid" aria-required="true" aria-invalid="false">
+				<select name="is_active" id="is_active" class="pj-form-field required valid" ng-model="employeedata.is_active" aria-required="true" aria-invalid="false">
 					<option value="">-- Choose--</option>
 					<option value="1">Active</option><option value="0">Inactive</option>				</select>
+					 <input id="id_is_active" maxlength="100" name="is_active" ng-model="employeedata.is_active" value="1" type="checkbox" />
 			</span>
 		</p>
 		<p>
 			<label class="title">Picture</label>
 			<span class="float_left block">
-				<input name="avatar" id="avatar" type="file">
+				 <input id="avatar" name="avatar" file-model="avatar" type="file"  />
 			</span>
 		</p>
 		<p>
 			<label class="title">&nbsp;</label>
-			<input value="Save" class="pj-button" type="submit">
-			<input value="Cancel" class="pj-button" onclick="javascript.void();" type="button">
+			<input value="Save" ng-click="submitForm()"  class="pj-button" type="submit">
+			<input value="Cancel" ng-click="CancelForm()"  class="pj-button" type="button">
 		</p>
 	</form>
      </div>
@@ -105,5 +104,5 @@
     </div>
 
 
-</body>
-</html>
+{% endblock %}
+

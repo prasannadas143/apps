@@ -1,4 +1,4 @@
-serviceapp.service('fileUpload', ['$http', function ($http) {
+serviceapp.service('fileUpload', ['$http','$q', function ($http,$q) {
         this.uploadFileToUrl = function(file, uploadUrl,data){
            var fd = new FormData();
            fd.append('file', file);
