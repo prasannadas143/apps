@@ -1,20 +1,10 @@
 
-serviceapp.controller("ServiceCtl",['$scope', '$http','fileUpload',
+serviceapp.controller("ServiceCtl",['$scope', '$http','$compile','fileUpload',
     function($scope,$http,fileUpload) {
         $scope.method = 'POST';
         $scope.url = '/services/addservice/';
 
-        $scope.servicedata = { service_name: "",
-                        service_desc: "",
-                        service_img: "",
-                        price: "",
-                        length: "",
-                        before: "",
-                        after: "",
-                        total: "",
-                        is_active: "",
-                        emp_service: ""
-        }
+   
      
         $scope.submitForm = function() {
             alert(JSON.stringify($scope.servicedata ));
@@ -25,10 +15,11 @@ serviceapp.controller("ServiceCtl",['$scope', '$http','fileUpload',
         
       }
 
-      $scope.EmployeeList = null;
             //Declaring the function to load data from database
-            $scope.fillEmployeeList = function () {
-                alert("list employees");
+            $scope.fillEmployeeList = function (employeename) {
+                alert("list of employees");
+              
+                                            
                 $http({
                     method: 'GET',
                     url: '/services/listemployeesname/',
@@ -36,12 +27,31 @@ serviceapp.controller("ServiceCtl",['$scope', '$http','fileUpload',
                 }).then(function successCallback(response) {
                     alert(JSON.stringify( response   ));
 
-                    $scope.EmployeeList = response.data;
-                    alert(JSON.stringify( $scope.EmployeeList ));
+                                                alert("employees list showed");
+
+                    $scope.employeelist = response.data;
+                    alert(JSON.stringify( $scope.employeelist));
+                    // alert(employeelist.length);
+                    // $scope.employeename="";
+
+                    // if (employeelist != null &&  employeelist.length > 0  ){
+                    //         alert("employees list");
+                    //           for (var i = 0; i <  employeelist.length; i++)
+                    //           {
+                    //               $scope.employeename += "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id  + ' ng-model=' + "servicedata.check".concat(employeelist[i].id.toString()) +       " value=" + employeelist[i].id + " />" + employeelist[i].name + " </label>";
+                                   
+                    //          }
+                             
+                    //         // var templateEl = angular.element($scope.employeename);
+                            // //Now compile the template with scope $scope
+                            // $compile(templateEl)($scope);
+                            // angular.element('#checkboxes').append(templateEL);
+                       //Let's say you have element with id 'foo' in which you want to create a button
+                    //}
 
                 });
            }
             //Calling the function to load the data on pageload
-           $scope.fillEmployeeList();
+           // $scope.fillEmployeeList();
     }
 ]);

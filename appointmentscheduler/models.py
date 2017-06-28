@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-import pdb
+import re,pdb
 
 class AppschedulerBookings(models.Model):
     uuid = models.CharField(unique=True, max_length=12, blank=True, null=True)
@@ -167,8 +167,8 @@ class AppschedulerRoles(models.Model):
 
 
 def service_img_location(instance, filename):
-    return "%s/%s/%s" %( "service" , instance.service_name, filename)
-
+    imagepath = "%s/%s/%s" %( "service" , instance.service_name, filename)
+    return re.sub('\s+','',imagepath)
 
 class AppschedulerServices(models.Model):
     PRIORITY_CHOICES = ((True, 'active'),

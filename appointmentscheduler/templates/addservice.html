@@ -11,28 +11,11 @@
 <script>
 
 $(document).ready(function() {
-    listemployees();
-})
-    function listemployees() {
-              $.ajax({
-                    method:'get',
-                    url:"{% url 'appointmentschduler:listemployeesname'  %}",
+  // Handler for .ready() called.
+  listemployees() ;
 
-                    success:function(response){
-                        console.log(response);
-                        employeelist =eval(response);
-                        if (employeelist != null &&  employeelist.length > 0  ){
-                              for (var i = 0; i <  employeelist.length; i++)
-                                  {
-                                  employeename= "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id + " value=" + employeelist[i].id  + " />" + employeelist[i].name + " </label>";
-                                   $( "#checkboxes" ).append( employeename);
-                             }
-                        }
-
-                    }
-              });
-
-        }
+  
+});
 
 
 var expanded = false;
@@ -49,6 +32,30 @@ function showCheckboxes() {
 }
 
 
+function listemployees() {
+
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:listemployeesname'  %}",
+
+            success:function(response){
+                // console.log(response);
+                employeelist =eval(response);
+                var employeename ="";
+                if (employeelist != null &&  employeelist.length > 0  ){
+                      for (var i = 0; i <  employeelist.length; i++)
+                      {
+                          employeename+= "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id  + ' ng-model=' + "servicedata.check" + employeelist[i].id.toString() +       " value=" + employeelist[i].id + " />" + employeelist[i].name + " </label>";
+                      }
+                      $( "#checkboxes" ).append( employeename);
+
+                }
+
+            }
+      });
+  }
+        
+
 </script>
     <link type="text/css" href="{% static 'css/custom.css'  %}" rel="stylesheet" type="text/css" />
 
@@ -57,11 +64,12 @@ function showCheckboxes() {
 <span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
-     <form class="form pj-form" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"   action="{% url 'appointmentschduler:addservice' %}" method="post" >
+    <div ng-app="ServiceMod">
+     <form class="form pj-form"  ng-controller="ServiceCtl"autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
             <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name" ng-model="servicedata.service_name" type="text" />
+                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" />
 
             </span>
         </p>
@@ -69,7 +77,7 @@ function showCheckboxes() {
             <label class="title">
                 Service description:</label>
             <span class="inline_block">
-                   <input id="id_service_desc" maxlength="100" name="service_desc" ng-model="servicedata.service_desc" type="text" />
+                   <input id="id_service_desc" maxlength="100" name="service_desc" type="text" />
             </span>
         </p>
         <p>
@@ -83,35 +91,38 @@ function showCheckboxes() {
             <label class="title">
                 Image</label>
             <span class="inline_block">
-            <input id="id_service_img" name="service_img" file-model="service_img" type="file"  />
+              <input id="id_service_img" name="service_img" file-model="service_img" type="file"   />
             </span>
         </p>
         <p>
             <label class="title">
                 Length (minutes)</label>
             <span class="inline_block">
-                 <input id="id_length" name="length" ng-model="servicedata.length" type="number" required />
+                 <input id="length" name="length" type="number" ng-model="length" required />
             </span>
         </p>
         <p>
             <label class="title">
                 Before (minutes)</label>
             <span>
-                <input id="id_before" name="before" ng-model="servicedata.before" type="number" required />
+                <input id="before" name="before" type="number" ng-model="before"  required />
             </span>
         </p>
         <p>
             <label class="title">
                 After (minutes)</label>
             <span>
-                          <input id="id_after" name="after" ng-model="servicedata.after" type="number" required />
-
+                          <input id="after" name="after" type="number" ng-model="after"  required />
+             </span>             
         </p>
         <p>
             <label class="title">
                 Total (minutes)
             </label>
-                 <span class="inline_block">
+                 <span class="inline_block"  id="total">
+                    {% verbatim %}
+                        {{ length + before + after}}
+                    {% endverbatim %}
 
                  </span>
         </p>
@@ -119,31 +130,37 @@ function showCheckboxes() {
             <label class="title">
                 Status</label>
             <span class="inline_block">
-                  <select id="id_is_active" name="is_active" ng-model="servicedata.is_active">
-<option value="True" selected="selected">active</option>
-<option value="False">inactive</option>
-</select>
+              <select id="id_is_active" name="is_active" >
+                  <option value="True" selected="selected">active</option>
+                  <option value="False">inactive</option>
+              </select>
             </span>
         </p>
     <p>
-         <div class="multiselect">
-    <div class="selectBox" onclick="showCheckboxes()">
-      <select>
-        <option>Select an option</option>
-      </select>
-      <div class="overSelect"></div>
-    </div>
-    <div id="checkboxes">
-
-
-    </div>
-  </div></p>
-
-
+      <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes()" >
+            <select>
+              <option>Select an option</option>
+            </select>
+            <div class="overSelect">
+              
             </div>
-            <input  type="submit" value="Submit"   >
-        </p>
-        </form>
+        </div>
+        <div id="checkboxes"  >
+        </div>
+    </div>
+    </p>
+    <p>
+      <div>
+        <input  type="submit" value="Submit"   >
+      </div>
+   </p>
+   </form>
+   </div>
+   
+
+
+    
 {% endblock %}
 
 

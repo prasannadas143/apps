@@ -62,26 +62,34 @@ def edit_service(request,id):
             if ( 'photoname' in request.FILES and request.FILES['photoname'] is not None):
                 # imagepath = appscheduleobj.service_img.file.name
                 if appscheduleobj.service_img.name != defaultimg:
-                    os.remove(appscheduleobj.service_img.path)
+                    os.remove(os.path.dirname(appscheduleobj.service_img.path))
                 appscheduleobj.service_img=request.FILES['photoname']
                 appscheduleobj.save()
-
 
             post.save()
             # os.remove(imagepath)
             return HttpResponseRedirect('/services/showservices/')
     else :
         form = ServiceForm( instance=appscheduleobj )
-    return render_to_response(template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
+        emp_service= appscheduleobj.emp_service.all()
+        return render_to_response(template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
 
 def deleteimage(request,id):
     #Implemented with angula js
-    pass
+    appscheduleobj=AppschedulerServices.objects.get(id=id)
+    defaultimg =  appscheduleobj.__class__._meta.get_field('service_img').default
+    oldimage =appscheduleobj.service_img.name
+    oldimagepath=  os.path.dirname(appscheduleobj.service_img.path)
+
+    appscheduleobj.service_img = defaultimg   
+    if oldimage!= defaultimg:
+        os.remove( oldimagepath )
+    return  HttpResponse(json.dumps(defaultimg), content_type='application/json')
 
 def delete_service(request,id):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()
-    return HttpResponseRedirect('/showservices/')
+    return HttpResponseRedirect('/services/showservices/')
 
 @csrf_exempt
 def employee_names(request):
@@ -91,13 +99,28 @@ def employee_names(request):
 
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
+@csrf_exempt
+def associated_employee_names(request,id):
+    employees = AppschedulerEmployees.objects.all()
+    # DON'T USE
+    employeelist = []
+    appscheduleobj = AppschedulerServices.objects.get(id=id)
+    emp_service= appscheduleobj.emp_service.all()
+    for employee in employees  :
+        employee_info = dict([("name",employee.emp_name), ("id",employee.id)]) 
+        for empl_in_service in emp_service:
+            if empl_in_service.id == employee.id :
+                employee_info['checked'] = True
+        employeelist.append(employee_info)
+    return HttpResponse(json.dumps(employeelist), content_type='application/json')
+
 def instance_to_dict(instance, fields=None, exclude=None):
     """
     Returns convert a model to a  dictionary
 
     """
     data = {}
-
+    
     for field in instance._meta.fields:
         if fields and field.name not in fields:
             continue

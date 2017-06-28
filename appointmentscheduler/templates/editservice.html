@@ -1,41 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-  <form action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}" method="post" enctype="multipart/form-data">
+{% extends "base.html" %}
+{% load static from staticfiles %}
+
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<script>
+
+$(document).ready(function() {
+  // Handler for .ready() called.
+  assiosiated_employees({{ appscheduleinst.id }});
+});
+
+
+var expanded = false;
+
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+  }
+}
+
+
+function assiosiated_employees(serviceid) {
+    alert(serviceid);
+    $.ajax({
+            method:'get',
+            url:"/services/associated_employee_names/" + serviceid,
+            data: { },
+            dataType: "json",
+            success:function(response){
+                console.log(response);
+                employeelist =eval(response);
+
+                var employeename ="";
+                if (employeelist != null &&  employeelist.length > 0  ){
+                      for (var i = 0; i <  employeelist.length; i++)
+                      {
+                          checked="";
+                          if (employeelist[i].checked) {
+                                 checked = "checked" ;
+                           }
+                            employeename+= "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id  + ' ng-model=' + "servicedata.check" + employeelist[i].id.toString() +       " value=" + employeelist[i].id + " " + checked + " />" + employeelist[i].name + " </label>";
+                        
+                      }
+                      $( "#checkboxes" ).append( employeename);
+
+                }
+
+            }
+      });
+  }
+        
+function delete_image(serviceid) {
+    $.ajax({
+            method:'get',
+            url:"/services/deleteimage/" + serviceid,
+            data: { },
+            async:false,
+            success:function(response){
+                console.log(response);
+                var pic = document.getElementById('service_img');
+                pic.src = response
+            },
+             error: function(xhr, status, error){
+             var err = eval("(" + xhr.responseText + ")");
+             }
+    });  
+
+}
+
+
+</script>
+
+    <link type="text/css" href="{% static 'css/custom.css'  %}" rel="stylesheet" type="text/css" />
+<span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
+<span  class="block">Fill in the form below to add a new service. You can add title, description,
+    price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
+    <div ng-app="ServiceMod">
+
+  <form ng-controller="ServiceCtl" action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}" method="post" enctype="multipart/form-data">
 
       {% csrf_token %}
 
-    {% for field in form %}
-      {% if field.name == "service_img" %}
+          <label class="title">
+                Service name:</label>
+            <span class="inline_block">
+                   <input id="id_service_name" maxlength="100" name="service_name" type="text" value="{{ appscheduleinst.service_name }}" />
+
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Service description:</label>
+            <span class="inline_block">
+                   <input id="id_service_desc" maxlength="100" name="service_desc"  type="text" value="{{ appscheduleinst.service_desc }}" />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Price</label>
+                <span class="inline_block">
+                    <input id="id_price" name="price"  step="0.01" type="number"          
+                    value="{{ appscheduleinst.price }}" required />
+                </span>
+        </p>
+        <p>
+            <label class="title">
+                Image</label>
            <div class="fieldWrapper">
-               <img src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
-                <p><label for="id_photo">service image</label>
+                 <img id="service_img" src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
+                  <p><label for="id_photo">service image</label>
                 </a> <br> <input type="file" name="photoname" id="id_photo"></p>
                 {% if appscheduleinst.service_img.name != defaultimg %}
-                        <button onclick="location.href={% url 'appointmentschduler:delete_service_image' appscheduleinst.id %};">Delete image</button>
+                        <button onclick="delete_image( {{  appscheduleinst.id }} )">Delete image</button>
                 {% endif %}
 
                </div>
 
-      {% else %}
-        <div class="fieldWrapper">
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field }}
+        </p>
+        <p>
+            <label class="title">
+                Length (minutes)</label>
+              <span class="inline_block">
+                 <input id="length" name="length" type="number"  
+                 value="{{ appscheduleinst.length }}" ng-model="length" ng-init="length={{ appscheduleinst.length }}" required />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                Before (minutes)</label>
+            <span>
+                <input id="before" name="before"  type="number"   
+                value="{{ appscheduleinst.before }}" ng-init="before={{ appscheduleinst.before }}" required />
+            </span>
+        </p>
+        <p>
+            <label class="title">
+                After (minutes)</label>
+            <span>
+                          <input id="id_after" name="after" type="number" 
+                          value="{{ appscheduleinst.after }}"  ng-init="after={{ appscheduleinst.after }}"  required />
+             </span>             
+        </p>
+        <p>
+            <label class="title">
+                Total (minutes)
+            </label>
+                 <span class="inline_block">
+                    <p>    {% verbatim %}
+                              {{ length + before + after}}
+                            {% endverbatim %}
+                   </p>
+                 </span>
+        </p>
+        <p>
+            <label class="title">
+                Status</label>
+            <span class="inline_block">
+              <select id="id_is_active" name="is_active" >
+                  <option value="True" >active</option>
+                  <option value="False">inactive</option>
+              </select>
+            </span>
+        </p>
+    <p>
+      <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes()" >
+            <select>
+              <option>Select an option</option>
+            </select>
+            <div class="overSelect">
+              
+            </div>
+        </div>
+        <div id="checkboxes"   >
 
         </div>
-
-      {% endif %}
-   {% endfor %}
-        <div class="fieldWrapper">
-          <input type="text" name="firstname" value='{{ appscheduleinst.total }}'>
-        </div>
-        <input type="submit" value="submit" >
-
+    </div>
+    </p>
+    <p>
+      <div>
+        <input  type="submit" value="Submit"   >
+      </div>
+   </p>
   </form>
 
-</body>
-</html>
+</div>
+
+{% endblock %}
