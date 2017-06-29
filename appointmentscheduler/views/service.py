@@ -86,9 +86,18 @@ def deleteimage(request,id):
         os.remove( oldimagepath )
     return  HttpResponse(json.dumps(defaultimg), content_type='application/json')
 
-def delete_service(request,id):
+def delete_service(request,id=None):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()
+    return HttpResponseRedirect('/services/showservices/')
+
+@csrf_exempt
+def delete_services(request):
+
+    deleteids= dict( request.POST)['checked']
+    for id in deleteids:
+        aservc=AppschedulerServices.objects.get(id=id)
+        aservc.delete()
     return HttpResponseRedirect('/services/showservices/')
 
 @csrf_exempt

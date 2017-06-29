@@ -87,9 +87,6 @@ class AppschedulerDates(models.Model):
         unique_together = (('foreign_id', 'type', 'date'),)
 
 
-def employee_img_location(instance, filename):
-    return "%s/%s/%s" %( "Employees" , instance.emp_name, filename)
-
 class AppschedulerEmployees(models.Model):
     emp_name = models.CharField(max_length=255, blank=False, null=False)
     emp_notes = models.TextField(blank=False, null=False)
@@ -97,11 +94,11 @@ class AppschedulerEmployees(models.Model):
     password = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    avatar = models.ImageField(upload_to = employee_img_location, default = 'service/no-img.jpg')
+    avatar = models.CharField(max_length=255, blank=True, null=True)
     last_login = models.DateTimeField(blank=True, null=True)
-    is_subscribed = models.BooleanField(default=False)
-    is_subscribed_sms = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_subscribed = models.IntegerField(blank=True, null=True)
+    is_subscribed_sms = models.IntegerField(blank=True, null=True)
+    is_active = models.IntegerField(blank=True, null=True)
 
     class Meta:
         # managed = False
@@ -195,8 +192,11 @@ class AppschedulerServices(models.Model):
         setattr(self,"_total" , int(self.length + self.after + self.before))
         return self._total
 
+    def employee_count_in_service(self):
+        return self.emp_service.count() 
 
-    total = property( get_total)
+    total = property( get_total )
+    emp_count = property( employee_count_in_service )
 
 
 

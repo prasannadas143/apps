@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^addemployee/$', employees.add_Employee, name="addemployee"),
 	url(r'^deleteimage/(?P<id>\d+)/$', service.deleteimage, name="delete_service_image"),
     url(r'^deleteservice/(?P<id>\d+)/$', service.delete_service, name="delete_service"),
+    url(r'^deleteservices/$', service.delete_services, name="delete_services"),
     url(r'^employeelist/$', employees.employee_List, name="employeelist"),
     url(r'^editemployee/(?P<id>\d+)/$', employees.edit_Employee, name="editEmployee"),
     url(r'^getemployees/$', employees.get_Employees, name="getemployees"),

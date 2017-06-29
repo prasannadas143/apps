@@ -7,11 +7,15 @@
 {% endblock %}
 {% block content %} 
 
-<table>
+<table  "table table-bordered">
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
-   {% for s in services %}
+<form action="{% url 'appointmentschduler:delete_services' %}"  method="post">
+
+   {% for s in services.object_list %}
         <tr id="{{ s.id }}">
+              <td><input type="checkbox"  id="{{ s.id }}" name='checked' value="{{ s.id }}"></td>
               <td>{{s.service_name}}</td>
+              <td> {{ s.emp_count }}</td>
               <td>{{s.price}}</td>
               <td>{{s.before}}</td>
               <td>{{s.after}}</td>
@@ -19,9 +23,32 @@
               <td>{{s.is_active}}</td>
               <td><a href="{% url 'appointmentschduler:edit_service' s.id %}">Edit</a></td>
               <td><a href="{% url 'appointmentschduler:delete_service' s.id %}">Delete</a></td>
+                    {% csrf_token %}
+
+                  <input type="hidden" name="item_id" value="{{s.id}}" />
 
         </tr>
     {% endfor %}
 </table>
+<div class="pagination">
+      <ul>
+          {% if services.has_previous %}
+              <li><a href="?page={{ posts.previous_page_number }}">Previous</a></li>
+          {% endif %}
+          {% for pg in services.paginator.page_range %}
+              {% if services.number == pg %}
+                  <li class="active"><a href="?page={{ pg }}">{{ pg }}</a></li>
+              {% else %}
+                  <li><a href="?page={{ pg }}">{{ pg }}</a></li>
+              {% endif %}
+          {% endfor %}
+          {% if services.has_next %}
+              <li><a href="?page={{ posts.next_page_number }}">Next</a></li>
+          {% endif %}
+      </ul>
+    </div>
+    <button type="submit"   >Delete </button>
+
+</form>
 {% endblock %}
 
