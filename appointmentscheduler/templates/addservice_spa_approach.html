@@ -3,7 +3,6 @@
 
 <script>
     function listemployees() {
-           alert("employeed id select");
               $.ajax({
                     method:'get',
                     url:"{% url 'appointmentschduler:getemployees'  %}",
@@ -17,17 +16,12 @@
                              }
                          $("#employeeid").multiselect('fast');
                         }
-
                     }
               });
-
         }
-
-
-
-
 </script>
 </head>
+
 <body>
 
 <span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
@@ -141,7 +135,4 @@
 </div>
 </body>
 </html>
-
-
-
 {

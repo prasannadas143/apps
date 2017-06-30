@@ -1,34 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 {% load static from staticfiles %}
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Employee</title>
-    <link href="{% static "css/admin.css"  %}" rel="stylesheet" type="text/css" />
-    <link href="{% static "css/popup.css"  %}" rel="stylesheet" type="text/css" />
-    <link href="{% static "css/reset.css"  %}" rel="stylesheet" type="text/css" />
-</head>
-<body>
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+
+
+<script>
+
+$(document).ready(function() {
+  // Handler for .ready() called.
+  listServices() ;
+  
+});
+
+var expanded = false;
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+  }
+}
+
+
+function listServices() {
+
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:listServicesName'  %}",
+
+            success:function(response){
+                // console.log(response);
+                servicelist =eval(response);
+                var serviceName ="";
+                if (servicelist != null &&  servicelist.length > 0  ){
+                      for (var i = 0; i <  servicelist.length; i++)
+                      {
+                          serviceName+= "<label for=" + servicelist[i].name +  ' > <input type="checkbox" name=' + "check" + servicelist[i].id  + ' ng-model=' + "servicedata.check" + servicelist[i].id.toString() +       " value=" + servicelist[i].id + " />" + servicelist[i].name + " </label>";
+                      }
+                      $( "#checkboxes" ).append( serviceName);
+
+                }
+
+            }
+      });
+  }
+        
+
+</script>
 
 <div id="container">
-    <div id="header">
+	
+	<div id="header">
         <div id="logo">
             <a href="javascript:void();" target="_blank" rel="nofollow">
                 365 Plateform</a> <span>v1.0</span>
         </div>
     </div>
-    <div id="middle">
 
+<div id="middle">
+  <div id="right">
 
-        <div id="right">
-        <div class="PPPcontent-top">
-
-            <div class="content-middle" id="content">
-            <div class="notice-box">
-			<span class="notice-info">&nbsp;</span>
-			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
-
-         <form  action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
+<form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post" id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
 		<input name="employee_create" value="1" type="hidden">
 		<input style="display:none">
 		<input style="display:none" type="password">
@@ -36,21 +76,25 @@
 				<label class="title">Employee name:</label>
 				<span class="inline_block">
 
-					{{ form.emp_name }}
-				</span>
+				  <input id="id_emp_name" maxlength="100" name="emp_name"  type="text"  value="{{ appscheduleinst.emp_name }}" required="" />
+
+            </span>
 			</p>
 					<p>
 			<label class="title">Notes:</label>
-				{{ form.emp_notes }}
+			  <input id="id_emp_notes" maxlength="100" name="emp_notes"  type="text" value="{{ appscheduleinst.emp_notes }}" />
+				
 		</p>
 		<p style="position: relative">
 			<label class="title">Email</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-				{{ form.email }}
+				 <input id="id_email" maxlength="600" name="email"  type="text" value="{{ appscheduleinst.email }}" required="" />
 			</span>
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed" id="is_subscribed" value="1" type="checkbox">
+				<label>
+<input id="is_subscribed" maxlength="600" name="is_subscribed"  type="checkbox" value="{{ appscheduleinst.is_subscribed }}" required="" />
+
 				Send email when new booking is made</label>
 			</span>
 		</p>
@@ -58,53 +102,69 @@
 			<label class="title">Password</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
-				{{ form.password }}
+				<input id="id_password" maxlength="10" name="password"  type="password" value="{{ appscheduleinst.password }}" required="" />
 			</span>
 		</p>
 		<p style="position: relative">
 			<label class="title">Phone</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
-				{{ form.phone }}
+				<input id="id_phone" maxlength="600" name="phone"  type="text" value="{{ appscheduleinst.phone }}" required="" />
 			</span>
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed_sms" id="is_subscribed_sms" value="1" type="checkbox"> Send SMS when new booking is made</label>
+				<label>
+<input id="is_subscribed_sms" maxlength="600" name="is_subscribed_sms"  type="checkbox" value="{{ appscheduleinst.is_subscribed_sms }}" required="" />
+				Send SMS when new booking is made</label>
 			</span>
 		</p>
 		<p>
 			<label class="title">Services</label>
-			<select name="service_id[]" class="pj-form-field" multiple="" style="display: none;">
-				<option value="1">Aromatherapy</option><option value="2">Face Therapies</option><option value="3">Hairstyle</option><option value="4">Makeup</option><option value="5">Massages</option><option value="6">Nails</option>			</select><button type="button" class="ui-multiselect ui-widget ui-state-default ui-corner-all" aria-haspopup="true" style="width: 231px;"><span class="ui-icon ui-icon-triangle-2-n-s"></span><span>Select options</span></button>
+			  <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes()" >
+            <select>
+              <option>Select an option</option>
+            </select>
+            <div class="overSelect">
+              
+            </div>
+        </div>
+        <div id="checkboxes"  >
+        </div>
+    </div>
 		</p>
 		<p>
 			<label class="title">Status</label>
 			<span class="inline_block">
-				<select name="is_active" id="is_active" class="pj-form-field required valid" aria-required="true" aria-invalid="false">
+				<select name="is_active" id="is_active" class="pj-form-field required valid" ng-model="employeedata.is_active" aria-required="true" aria-invalid="false">
 					<option value="">-- Choose--</option>
 					<option value="1">Active</option><option value="0">Inactive</option>				</select>
+					 <input id="id_is_active" maxlength="100" name="is_active" ng-model="employeedata.is_active" value="1" type="checkbox" />
 			</span>
 		</p>
+
+
 		<p>
 			<label class="title">Picture</label>
 			<span class="float_left block">
-				<input name="avatar" id="avatar" type="file">
+				 <input id="avatar" name="avatar" type="file"  />
+
 			</span>
 		</p>
 		<p>
 			<label class="title">&nbsp;</label>
-			<input value="Update" class="pj-button" type="submit">
-			<input value="Cancel" class="pj-button" onclick="javascript.void();" type="button">
+			<input value="Save" class="pj-button" type="submit">
+			<input value="Cancel" ng-click="CancelForm()"  class="pj-button" type="button">
 		</p>
 	</form>
-     </div>
-        </div>
-        </div>
+ 
 
-    </div>
-    </div>
+  </div>
+</div>
 
 
+</div>
 
 
-</body>
-</html>
+{% endblock %}
+
+

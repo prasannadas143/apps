@@ -18,13 +18,22 @@ serviceapp.controller("EmployeeCtrl",['$scope', '$http','fileUpload',
         }
      
         $scope.submitForm = function() {
-        console.log(JSON.stringify($scope.employeedata ))
             var file = $scope.avatar;
             data = $scope.employeedata;
             url = $scope.url;
             fileUpload.uploadFileToUrl(file, url, data);
             window.location.href = '/services/employeelist/';
-        }  
+        }
+
+          $scope.UpdateForm = function() {
+            alert("UpdateForm");
+            retun ;
+            var file = $scope.avatar;
+            data = $scope.employeedata;
+            url = $scope.url;
+            fileUpload.uploadFileToUrl(file, url, data);
+            window.location.href = '/services/employeelist/';
+        }
 
          $scope.CancelForm = function() {
             window.location.href = '/services/employeelist/';
