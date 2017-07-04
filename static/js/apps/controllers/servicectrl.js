@@ -2,9 +2,21 @@
 serviceapp.controller("ServiceCtl",['$scope', '$http','$compile','fileUpload',
     function($scope,$http,fileUpload) {
         $scope.method = 'POST';
-        $scope.url = '/services/addservice/';
+        $scope.url = '/services/getservices/';
+        
+        var successCallback = function(response) {
+            $scope.services = response.data ;
+            console.log( $scope.services);
+        }
 
-   
+        var errorCallBack = function(response) {
+            $scope.error = response.data ;            
+        }
+         $http({
+            method: 'GET',
+            url: $scope.url
+        }).then(successCallback, errorCallBack);
+
      
         $scope.submitForm = function() {
             alert(JSON.stringify($scope.servicedata ));

@@ -1,8 +1,12 @@
 from django.conf.urls import url
 
 from .views import service,employees
+from .api.views  import ServicesListView
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
+        url(r'^getservices/$', service.get_services_info, name="getservices"),
+
+    
     url(r'addservice/$', service.add_service , name="addservice"),
     url(r'^editservice/(?P<id>\d+)/$', service.edit_service, name="edit_service"),
     url(r'^addemployee/$', employees.add_Employee, name="addemployee"),

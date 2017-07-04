@@ -16,15 +16,48 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.files import File
 from base64 import decodestring
+from django.utils.safestring import mark_safe
 
 
 
 @csrf_exempt
 def show_services(request):
-    services = AppschedulerServices.objects.all()
     # DON'T USE
+    # for sevice in services:
+    #     service_json = instance_to_dict(services)
+    #     services_json.append( service_json )
     template_name="showservices.html"
-    return render_to_response(template_name, {'services': services})
+    # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
+    services = AppschedulerServices.objects.all()
+
+    services_info=[]
+    for service in services:
+        data=dict()
+        data['id'] = service.pk
+        data['service_name'] = service.service_name
+        data['price'] = float(service.price)
+        data['length'] = service.length
+        data['is_active'] = service.is_active
+        services_info.append(data)
+    
+    # pdb.set_trace()
+    return render_to_response(template_name, { "services" : json.dumps(services_info) } )   
+
+def get_services_info(request):
+    services = AppschedulerServices.objects.all()
+
+    jsondata=[]
+    for service in services:
+        data=dict()
+        data['id'] = service.pk
+        data['service_name'] = service.service_name
+        data['price'] = float(service.price)
+        data['length'] = service.length
+        data['is_active'] = service.is_active
+        jsondata.append(data)
+    services_json = json.dumps( jsondata)
+
+    return JsonResponse( services_json , safe=False)
 
 @csrf_exempt
 def add_service(request):

@@ -1,0 +1,25 @@
+
+<form ng-controller="ServiceCtl" method="post"  >
+<table>
+
+        <tr   ng-repeat="service in services">
+              <td><input type="checkbox"  id= "{{ service.id }}" name='checked' value="{{ service.id }}"></td>
+              <td> {{service.service_name }} </td>
+              <td> {{ service.price}} </td>
+              <td> {{ service.before}} </td>
+              <td> {{ service.after}} </td>
+              <td> {{ service.total}} </td>
+              <td> {{ service.is_active}} </td>
+              <td><a ng-href="/services/editservice/{{ service.id }}" >Edit</a></td>
+              <td><a ng-href="/services/deleteservice/{{ service.id }}" >Delete</a></td>
+                  
+
+                  <input type="hidden" name="item_id" value="{{ service.id}}" />
+
+        </tr>
+    </table>
+
+<button type="submit" ng-href="/services/deleteservice/{{ service.pk }}"  >Delete </button>
+
+
+</form>
