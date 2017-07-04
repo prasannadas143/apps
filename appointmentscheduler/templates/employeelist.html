@@ -10,19 +10,44 @@
 
 <div>Employee List</div>
 
-<table>
+<div>
+
+<table style="width: 100%;">
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addemployee' %}'"  value="Add Employee" />
+
+   <tr>
+     <th  style="text-align:left;">Emp Name</th>
+       <th  style="text-align:left;">Image</th>
+      <th style="text-align: left;">Emp Notes</th>
+      <th style="text-align: left;">Email</th>
+      <th  style="text-align: left;">Phone</th>
+      <th  style="text-align: left;">Is Active</th>
+      <th style="text-align: left;">Actions</th>
+   </tr>
+
    {% for emp in employees %}
-        <tr id="{{ emp.id }}">
+            <tr id="{{ emp.id }}">
              <td>{{emp.emp_name}}</td>
-             <td>{{emp.emp_notes}}</td>
-              <td>{{emp.email}}</td>
+               <td>  <img height="50" width="50" src="/media/{{emp.avatar}} "></td>
+             <td style="width:300px;">{{emp.emp_notes}}</td>
+             <td>{{emp.email}}</td>
               <td>{{emp.phone}}</td>
-              <td>{{emp.total}}</td>
               <td>{{emp.is_active}}</td>
-               <td><a href="{% url 'appointmentschduler:editEmployee' emp.id %}">Edit </a></td>
+               <td><a href="{% url 'appointmentschduler:editEmployee' emp.id %}">Edit </a>|
+                   <a href="{% url 'appointmentschduler:deleteEmployee' emp.id %}">Delete </a>|
+                  <a href="{% url 'appointmentschduler:addemployee'%}">Add Employee
+                   </td>
         </tr>
     {% endfor %}
 </table>
+
+</div>
+
 {% endblock %}
 
+<style type="text/css">
+  .text-align{
+    text-align: left;
+  }
+
+</style>
