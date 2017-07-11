@@ -83,7 +83,7 @@ function delete_image(serviceid) {
 </script>
 
     <link type="text/css" href="{% static 'css/custom.css'  %}" rel="stylesheet" type="text/css" />
-<span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
+<span class="notice-info">&nbsp;</span> <span class="block bold">Edit service</span>
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
@@ -95,7 +95,7 @@ function delete_image(serviceid) {
           <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name" type="text" value="{{ appscheduleinst.service_name }}" />
+                   <input id="id_service_name" maxlength="100" name="service_name" type="text" value="{{ appscheduleinst.service_name|safe }}" />
 
             </span>
         </p>
@@ -103,7 +103,7 @@ function delete_image(serviceid) {
             <label class="title">
                 Service description:</label>
             <span class="inline_block">
-                   <input id="id_service_desc" maxlength="100" name="service_desc"  type="text" value="{{ appscheduleinst.service_desc }}" />
+                   <input id="id_service_desc" maxlength="100" name="service_desc"  type="text" value="{{ appscheduleinst.service_desc|safe }}" />
             </span>
         </p>
         <p>
@@ -111,18 +111,18 @@ function delete_image(serviceid) {
                 Price</label>
                 <span class="inline_block">
                     <input id="id_price" name="price"  step="0.01" type="number"          
-                    value="{{ appscheduleinst.price }}" required />
+                    value="{{ appscheduleinst.price|safe }}" required />
                 </span>
         </p>
         <p>
             <label class="title">
                 Image</label>
            <div class="fieldWrapper">
-                 <img id="service_img" src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
+                 <img id="service_img" src='{{ appscheduleinst.service_img.url|safe }}'  width=25% height= 25% />
                   <p><label for="id_photo">service image</label>
                 </a> <br> <input type="file" name="photoname" id="id_photo"></p>
                 {% if appscheduleinst.service_img.name != defaultimg %}
-                        <button onclick="delete_image( {{  appscheduleinst.id }} )">Delete image</button>
+                        <button onclick="delete_image( {{  appscheduleinst.id|safe }} )">Delete image</button>
                 {% endif %}
 
                </div>
@@ -133,7 +133,7 @@ function delete_image(serviceid) {
                 Length (minutes)</label>
               <span class="inline_block">
                  <input id="length" name="length" type="number"  
-                 value="{{ appscheduleinst.length }}" ng-model="length" ng-init="length={{ appscheduleinst.length }}" required />
+                 value="{{ appscheduleinst.length|safe }}" ng-model="length" ng-init="length={{ appscheduleinst.length|safe }}" required />
             </span>
         </p>
         <p>
@@ -141,7 +141,7 @@ function delete_image(serviceid) {
                 Before (minutes)</label>
             <span>
                 <input id="before" name="before"  type="number"   
-                value="{{ appscheduleinst.before }}" ng-init="before={{ appscheduleinst.before }}" required />
+                value="{{ appscheduleinst.before|safe }}" ng-init="before={{ appscheduleinst.before|safe }}" required />
             </span>
         </p>
         <p>
@@ -149,7 +149,7 @@ function delete_image(serviceid) {
                 After (minutes)</label>
             <span>
                           <input id="id_after" name="after" type="number" 
-                          value="{{ appscheduleinst.after }}"  ng-init="after={{ appscheduleinst.after }}"  required />
+                          value="{{ appscheduleinst.after|safe }}"  ng-init="after={{ appscheduleinst.after|safe }}"  required />
              </span>             
         </p>
         <p>
@@ -168,8 +168,8 @@ function delete_image(serviceid) {
                 Status</label>
             <span class="inline_block">
               <select id="id_is_active" name="is_active" >
-                  <option value="True" >active</option>
-                  <option value="False">inactive</option>
+                  <option {% if appscheduleinst.is_active|safe == "True" %} selected {% endif %} value="True" >active</option>
+                  <option {% if appscheduleinst.is_active|safe == "False" %} selected {% endif %} value="False">inactive</option>
               </select>
             </span>
         </p>

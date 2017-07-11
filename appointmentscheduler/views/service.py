@@ -17,6 +17,7 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from base64 import decodestring
 from django.utils.safestring import mark_safe
+from django.db.models import Count
 
 
 
@@ -29,19 +30,19 @@ def show_services(request):
     template_name="showservices.html"
     # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
     services = AppschedulerServices.objects.all()
-
     services_info=[]
     for service in services:
         data=dict()
         data['id'] = service.pk
         data['service_name'] = service.service_name
+        data['cnt_employees'] = service.emp_service.count()
         data['price'] = float(service.price)
         data['length'] = service.length
-        data['is_active'] = service.is_active
+        data['total'] = service.total
+        data['is_active'] = str(service.is_active)
         services_info.append(data)
     
-    # pdb.set_trace()
-    return render_to_response(template_name, { "services" : json.dumps(services_info) } )   
+    return render_to_response(template_name, { "services" : mark_safe(services_info) } )   
 
 def get_services_info(request):
     services = AppschedulerServices.objects.all()
@@ -65,7 +66,6 @@ def add_service(request):
     if request.method == "POST":
         form = ServiceForm(request.POST or None, request.FILES or None)
         if form.is_valid():
-            form.save()
             service_instance = form.instance
             for key, value in request.POST.items():
                 matchobj =  re.match(r'^check\d+', key)
@@ -74,6 +74,8 @@ def add_service(request):
                     empid= request.POST[fieldname]
                     empinstance = AppschedulerEmployees.objects.get(id=int(empid))
                     service_instance.emp_service.add(empinstance)
+            form.save()
+
             return HttpResponseRedirect('/services/showservices/')
     else:
         form = ServiceForm()
@@ -119,19 +121,23 @@ def deleteimage(request,id):
         os.remove( oldimagepath )
     return  HttpResponse(json.dumps(defaultimg), content_type='application/json')
 
+@csrf_exempt
 def delete_service(request,id=None):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()
-    return HttpResponseRedirect('/services/showservices/')
+    return HttpResponse(status=204)
+
+    # return HttpResponseRedirect('/services/showservices/')
 
 @csrf_exempt
 def delete_services(request):
-
-    deleteids= dict( request.POST)['checked']
-    for id in deleteids:
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
         aservc=AppschedulerServices.objects.get(id=id)
-        aservc.delete()
-    return HttpResponseRedirect('/services/showservices/')
+        # aservc.delete()
+    return HttpResponse(status=204)
+
+    # return HttpResponseRedirect('/services/showservices/')
 
 @csrf_exempt
 def employee_names(request):
