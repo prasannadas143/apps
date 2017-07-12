@@ -32,7 +32,6 @@ function showCheckboxes() {
 
 
 function assiosiated_employees(serviceid) {
-    alert(serviceid);
     $.ajax({
             method:'get',
             url:"/services/associated_employee_names/" + serviceid,
@@ -79,6 +78,33 @@ function delete_image(serviceid) {
 
 }
 
+    function check_duplicated_name() {
+
+      $.ajax({
+              method:'get',
+              url:"{% url 'appointmentschduler:listServicesName'  %}",
+
+              success:function(response){
+                  // console.log(response);
+                  servicelist =eval(response);
+                  var servicename ="";
+                      var x = document.getElementById("id_service_name");
+                       textvalue = x.value.toUpperCase();
+                  if (servicelist != null &&  servicelist.length > 0  ){
+                        for (var i = 0; i <  servicelist.length; i++)
+                        {
+                            servicename= servicelist[i].name.toUpperCase(); 
+                            if (servicename == textvalue) {
+                               alert("service name exist");
+                               return false;
+                            }
+                        }
+
+                  }
+
+              }
+        });
+  } 
 
 </script>
 
@@ -95,7 +121,7 @@ function delete_image(serviceid) {
           <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name" type="text" value="{{ appscheduleinst.service_name|safe }}" />
+                   <input id="id_service_name" maxlength="100" name="service_name" type="text" value="{{ appscheduleinst.service_name|safe }}"  onblur="check_duplicated_name()" />
 
             </span>
         </p>
@@ -156,7 +182,7 @@ function delete_image(serviceid) {
             <label class="title">
                 Total (minutes)
             </label>
-                 <span class="inline_block">
+                  <span class="inline_block">
                     <p>    {% verbatim %}
                               {{ length + before + after}}
                             {% endverbatim %}

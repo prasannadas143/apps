@@ -66,7 +66,9 @@ def add_service(request):
     if request.method == "POST":
         form = ServiceForm(request.POST or None, request.FILES or None)
         if form.is_valid():
+            form.save()
             service_instance = form.instance
+            
             for key, value in request.POST.items():
                 matchobj =  re.match(r'^check\d+', key)
                 if matchobj:
@@ -74,7 +76,6 @@ def add_service(request):
                     empid= request.POST[fieldname]
                     empinstance = AppschedulerEmployees.objects.get(id=int(empid))
                     service_instance.emp_service.add(empinstance)
-            form.save()
 
             return HttpResponseRedirect('/services/showservices/')
     else:
@@ -90,7 +91,7 @@ def edit_service(request,id):
     if request.method == "POST":
         form = ServiceForm(request.POST or None , request.FILES or None, instance=appscheduleobj)
         if form.is_valid():
-            post = form.save(commit=False)
+            post = form.save()
             for key in request.POST:
                 if hasattr(post, key):
                     setattr(post, key , request.POST[key])
@@ -102,6 +103,14 @@ def edit_service(request,id):
                 appscheduleobj.save()
 
             post.save()
+            service_instance = form.instance
+            for key, value in request.POST.items():
+                matchobj =  re.match(r'^check\d+', key)
+                if matchobj:
+                    fieldname = matchobj.group()
+                    empid= request.POST[fieldname]
+                    empinstance = AppschedulerEmployees.objects.get(id=int(empid))
+                    service_instance.emp_service.add(empinstance)
             # os.remove(imagepath)
             return HttpResponseRedirect('/services/showservices/')
     else :
@@ -138,6 +147,7 @@ def delete_services(request):
     return HttpResponse(status=204)
 
     # return HttpResponseRedirect('/services/showservices/')
+
 
 @csrf_exempt
 def employee_names(request):

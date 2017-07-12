@@ -7,10 +7,9 @@
 {% endblock %}
 {% block content %} 
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css"/>
-
- 
-<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+   <input type="button" value="active"   id="search"  />
 
 <table>
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
@@ -52,12 +51,13 @@
 
 <script type="text/javascript">
 
-      var data = {{ services|safe }} ;
-      var services_info = data;
-      console.log( services_info );
-      var rows_selected = [];
 
-      let table = $('#datatables').DataTable({
+  var data = {{ services|safe }} ;
+  var services_info = data;
+  console.log( services_info );
+  var rows_selected = [];
+
+  let table = $('#datatables').DataTable({
        
         "data":  services_info,
         "createdRow": function( row, data, dataIndex ) {
@@ -160,7 +160,13 @@
       $('input[type="checkbox"]', rows).prop('checked', this.checked);
    });
 
- 
+$("#search").on('click',function(){
+    alert("active selected");
+    alert($(this).val());
+    table.columns(6).search($(this).val()).draw();
+}); 
+
+
 function updateDataTableSelectAllCtrl(table){
    var $table             = table.table().node();
    var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
@@ -252,11 +258,12 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       var ids = $.map(table.rows('.selected').data(), function (item) {
             return item.id;
         });
-      if(ids!="")
+      if(ids!=""){
         rowids = ids.join(",");
-      else
-       alert("no rows selected");
-       alert(rowids);
+      }
+      else {
+          alert("no rows selected");
+     }
        $.ajax({
                 url: '/services/deleteservices/',
                 method: 'POST',
@@ -264,9 +271,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
                         "rowids":rowids,
                       },
           }).success(function (data, textStatus, jqXHR) {
-                alert("success")
                 $.each(ids, function( index, value ) {
-                  alert( index + ": " + value );
                   table.row( '#' + value ).remove().draw();
                 });
             }).error(function (jqXHR, textStatus, errorThrown) {
@@ -275,6 +280,13 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
    
    });
  
+ var filteredData = table
+    .columns( [0, 1] )
+    .data()
+    .flatten()
+    .filter( function ( value, index ) {
+        return value > 20 ? true : false;
+    } );
 
 
       // FOR TESTING ONLY
@@ -307,7 +319,6 @@ $('#datatables tbody').on('click', 'button', function () {
 
     $('#confirm').on('click', '#delete', function (e) {
 
-        alert(JSON.stringify(id));
         $.ajax({
               url: '/services/deleteservice/' + id + '/',
               method: 'POST'

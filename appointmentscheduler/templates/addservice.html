@@ -54,7 +54,35 @@ function listemployees() {
             }
       });
   }
-        
+      
+
+    function check_duplicated_name() {
+
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:listServicesName'  %}",
+
+            success:function(response){
+                // console.log(response);
+                servicelist =eval(response);
+                var servicename ="";
+                    var x = document.getElementById("id_service_name");
+                     textvalue = x.value.toUpperCase();
+                if (servicelist != null &&  servicelist.length > 0  ){
+                      for (var i = 0; i <  servicelist.length; i++)
+                      {
+                          servicename= servicelist[i].name.toUpperCase(); 
+                          if (servicename == textvalue) {
+                             alert("service name exist");
+                             return false;
+                          }
+                      }
+
+                }
+
+            }
+      });
+  }  
 
 </script>
 
@@ -66,11 +94,11 @@ function listemployees() {
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
-     <form class="form pj-form"  ng-controller="ServiceCtl"autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
+     <form class="form pj-form"  ng-controller="ServiceCtl" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
             <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" />
+                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" onblur="check_duplicated_name()" />
 
             </span>
         </p>
@@ -132,8 +160,8 @@ function listemployees() {
                 Status</label>
             <span class="inline_block">
               <select id="id_is_active" name="is_active" >
-                  <option value="True" selected="selected">active</option>
-                  <option value="False">inactive</option>
+                  <option value="True">active</option>
+                  <option value="False" selected="selected">inactive</option>
               </select>
             </span>
         </p>
