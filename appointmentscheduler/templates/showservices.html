@@ -9,7 +9,9 @@
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
-   <input type="button" value="active"   id="search"  />
+   <input type="button" value="active"   id="active"  />
+   <input type="button" value="inactive"   id="inactive"  />
+
 
 <table>
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
@@ -56,21 +58,46 @@
   var services_info = data;
   console.log( services_info );
   var rows_selected = [];
+  draw_datatable(0);
 
-  let table = $('#datatables').DataTable({
+$("#active").click(function(){
+   active = 1
+   draw_datatable(active);
+});
+
+$("#inactive").click(function(){
+   active = 2
+   draw_datatable(active);
+});
+
+var table ;
+function draw_datatable(active) {
+
+  if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
+     table.destroy();
+  }
+
+   table = $('#datatables').DataTable({
        
         "data":  services_info,
         "createdRow": function( row, data, dataIndex ) {
                         $(row).attr('id', data.id);
-                      },
+                        $(row).find('td').eq(6).attr("data-search", data.is_active);
+                         if (data.is_active == "False" && active == 1) {
+                             jQuery(row).hide();
+                          }
+                          else if(data.is_active == "True" && active == 2) {
+                             jQuery(row).hide();
+                          }
 
-     
+           },
+       
       "columnDefs": [ 
 
             {
               'targets': 0,
-              'searchable': false,
-              'orderable': false,
+              'searchable': true,
+              'orderable': true,
               'className': 'dt-body-center',
               "data": null,
               render: function ( data, type, row ) {
@@ -102,6 +129,8 @@
               'targets':6,
               "data": "is_active",
               render: function ( d, t, r ) {
+
+
                     var $select = $("<select></select>", {
                       "id": "is_active",
                         "value": d
@@ -111,6 +140,7 @@
                             "value": "True"
                         });
                         if(d == "True"){
+                          hiddenvalue = true
                           $option.attr("selected", "selected")
                         }
                     $select.append($option);
@@ -120,15 +150,17 @@
                             "value": "False"
                         });
                         if(d == "False"){
+                          hiddenvalue = true
                           $option.attr("selected", "selected")
                         }
 
                       $select.append($option);
-                    
-                    return $select.prop("outerHTML");
+                      var $hiddenInput = $('<input/>',{type:'hidden',value:hiddenvalue});
+                       var $selecthtml = $select.prop("outerHTML");
+                       var $updated = $selecthtml + $hiddenInput.html();
+                    return $selecthtml;
                 }
-
-            },
+              },
             
             {
               'targets':7,
@@ -146,11 +178,11 @@
              // If row ID is in the list of selected row IDs
                if($.inArray(rowId, rows_selected) !== -1){
                   $(row).find('input[type="checkbox"]').prop('checked', true);
-                  $(row).addClass('selected');
+                  $(row).addClass('<select id="is_active" value="True"><option value="True" selected="selected">active</option><option value="False">inactive</option></select>');
                }
             }
       });
-
+}
     let id = 0;
 
    // Handle click on "Select all" control
@@ -160,11 +192,6 @@
       $('input[type="checkbox"]', rows).prop('checked', this.checked);
    });
 
-$("#search").on('click',function(){
-    alert("active selected");
-    alert($(this).val());
-    table.columns(6).search($(this).val()).draw();
-}); 
 
 
 function updateDataTableSelectAllCtrl(table){
