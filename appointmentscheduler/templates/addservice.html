@@ -86,7 +86,6 @@ function listemployees() {
 
 </script>
 
-    <link type="text/css" href="{% static 'css/custom.css'  %}" rel="stylesheet" type="text/css" />
 
 
 
@@ -94,27 +93,51 @@ function listemployees() {
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
-     <form class="form pj-form"  ng-controller="ServiceCtl" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
+     <form class="form pj-form ng-pristine ng-invalid ng-invalid-required"   name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
+     <p>
             <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" onblur="check_duplicated_name()" />
+                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" ng-model="service_name" ng-minlength="4" ng-maxlength="50" ng-pattern="/^\w+$/" onblur="check_duplicated_name()" required />
 
-            </span>
+             </span>
+
+             <span ng-messages="serviceform.service_name.$error" style="color:maroon" role="alert" >
+                   <span ng-message="required"> Please fill service name </span>
+             </span>
+
+
+              <div ng-messages="serviceform.service_name.$error"  ng-show="serviceform.service_name.$invalid && !serviceform.service_name.$pristine " style="color:maroon" role="alert" >
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+              </div>
+ 
         </p>
         <p>
             <label class="title">
                 Service description:</label>
             <span class="inline_block">
-                   <input id="id_service_desc" maxlength="100" name="service_desc" type="text" />
+                   <input id="id_service_desc" maxlength="100" name="service_desc" type="text"  ng-model="service_desc" ng-minlength="4" ng-maxlength="200"  />
             </span>
+
+            <div ng-messages="serviceform.service_desc.$error"  ng-show="serviceform.service_desc.$invalid && !serviceform.service_desc.$pristine" style="color:maroon" role="alert">
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="number">You did not enter a valid number</div>
+            </div>
         </p>
         <p>
             <label class="title">
                 Price</label>
                 <span class="inline_block">
-                    <input id="id_price" name="price" ng-model="servicedata.price" step="0.01" type="number" required />
+                    <input id="id_price" name="price" ng-model="price" step="0.01" min="0" type="number" required />
                 </span>
+                    <span ng-messages="serviceform.price.$error" style="color:maroon" role="alert" >
+                     <span ng-message="required"> Please fill price </span>
+                 </span>
+               <div ng-messages="serviceform.price.$error"  ng-show="serviceform.price.$invalid && !serviceform.price.$pristine "style="color:maroon" role="alert">
+                  <div ng-message="minlength">Your field is too short   </div>
+                  <div ng-message="number">Your field is not number</div>
+              </div>
         </p>
         <p>
             <label class="title">
@@ -127,22 +150,43 @@ function listemployees() {
             <label class="title">
                 Length (minutes)</label>
             <span class="inline_block">
-                 <input id="length" name="length" type="number" ng-model="length" required />
+                 <input id="length" name="length" type="number" ng-model="length" min="0" type="number" required />
             </span>
+               <span ng-messages="serviceform.length.$error" style="color:maroon" role="alert" >
+                   <span ng-message="required">Please fill the length of the service </span>
+             </span>
+              <div ng-messages="serviceform.length.$error"  ng-show="serviceform.length.$invalid && !serviceform.length.$pristine"style="color:maroon" role="alert">
+                  <div ng-message="minlength">Your field is too short   </div>
+                  <div ng-message="number">Your field is not number </div>
+              </div>
         </p>
         <p>
-            <label class="title">
+            <label class="minutes">
                 Before (minutes)</label>
             <span>
-                <input id="before" name="before" type="number" ng-model="before"  required />
+                <input id="before" name="before" type="number" ng-model="before"  min="0" type="number" required />
             </span>
+              <span ng-messages="serviceform.before.$error" style="color:maroon" role="alert" >
+                   <span ng-message="required"> Please fill the field</span>
+             </span>
+            <div ng-messages="serviceform.before.$error"  ng-show="serviceform.before.$invalid && !serviceform.before.$pristine"style="color:maroon" role="alert">
+                  <div ng-message="minlength">Your field is too short   </div>
+                  <div ng-message="number">Your field is not number</div>
+              </div>
         </p>
         <p>
             <label class="title">
                 After (minutes)</label>
             <span>
-                          <input id="after" name="after" type="number" ng-model="after"  required />
-             </span>             
+                          <input id="after" name="after" type="number" ng-model="after"  min="0" type="number" required />
+             </span>  
+              <span ng-messages="serviceform.after.$error" style="color:maroon" role="alert" >
+                   <span ng-message="required"> Please fill the field </span>
+             </span>
+              <div ng-messages="serviceform.after.$error"  ng-show="serviceform.after.$invalid && !serviceform.after.$pristine"style="color:maroon" role="alert">
+                  <div ng-message="minlength">Your field is too short   </div>
+                  <div ng-message="number">Your field is not number</div>
+              </div>           
         </p>
         <p>
             <label class="title">
@@ -159,7 +203,7 @@ function listemployees() {
             <label class="title">
                 Status</label>
             <span class="inline_block">
-              <select id="id_is_active" name="is_active" >
+              <select id="id_is_active" name="is_active" required>
                   <option value="True">active</option>
                   <option value="False" selected="selected">inactive</option>
               </select>
@@ -181,7 +225,7 @@ function listemployees() {
     </p>
     <p>
       <div>
-        <input  type="submit" value="Submit"   >
+        <input  type="submit" value="Submit"  class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="serviceform.$invalid ">
       </div>
    </p>
    </form>
@@ -196,4 +240,3 @@ function listemployees() {
 
 
 
-{

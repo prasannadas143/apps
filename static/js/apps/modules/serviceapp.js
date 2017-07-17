@@ -1,1 +1,1 @@
-var serviceapp = angular.module("ServiceMod", [ "ngRoute"]);
+var serviceapp = angular.module("ServiceMod", [ "ngMessages"]);

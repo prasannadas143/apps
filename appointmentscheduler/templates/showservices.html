@@ -9,8 +9,9 @@
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
-   <input type="button" value="active"   id="active"  />
-   <input type="button" value="inactive"   id="inactive"  />
+   <input type="button" value="Active"   id="active"  />
+   <input type="button" value="Inactive"   id="inactive"  />
+   <input type="button" value="All"   id="all"  />
 
 
 <table>
@@ -61,12 +62,16 @@
   draw_datatable(0);
 
 $("#active").click(function(){
-   active = 1
+   active = 1;
    draw_datatable(active);
 });
 
 $("#inactive").click(function(){
-   active = 2
+   active = 2;
+   draw_datatable(active);
+});
+$("#all").click(function(){
+   active = 0;
    draw_datatable(active);
 });
 
