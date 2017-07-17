@@ -84,7 +84,7 @@ function listemployees() {
       });
   }  
 
-</script>
+</script> 
 
 
 
@@ -122,7 +122,7 @@ function listemployees() {
 
             <div ng-messages="serviceform.service_desc.$error"  ng-show="serviceform.service_desc.$invalid && !serviceform.service_desc.$pristine" style="color:maroon" role="alert">
                 <div ng-message="minlength">Your field is too short   </div>
-                <div ng-message="number">You did not enter a valid number</div>
+                <div ng-message="maxlength">Your field is too long</div>
             </div>
         </p>
         <p>

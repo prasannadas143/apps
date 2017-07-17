@@ -173,13 +173,13 @@ def service_img_location(instance, filename):
 class AppschedulerServices(models.Model):
     PRIORITY_CHOICES = ((True, 'active'),
                         (False, 'inactive'),)
-    service_name = models.CharField(max_length=100, unique=True,blank=True, null=True)
+    service_name = models.CharField(max_length=100, unique=True )
     service_desc = models.CharField(max_length=100, blank=True, null=True)
     service_img = models.ImageField(upload_to = service_img_location, default = 'service/no-img.jpg')
     price = models.DecimalField(max_digits=9, decimal_places=2, blank=False, null=False)
-    length = models.SmallIntegerField( blank=False, null=False)
-    before = models.SmallIntegerField( blank=False, null=False)
-    after = models.SmallIntegerField( blank=False, null=False)
+    length = models.SmallIntegerField( blank=False, null=False, default= 0)
+    before = models.SmallIntegerField( blank=False, null=False,default= 0)
+    after = models.SmallIntegerField( blank=False, null=False,default= 0)
     total = models.SmallIntegerField()
     is_active = models.BooleanField(choices=PRIORITY_CHOICES,  default=True)
     emp_service = models.ManyToManyField(AppschedulerEmployees,  blank=True)
