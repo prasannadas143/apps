@@ -8,7 +8,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
-import re,pdb
+from django.utils.text import slugify
+
+import re,pdb,os,datetime
 
 class AppschedulerBookings(models.Model):
     uuid = models.CharField(unique=True, max_length=12, blank=True, null=True)
@@ -167,13 +169,16 @@ class AppschedulerRoles(models.Model):
 
 
 def service_img_location(instance, filename):
-    imagepath = "%s/%s/%s" %( "service" , instance.service_name, filename)
+    # imagepath = "%s/%s/%s" %( "service" , instance.service_name, filename)
+    filename, ext = os.path.splitext(filename.lower())
+    filename = "%s.%s%s" % (slugify(filename),datetime.datetime.now().strftime("%Y-%m-%d.%H-%M-%S"), ext)
+    imagepath = '%s/%s/%s' % ('service', instance.service_name,filename)
     return re.sub('\s+','',imagepath)
 
 class AppschedulerServices(models.Model):
     PRIORITY_CHOICES = ((True, 'active'),
                         (False, 'inactive'),)
-    service_name = models.CharField(max_length=100, unique=True )
+    service_name = models.CharField(max_length=100, unique=True, blank=False, null=False )
     service_desc = models.CharField(max_length=100, blank=True, null=True)
     service_img = models.ImageField(upload_to = service_img_location, default = 'service/no-img.jpg')
     price = models.DecimalField(max_digits=9, decimal_places=2, blank=False, null=False)
