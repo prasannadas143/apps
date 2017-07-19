@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -17,6 +17,35 @@ $(document).ready(function() {
   
 });
 
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
 
 var expanded = false;
 
@@ -37,6 +66,11 @@ function listemployees() {
     $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:listemployeesname'  %}",
+
+           "beforeSend": function(xhr, settings) {
+                console.log("Before Send");
+                $.ajaxSettings.beforeSend(xhr, settings);
+            },
 
             success:function(response){
                 // console.log(response);
@@ -61,7 +95,10 @@ function listemployees() {
     $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:listServicesName'  %}",
-
+            "beforeSend": function(xhr, settings) {
+                console.log("Before Send");
+                $.ajaxSettings.beforeSend(xhr, settings);
+            },
             success:function(response){
                 // console.log(response);
                 servicelist =eval(response);
@@ -84,6 +121,8 @@ function listemployees() {
       });
   }  
 
+
+
 </script> 
 
 
@@ -93,7 +132,7 @@ function listemployees() {
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
-     <form class="form pj-form ng-pristine ng-invalid ng-invalid-required"   name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post">
+     <form class="form pj-form ng-pristine ng-invalid ng-invalid-required"   name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post"> {% csrf_token %}
      <p>
             <label class="title">
                 Service name:</label>
@@ -156,7 +195,6 @@ function listemployees() {
                    <span ng-message="required">Please fill the length of the service </span>
              </span>
               <div ng-messages="serviceform.length.$error"  ng-show="serviceform.length.$invalid && !serviceform.length.$pristine"style="color:maroon" role="alert">
-                  <div ng-message="minlength">Your field is too short   </div>
                   <div ng-message="number">Your field is not number </div>
               </div>
         </p>
@@ -170,7 +208,6 @@ function listemployees() {
                    <span ng-message="required"> Please fill the field</span>
              </span>
             <div ng-messages="serviceform.before.$error"  ng-show="serviceform.before.$invalid && !serviceform.before.$pristine"style="color:maroon" role="alert">
-                  <div ng-message="minlength">Your field is too short   </div>
                   <div ng-message="number">Your field is not number</div>
               </div>
         </p>
@@ -184,7 +221,6 @@ function listemployees() {
                    <span ng-message="required"> Please fill the field </span>
              </span>
               <div ng-messages="serviceform.after.$error"  ng-show="serviceform.after.$invalid && !serviceform.after.$pristine"style="color:maroon" role="alert">
-                  <div ng-message="minlength">Your field is too short   </div>
                   <div ng-message="number">Your field is not number</div>
               </div>           
         </p>

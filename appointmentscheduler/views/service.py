@@ -4,7 +4,7 @@ from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmplo
 from  appointmentscheduler.form.serviceform import ServiceForm
 from django.http import JsonResponse
 import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
+from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
 from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
@@ -21,7 +21,7 @@ from django.db.models import Count
 
 
 
-@csrf_exempt
+@requires_csrf_token
 def show_services(request):
     # DON'T USE
     # for sevice in services:
@@ -42,27 +42,14 @@ def show_services(request):
         data['is_active'] = str(service.is_active)
         services_info.append(data)
     
-    return render_to_response(template_name, { "services" : mark_safe(services_info) } )   
+    return render(request, template_name, { "services" : mark_safe(services_info) } )   
 
-def get_services_info(request):
-    services = AppschedulerServices.objects.all()
 
-    jsondata=[]
-    for service in services:
-        data=dict()
-        data['id'] = service.pk
-        data['service_name'] = service.service_name
-        data['price'] = float(service.price)
-        data['length'] = service.length
-        data['is_active'] = service.is_active
-        jsondata.append(data)
-    services_json = json.dumps( jsondata)
 
-    return JsonResponse( services_json , safe=False)
-
-@csrf_exempt
+@requires_csrf_token
 def add_service(request):
-    template_name = "addservice.html"
+    template_name = "addservice.html"  
+ 
     if request.method == "POST":
         form = ServiceForm(request.POST or None, request.FILES or None)
         if form.is_valid():
@@ -70,7 +57,7 @@ def add_service(request):
             service_instance = form.instance
             
             for key, value in request.POST.items():
-                matchobj =  re.match(r'^check\d+', key)
+                matchobj =  re.match(r'^check\d+', key)     
                 if matchobj:
                     fieldname = matchobj.group()
                     empid= request.POST[fieldname]
@@ -80,13 +67,13 @@ def add_service(request):
             return HttpResponseRedirect('/services/showservices/')
     else:
         form = ServiceForm()
-    return render_to_response(template_name,{'form': form} )
+    return render(request, template_name,{'form': form } )
 
 
-@csrf_exempt
+@requires_csrf_token
 def edit_service(request,id):
     template_name="editservice.html"
-    appscheduleobj = AppschedulerServices.objects.get(id=id)
+    appscheduleobj =     AppschedulerServices.objects.get(id=id)
     defaultimg=appscheduleobj.__class__._meta.get_field('service_img').default
     if request.method == "POST":
         form = ServiceForm(request.POST or None , request.FILES or None, instance=appscheduleobj)
@@ -116,8 +103,9 @@ def edit_service(request,id):
     else :
         form = ServiceForm( instance=appscheduleobj )
         emp_service= appscheduleobj.emp_service.all()
-        return render_to_response(template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
+        return render(request, template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
 
+@requires_csrf_token
 def deleteimage(request,id):
     #Implemented with angula js
     appscheduleobj=AppschedulerServices.objects.get(id=id)
@@ -130,7 +118,7 @@ def deleteimage(request,id):
         os.remove( oldimagepath )
     return  HttpResponse(json.dumps(defaultimg), content_type='application/json')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def delete_service(request,id=None):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()
@@ -138,7 +126,7 @@ def delete_service(request,id=None):
 
     # return HttpResponseRedirect('/services/showservices/')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def delete_services(request):
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
@@ -148,8 +136,7 @@ def delete_services(request):
 
     # return HttpResponseRedirect('/services/showservices/')
 
-
-@csrf_exempt
+@ensure_csrf_cookie
 def employee_names(request):
     employees = AppschedulerEmployees.objects.all()
     # DON'T USE
@@ -157,7 +144,7 @@ def employee_names(request):
 
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def associated_employee_names(request,id):
     employees = AppschedulerEmployees.objects.all()
     # DON'T USE

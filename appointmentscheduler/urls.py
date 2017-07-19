@@ -4,7 +4,6 @@ from .views import service,employees
 from .api.views  import ServicesListView
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
-        url(r'^getservices/$', service.get_services_info, name="getservices"),
 
     
     url(r'addservice/$', service.add_service , name="addservice"),

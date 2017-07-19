@@ -1,7 +1,4 @@
-$(document).ready(function() {
-  // Handler for .ready() called.
-  assiosiated_employees({{ appscheduleinst.id }});
-});
+
 
 
 var expanded = false;

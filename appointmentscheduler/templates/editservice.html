@@ -16,6 +16,35 @@ $(document).ready(function() {
   assiosiated_employees({{ appscheduleinst.id }});
 });
 
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+
 
 var expanded = false;
 
@@ -37,6 +66,7 @@ function assiosiated_employees(serviceid) {
             url:"/services/associated_employee_names/" + serviceid,
             data: { },
             dataType: "json",
+           
             success:function(response){
                 console.log(response);
                 employeelist =eval(response);
@@ -65,7 +95,6 @@ function delete_image(serviceid) {
             method:'get',
             url:"/services/deleteimage/" + serviceid,
             data: { },
-            async:false,
             success:function(response){
                 console.log(response);
                 var pic = document.getElementById('service_img');
@@ -83,12 +112,11 @@ function delete_image(serviceid) {
       $.ajax({
               method:'get',
               url:"{% url 'appointmentschduler:listServicesName'  %}",
-
               success:function(response){
                   // console.log(response);
                   servicelist =eval(response);
                   var servicename ="";
-                      var x = document.getElementById("id_service_name");
+                      var x = document.getElementById("service_name");
                        textvalue = x.value.toUpperCase();
                   if (servicelist != null &&  servicelist.length > 0  ){
                         for (var i = 0; i <  servicelist.length; i++)
@@ -114,13 +142,13 @@ function delete_image(serviceid) {
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
 
-  <form  class="form pj-form ng-pristine ng-invalid ng-invalid-required"  name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}"  method="post"  >
+  <form  class="form pj-form ng-pristine ng-invalid ng-invalid-required"  name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}"  method="post"  >{% csrf_token %}
 
 
           <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="50" ng-pattern="/^\w+$/"  ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur="check_duplicated_name()"  required  />
+                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="50" ng-pattern="/^\w+$/"  ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name()"  required  />
 
             </span>
            
@@ -162,7 +190,7 @@ function delete_image(serviceid) {
             <label class="title">
                 Image</label>
            <div class="fieldWrapper">
-                 <img id="service_img" src='{{ appscheduleinst.service_img.url|safe }}'  width=25% height= 25% />
+                 <img id="service_img" src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
                   <p><label for="id_photo">service image</label>
                 </a> <br> <input type="file" name="photoname" id="id_photo"></p>
                 {% if appscheduleinst.service_img.name != defaultimg %}
@@ -177,7 +205,7 @@ function delete_image(serviceid) {
                 Length (minutes)</label>
               <span class="inline_block">
                  <input id="length" name="length" type="number"  
-                  ng-model="length" ng-init="length={{ appscheduleinst.length|safe }}" required />
+                  ng-model="length" ng-init="length={{ appscheduleinst.length}}" required />
             </span>
                 <span ng-messages="serviceform.length.$error" style="color:maroon" role="alert" >
                    <span ng-message="required">Please fill the length of the service </span>
@@ -192,7 +220,7 @@ function delete_image(serviceid) {
                 Before (minutes)</label>
             <span>
                 <input id="before" name="before"  type="number"   
-                 ng-model="before" ng-init="before={{ appscheduleinst.before|safe }}" required />
+                 ng-model="before" ng-init="before={{ appscheduleinst.before }}" required />
             </span>
             <span ng-messages="serviceform.before.$error" style="color:maroon" role="alert" >
                    <span ng-message="required">Please fill the field before </span>
@@ -203,7 +231,7 @@ function delete_image(serviceid) {
                 After (minutes)</label>
             <span>
                           <input id="id_after" name="after" type="number" 
-                          ng-model="after"  ng-init="after={{ appscheduleinst.after|safe }}"  required />
+                          ng-model="after"  ng-init="after={{ appscheduleinst.after }}"  required />
              </span>      
 
              <span ng-messages="serviceform.after.$error" style="color:maroon" role="alert" >
