@@ -73,7 +73,7 @@ function listServices() {
 			<span class="notice-info">&nbsp;</span>
 			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
 
-         <form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
+         <form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" method="post" >
 		<input name="employee_create" value="1" type="hidden">
 		<input style="display:none">
 		<input style="display:none" type="password">
@@ -153,8 +153,8 @@ function listServices() {
 		</p>
 		<p>
 			<label class="title">&nbsp;</label>
-			<input value="Save" ng-click="submitForm()"  class="pj-button" type="submit">
-			<input value="Cancel" ng-click="CancelForm()"  class="pj-button" type="button">
+			<input value="Save"  class="pj-button" type="submit">
+			<input value="Cancel" ng-click=CancelForm()  class="pj-button" type="button">
 		</p>
 	</form>
 

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}
+{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+
+<form method="POST" id="BookingOptions" name="BookingOptions" action="{% url 'appointmentschduler:BookingOptions' %}">
+<div>{{ message|default:"" }}</div>
+<div>
+<div>
+<label>Step (in minutes)</label>
+<select name="{{ items.step_id }}">
+{% for entry in items.steps %}
+    <option {% if entry == items.step_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+{% endfor %}
+</select>
+</div>
+
+
+<div>
+<label>Default status for booked dates if paid</label>
+<select name="{{ items.status_id }}">
+{% for entry in items.status_if_paid_list %}
+    <option {% if entry == items.status_if_paid_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+{% endfor %}
+</select>
+</div>
+
+
+
+<div>
+<label>Default status for booked dates if not paid</label>
+<select name="{{ items.status_not_id }}">
+{% for entry in items.status_if_not_paid_list %}
+
+    <option {% if entry == items.status_if_not_paid_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+{% endfor %}
+</select>
+</div>
+
+
+<div>
+<label>Accept bookings X hours before appointment start time</label>
+<input  name="{{ items.hide_prices_id }}" value=" {{items.hide_prices_list_selected}}" step="1" type="number" 
+minvalue=1  required />
+</div>
+
+
+<div>
+<label>Client can cancel booking upto  X hours before appointment start time</label>
+<input  name="{{ items.accept_booking_ahead_id }}" value=" {{items.accept_booking_ahead_selected}}" step="1" type="number" 
+minvalue=1  required />
+</div>
+
+<div>
+Accept bookings X days ahead</label>
+    <input name="{{ items.accept_booking_id }}" value=" {{items.accept_booking_selected}}" step="1" minvalue=1  type="number" required />
+</div>
+
+<div class="button">
+
+<input type="submit" value="Save" name="">
+
+</div>
+
+
+</div>
+
+
+</form>
+
+{% endblock  %}
+
+

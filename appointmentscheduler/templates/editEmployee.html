@@ -8,7 +8,6 @@
 {% block content %}
 
 
-
 <script>
 
 $(document).ready(function() {
@@ -113,7 +112,7 @@ function listServices() {
 			</span>
 			<span style="position: absolute; top: 7px; left: 405px">
 				<label>
-<input id="is_subscribed_sms" maxlength="600" name="is_subscribed_sms"  type="checkbox" value="{{ appscheduleinst.is_subscribed_sms }}" required="" />
+<input id="is_subscribed_sms" maxlength="600" name="is_subscribed_sms"  type="checkbox" value="{{ appscheduleinst.is_subscribed_sms }}"  />
 				Send SMS when new booking is made</label>
 			</span>
 		</p>
@@ -135,25 +134,26 @@ function listServices() {
 		<p>
 			<label class="title">Status</label>
 			<span class="inline_block">
-				<select name="is_active" id="is_active" class="pj-form-field required valid" ng-model="employeedata.is_active" aria-required="true" aria-invalid="false">
-					<option value="">-- Choose--</option>
-					<option value="1">Active</option><option value="0">Inactive</option>				</select>
-					 <input id="id_is_active" maxlength="100" name="is_active" ng-model="employeedata.is_active" value="1" type="checkbox" />
+				<select name="is_active" id="is_active" class="pj-form-field required valid" value="{{ appscheduleinst.is_active }}"  aria-required="true" aria-invalid="false">
+					<option value="1">Active</option>
+					<option value="0">Inactive</option>
+				</select>
 			</span>
 		</p>
 
 
-		<p>
+	<p>
 			<label class="title">Picture</label>
 			<span class="float_left block">
-				 <input id="avatar" name="avatar" type="file"  />
-
+				 <input id="avatar" name="avatar"  type="file"  />
+			<img height="250" width="250" src="/media/{{appscheduleinst.avatar}} ">
 			</span>
 		</p>
-		<p>
+
+		1<p>
 			<label class="title">&nbsp;</label>
-			<input value="Save" class="pj-button" type="submit">
-			<input value="Cancel" ng-click="CancelForm()"  class="pj-button" type="button">
+			<input value="submit" class="pj-button" type="submit">
+			<input value="Cancel" ng-click=CancelForm()   class="pj-button" type="button">
 		</p>
 	</form>
  
@@ -163,6 +163,33 @@ function listServices() {
 
 
 </div>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+    //set initial state.
+    $('#is_subscribed_sms').change(function() {
+        if($(this).is(":checked")) {
+         $(this).val(true);
+        }
+        else
+        {
+           $(this).val(false);
+        }
+    });
+ $('#is_subscribed').change(function() {
+        if($(this).is(":checked")) {
+         $(this).val(true);
+        }
+        else
+        {
+           $(this).val(false);
+        }
+    });
+
+});
+
+</script>
 
 
 {% endblock %}

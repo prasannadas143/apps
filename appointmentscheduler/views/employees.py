@@ -44,11 +44,14 @@ def delete_employee(request,id=None):
 @csrf_exempt
 def add_Employee(request):
     # DON'T USE
+    pdb.set_trace()
     if request.method == 'POST':
 
         # create a form instance and populate it with data from the request:
         # check whether it's valid:
         form = EmployeeForm(request.POST or None, request.FILES or None)
+
+        
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
@@ -56,7 +59,7 @@ def add_Employee(request):
             # redirect to a new URL:
             form.save()
 
-            return HttpResponse(' ')
+            return HttpResponseRedirect('/services/employeelist/')
 
             # if a GET (or any other method) we'll create a blank form
     else:
@@ -70,19 +73,29 @@ def add_Employee(request):
 def edit_Employee(request, id):
     template_name = "editEmployee.html"
     appscheduleobj = AppschedulerEmployees.objects.get(id=id)
-
+    defaultimg=appscheduleobj.__class__._meta.get_field('avatar').default
+    pdb.set_trace()
     if request.method == "POST":
         form = EmployeeForm(request.POST or None, request.FILES or None, instance=appscheduleobj)
         if form.is_valid():
             post = form.save(commit=False)
             for key in request.POST:
                 if hasattr(post, key):
-                    setattr(post, key, request.POST[key])
+                   
+                   if key=='is_subscribed' and request.POST.get('is_subscribed') == 'true':
+                      form.instance.is_subscribed = True
+                      request.POST['is_subscribed']  = True
+                setattr(post, key, request.POST[key])
+            if 'avatar' in request.FILES and request.FILES['avatar'] is not None:
+                if appscheduleobj.avatar.name != defaultimg:
+                    appscheduleobj.avatar=defaultimg
+                appscheduleobj.avatar=request.FILES['avatar']
+                appscheduleobj.save()
             post.save()
-        return HttpResponseRedirect('/services/employeelist/')
+            return HttpResponseRedirect('/services/employeelist/')
     else:
         form = EmployeeForm(instance=appscheduleobj)
-    return render_to_response(template_name, {'form': form, 'appscheduleinst': appscheduleobj})
+    return render_to_response(template_name, {'form': form, 'appscheduleinst': appscheduleobj, "defaultimg" : defaultimg })
 
 
 def get_Employees(request):

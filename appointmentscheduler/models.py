@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.text import slugify
 
-import re,pdb,os,datetime
+import re,pdb,os,datetime,uuid
 
 class AppschedulerBookings(models.Model):
     uuid = models.CharField(unique=True, max_length=12, blank=True, null=True)
@@ -89,6 +89,12 @@ class AppschedulerDates(models.Model):
         unique_together = (('foreign_id', 'type', 'date'),)
 
 
+def employee_img_location(instance, filename):
+    u = uuid.uuid1()
+    imagepath = "%s/%d_%s" %( "employee" ,u.int, filename)
+    return re.sub('\s+','',imagepath)
+
+
 class AppschedulerEmployees(models.Model):
     emp_name = models.CharField(max_length=255, blank=False, null=False)
     emp_notes = models.TextField(blank=False, null=False)
@@ -96,11 +102,12 @@ class AppschedulerEmployees(models.Model):
     password = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    avatar = models.CharField(max_length=255, blank=True, null=True)
+    avatar = models.ImageField(upload_to=employee_img_location, default = 'employee/no-img.jpg')
     last_login = models.DateTimeField(blank=True, null=True)
-    is_subscribed = models.IntegerField(blank=True, null=True)
-    is_subscribed_sms = models.IntegerField(blank=True, null=True)
-    is_active = models.IntegerField(blank=True, null=True)
+
+    is_subscribed = models.BooleanField(default=False)
+    is_subscribed_sms = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         # managed = False

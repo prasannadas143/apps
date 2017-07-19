@@ -1,7 +1,9 @@
 from django.conf.urls import url
 
 from .views import service,employees
-from .api.views  import ServicesListView
+from .views.Options import General
+from .views.Options.Booking import Options,Payments
+
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
 
@@ -18,6 +20,8 @@ urlpatterns = [
     url(r'^listemployeesname/$', service.employee_names, name="listemployeesname"),
     url(r'^listServicesName/$', employees.services_names, name="listServicesName"),
     url(r'^deleteEmployee/(?P<id>\d+)/$', employees.delete_employee, name="deleteEmployee"),
-       url(r'associated_employee_names/(?P<id>\d+)/$', service.associated_employee_names, name="assiosiated_employees"),
+    url(r'^updateGeneral/$', General.updateGeneral, name="updateGeneral"),
+    url(r'^BookingOptions/$', Options.BookingOptions, name="BookingOptions"),
+    url(r'associated_employee_names/(?P<id>\d+)/$', service.associated_employee_names, name="assiosiated_employees"),
  
 ]

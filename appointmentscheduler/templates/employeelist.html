@@ -12,17 +12,17 @@
 
 <div>
 
-<table style="width: 100%;">
+<table style="width: 90%;">
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addemployee' %}'"  value="Add Employee" />
 
    <tr>
-     <th  style="text-align:left;">Emp Name</th>
-       <th  style="text-align:left;">Image</th>
-      <th style="text-align: left;">Emp Notes</th>
-      <th style="text-align: left;">Email</th>
+      <th  style="text-align:left;">Emp Name</th>
+      <th  style="text-align:left;">Image</th>
+      <th  style="text-align: left;">Emp Notes</th>
+      <th  style="text-align: left;">Email</th>
       <th  style="text-align: left;">Phone</th>
       <th  style="text-align: left;">Is Active</th>
-      <th style="text-align: left;">Actions</th>
+      <th  style="text-align: left;">Actions</th>
    </tr>
 
    {% for emp in employees %}
@@ -35,7 +35,7 @@
               <td>{{emp.is_active}}</td>
                <td><a href="{% url 'appointmentschduler:editEmployee' emp.id %}">Edit </a>|
                    <a href="{% url 'appointmentschduler:deleteEmployee' emp.id %}">Delete </a>|
-                  <a href="{% url 'appointmentschduler:addemployee'%}">Add Employee
+                  <a href="{% url 'appointmentschduler:addemployee'%}">Add Employee</a>
                    </td>
         </tr>
     {% endfor %}

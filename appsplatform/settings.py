@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'djng',
     'bootstrap3',
     'appointmentscheduler',
-    'rest_framework',
 
 ]
 
@@ -81,12 +80,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'appsplatform.wsgi.application'
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-}
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
