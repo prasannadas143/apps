@@ -64,7 +64,7 @@ def add_service(request):
                     empinstance = AppschedulerEmployees.objects.get(id=int(empid))
                     service_instance.emp_service.add(empinstance)
 
-            return HttpResponseRedirect('/services/showservices/')
+            return HttpResponseRedirect('/appointmentschduler/showservices/')
     else:
         form = ServiceForm()
     return render(request, template_name,{'form': form } )
@@ -99,7 +99,7 @@ def edit_service(request,id):
                     empinstance = AppschedulerEmployees.objects.get(id=int(empid))
                     service_instance.emp_service.add(empinstance)
             # os.remove(imagepath)
-            return HttpResponseRedirect('/services/showservices/')
+            return HttpResponseRedirect('/appointmentschduler/showservices/')
     else :
         form = ServiceForm( instance=appscheduleobj )
         emp_service= appscheduleobj.emp_service.all()

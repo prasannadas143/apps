@@ -14,18 +14,13 @@ from django.core.files import File
 from base64 import decodestring
 from django.http import JsonResponse
 import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
+from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
 from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 
-@csrf_exempt
-def employee_List(request):
-    employees = AppschedulerEmployees.objects.all()
-    # DON'T USE
-    template_name = "employeelist.html"
-    return render_to_response(template_name, {'employees': employees})
+
 
 @csrf_exempt
 def services_names(request):
@@ -34,6 +29,29 @@ def services_names(request):
     serviceslist = [dict([("name",service.service_name), ("id",service.id)]) for service in services ]
     return HttpResponse(json.dumps(serviceslist), content_type='application/json')
 
+@csrf_exempt
+def employee_List(request):
+    employees = AppschedulerEmployees.objects.all()
+    # DON'T USE
+    template_name = "employeelist.html"
+    return render_to_response(template_name, {'employees': employees})
+
+
+@ensure_csrf_cookie
+def list_phones(request):
+    employees = AppschedulerEmployees.objects.all()
+    # DON'T USE
+    listphones= [dict([("phone",str(employee.phone)), ("id",employee.id)]) for employee in employees ]
+
+    return HttpResponse(json.dumps(listphones), content_type='application/json')
+
+@ensure_csrf_cookie
+def list_emails(request):
+    employees = AppschedulerEmployees.objects.all()
+    # DON'T USE
+    listemails = [dict([("email",str(employee.email)), ("id",employee.id)]) for employee in employees ]
+
+    return HttpResponse(json.dumps(listemails), content_type='application/json')
 
 @csrf_exempt
 def delete_employee(request,id=None):
@@ -44,22 +62,28 @@ def delete_employee(request,id=None):
 @csrf_exempt
 def add_Employee(request):
     # DON'T USE
-    pdb.set_trace()
     if request.method == 'POST':
 
         # create a form instance and populate it with data from the request:
         # check whether it's valid:
         form = EmployeeForm(request.POST or None, request.FILES or None)
 
-        
+ 
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
-
             # redirect to a new URL:
             form.save()
-
-            return HttpResponseRedirect('/services/employeelist/')
+            employee_instance = form.instance
+                
+            for key, value in request.POST.items():
+                matchobj =  re.match(r'^check\d+', key)     
+                if matchobj:
+                    fieldname = matchobj.group()
+                    empid= request.POST[fieldname]
+                    empinstance = AppschedulerServices.objects.get(id=int(empid))
+                    employee_instance.appschedulerservices_set.add(empinstance)
+            return HttpResponseRedirect('/appointmentschduler/employeelist/')
 
             # if a GET (or any other method) we'll create a blank form
     else:

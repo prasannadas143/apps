@@ -21,7 +21,7 @@ from django.views.generic.base import TemplateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^services/', include('appointmentscheduler.urls', namespace="appointmentschduler") ),
+    url(r'^appointmentschduler/', include('appointmentscheduler.urls', namespace="appointmentschduler") ),
 ]
 
 if settings.DEBUG is True:

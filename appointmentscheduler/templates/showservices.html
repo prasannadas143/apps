@@ -326,7 +326,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
           alert("no rows selected");
      }
        $.ajax({
-                url: '/services/deleteservices/',
+                url: "{% url 'appointmentschduler:deleteservices' %}",
                 method: 'POST',
                 data : {
                         "rowids":rowids,
@@ -357,7 +357,7 @@ $('#datatables tbody').on('click', 'button', function () {
     let class_name = $(this).attr('class');
     if (class_name == 'btn btn-info') {
        
-          location.href = "/services/editservice/" + data['id'];
+          location.href = "/appointmentschduler/editservice/" + data['id'];
 
 
     } else if( class_name == 'btn btn-danger') {
@@ -373,7 +373,7 @@ $('#datatables tbody').on('click', 'button', function () {
     $('#confirm').on('click', '#delete', function (e) {
 
         $.ajax({
-              url: '/services/deleteservice/' + id + '/',
+              url: "/appointmentschduler/deleteservice/" + id ,
               method: 'POST'
           }).success(function (data, textStatus, jqXHR) {
               // location.reload();

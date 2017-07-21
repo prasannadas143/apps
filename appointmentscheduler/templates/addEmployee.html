@@ -15,6 +15,36 @@ $(document).ready(function() {
   
 });
 
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+
 var expanded = false;
 function showCheckboxes() {
   var checkboxes = document.getElementById("checkboxes");
@@ -41,7 +71,7 @@ function listServices() {
                 if (servicelist != null &&  servicelist.length > 0  ){
                       for (var i = 0; i <  servicelist.length; i++)
                       {
-                          serviceName+= "<label for=" + servicelist[i].name +  ' > <input type="checkbox" name=' + "check" + servicelist[i].id  + ' ng-model=' + "servicedata.check" + servicelist[i].id.toString() +       " value=" + servicelist[i].id + " />" + servicelist[i].name + " </label>";
+                          serviceName+= "<label for=" + servicelist[i].name +  ' > <input type="checkbox" name=' + "check" + servicelist[i].id  + " value=" + servicelist[i].id + " />" + servicelist[i].name + " </label>";
                       }
                       $( "#checkboxes" ).append( serviceName);
 
@@ -51,6 +81,72 @@ function listServices() {
       });
   }
         
+function check_duplicated_phoneno() {
+
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:listphones'  %}",
+          
+            success:function(response){
+                // console.log(response);
+                listphones =eval(response);
+                var x = document.getElementById("id_phone");
+                textvalue = x.value.trim();
+                if (listphones != null &&  listphones.length > 0  ){
+                      for (var i = 0; i <  listphones.length; i++)
+                      {
+                          phoneno= listphones[i].phone.trim(); 
+                          if (phoneno == textvalue) {
+                             alert("phone numer already exist");
+                             return false;
+                          }
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+  function check_duplicated_email() {
+
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:listemails'  %}",
+          
+            success:function(response){
+                // console.log(response);
+                listemails =eval(response);
+                var servicename ="";
+                var x = document.getElementById("id_email");
+                textvalue = x.value.trim();
+                if (listemails != null &&  listemails.length > 0  ){
+                      for (var i = 0; i <  listemails.length; i++)
+                      {
+                          email= listemails[i].email.trim(); 
+                          if (email == textvalue) {
+                             alert("Email already exist");
+                             return false;
+                          }
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+
+
+function setsubscribe() {
+
+	    var is_subscribed = document.getElementById("is_subscribed");
+	     is_subscribed.value = is_subscribed.checked ? 1: 0 ;
+
+	    var is_subscribed_sms = document.getElementById("is_subscribed_sms");
+	     is_subscribed_sms.value = is_subscribed_sms.checked ? 1: 0 ;
+	     return true;
+}
 
 </script>
 
@@ -66,37 +162,51 @@ function listServices() {
     <div id="middle">
 
         <div id="right">
-        <div class="PPPcontent-top">
+        <div class="content-top">
 
             <div class="content-middle" id="content">
             <div class="notice-box">
 			<span class="notice-info">&nbsp;</span>
 			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
+			<div>{{ form.errors|default:"" }}</div>
 
-         <form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" method="post" >
+         <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post" >
 		<input name="employee_create" value="1" type="hidden">
 		<input style="display:none">
 		<input style="display:none" type="password">
 					<p class="pj-multilang-wrap" data-index="1" style="display: ">
 				<label class="title">Employee name:</label>
 				<span class="inline_block">
-                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="employeedata.emp_name" type="text" />
+                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="emp_name" type="text" required />
+            	</span>
+            	<span ng-messages="frmCreateEmployee.emp_name.$error" style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
+				</span>
 
-            </span>
 			</p>
 					<p>
 			<label class="title">Notes:</label>
-			   <input id="id_emp_notes" maxlength="100" name="emp_notes" ng-model="employeedata.emp_notes" type="text" />
+			   {{form.emp_notes}}
 				
 		</p>
 		<p style="position: relative">
 			<label class="title">Email</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-				 <input id="id_email" maxlength="100" name="email" ng-model="employeedata.email" type="text" />
+			   		<input id="id_email" maxlength="254" name="email" type="email" ng-model="id_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
+			   			 onblur="check_duplicated_email()" required />
 			</span>
+
+
+			<span ng-messages="frmCreateEmployee.email.$error" style="color:maroon" role="alert">
+			  <span ng-message="required">This field is required</span>
+			  <span ng-message="email">Your email address is invalid</span>
+			</span>
+
+
+
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed" id="is_subscribed"  ng-model="employeedata.is_subscribed" value="1" type="checkbox">
+				<label><input name="is_subscribed" id="is_subscribed" type="checkbox"   value="0" >
 				Send email when new booking is made</label>
 			</span>
 		</p>
@@ -104,17 +214,26 @@ function listServices() {
 			<label class="title">Password</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
-				 <input id="id_password" maxlength="100" name="password" ng-model="employeedata.password" type="text" />
+			   		<input id="id_password" name="password" type="password" ng-model="password" required />
+			</span>
+			<span ng-messages="frmCreateEmployee.password.$error"  style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
 			</span>
 		</p>
 		<p style="position: relative">
 			<label class="title">Phone</label>
-			<span class="pj-form-field-custom pj-form-field-custom-before">
-				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
-				 <input id="id_phone" maxlength="100" name="phone" ng-model="employeedata.phone" type="text" />
-			</span>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr>
+				</span>
+					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{10,13}$/"  	 	required onblur="check_duplicated_phoneno()" />
+				</span>
+
+				<span ng-messages="frmCreateEmployee.phone.$error"   style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
+				  <span ng-message="pattern">Must be a valid phone number</span>
+				</span>
 			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed_sms" id="is_subscribed_sms"  ng-model="employeedata.is_subscribed_sms" value="1" type="checkbox"> Send SMS when new booking is made</label>
+				<label><input name="is_subscribed_sms" id="is_subscribed_sms"  type="checkbox" value="0" > Send SMS when new booking is made</label>
 			</span>
 		</p>
 
@@ -136,24 +255,24 @@ function listServices() {
 		<p>
 			<label class="title">Status</label>
 			<span class="inline_block">
-				<select name="is_active" id="is_active" class="pj-form-field required valid" ng-model="employeedata.is_active" aria-required="true" aria-invalid="false">
-					<option selected="true" value="">-- Choose--</option>
-					<option value="1">Active</option>
-					<option value="0">Inactive</option>			
-				</select>
-					 <input id="id_is_active" maxlength="100" name="is_active" ng-model="employeedata.is_active" value="1" type="checkbox" />
+				<select name="is_active" id="id_is_active" class="pj-form-field required valid" aria-required="true" aria-invalid="false">
+                  <option value="True">active</option>
+                  <option value="False" selected="selected">inactive</option>
+              </select>
 			</span>
 		</p>
 		<p>
 			<label class="title">Picture</label>
-			<span class="float_left block">
+			<span class="float_left block">  
 				 <input id="avatar" name="avatar"  type="file"  />
 
 			</span>
 		</p>
 		<p>
 			<label class="title">&nbsp;</label>
-			<input value="Save"  class="pj-button" type="submit">
+			
+        	<input  type="submit" value="Save" class="pj-button"  class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="frmCreateEmployee.$invalid " onclick="setsubscribe()">
+     
 			<input value="Cancel" ng-click=CancelForm()  class="pj-button" type="button">
 		</p>
 	</form>

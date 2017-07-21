@@ -67,11 +67,6 @@ function listemployees() {
             method:'get',
             url:"{% url 'appointmentschduler:listemployeesname'  %}",
 
-           "beforeSend": function(xhr, settings) {
-                console.log("Before Send");
-                $.ajaxSettings.beforeSend(xhr, settings);
-            },
-
             success:function(response){
                 // console.log(response);
                 employeelist =eval(response);
@@ -95,10 +90,6 @@ function listemployees() {
     $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:listServicesName'  %}",
-            "beforeSend": function(xhr, settings) {
-                console.log("Before Send");
-                $.ajaxSettings.beforeSend(xhr, settings);
-            },
             success:function(response){
                 // console.log(response);
                 servicelist =eval(response);
@@ -139,7 +130,7 @@ function listemployees() {
             <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" ng-model="service_name" ng-minlength="4" ng-maxlength="50" ng-pattern="/^\w+$/" onblur="check_duplicated_name()" required />
+                   <input id="id_service_name" maxlength="100" name="service_name"  type="text" ng-model="service_name" ng-minlength="4" ng-maxlength="100" ng-pattern="/^\w+$/" onblur="check_duplicated_name()" required />
 
              </span>
 

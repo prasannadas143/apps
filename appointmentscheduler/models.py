@@ -11,6 +11,9 @@ from django.db import models
 from django.utils.text import slugify
 
 import re,pdb,os,datetime,uuid
+from phonenumber_field.modelfields import PhoneNumberField
+from django.core import validators
+
 
 class AppschedulerBookings(models.Model):
     uuid = models.CharField(unique=True, max_length=12, blank=True, null=True)
@@ -90,29 +93,30 @@ class AppschedulerDates(models.Model):
 
 
 def employee_img_location(instance, filename):
-    u = uuid.uuid1()
-    imagepath = "%s/%d_%s" %( "employee" ,u.int, filename)
-    return re.sub('\s+','',imagepath)
+    filename, ext = os.path.splitext(filename.lower())
+    filename = "%s_%s.%s" % (slugify(filename),datetime.datetime.now().strftime("%Y-%m-%d.%H-%M-%S"), ext)
+    imagepath = "%s/%s_%s/%s" %( "employee" ,instance.emp_name,instance.phone, filename)
+    print(imagepath)
+    return re.sub('[!@#$+\s]','',imagepath)
 
 
 class AppschedulerEmployees(models.Model):
-    emp_name = models.CharField(max_length=255, blank=False, null=False)
-    emp_notes = models.TextField(blank=False, null=False)
-    email = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    password = models.TextField(blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
+    emp_name = models.CharField(max_length=100, blank=False, null=False)
+    emp_notes = models.TextField(blank=True, null=True)
+    email = models.EmailField(unique=True,  validators=[validators.validate_email,])
+    password = models.CharField(max_length=50)
+    phone =  PhoneNumberField(unique=True,  blank=False, null=False)
     avatar = models.ImageField(upload_to=employee_img_location, default = 'employee/no-img.jpg')
-    last_login = models.DateTimeField(blank=True, null=True)
-
     is_subscribed = models.BooleanField(default=False)
     is_subscribed_sms = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
+
 
     class Meta:
         # managed = False
         db_table = 'appscheduler_employees'
 
+  
 
 class AppschedulerEmployeesServices(models.Model):
     employee_id = models.IntegerField()
@@ -178,9 +182,9 @@ class AppschedulerRoles(models.Model):
 def service_img_location(instance, filename):
     # imagepath = "%s/%s/%s" %( "service" , instance.service_name, filename)
     filename, ext = os.path.splitext(filename.lower())
-    filename = "%s.%s%s" % (slugify(filename),datetime.datetime.now().strftime("%Y-%m-%d.%H-%M-%S"), ext)
+    filename = "%s_%s.%s" % (slugify(filename),datetime.datetime.now().strftime("%Y-%m-%d.%H-%M-%S"), ext)
     imagepath = '%s/%s/%s' % ('service', instance.service_name,filename)
-    return re.sub('\s+','',imagepath)
+    return re.sub('[!@#$+\s]','',imagepath)
 
 class AppschedulerServices(models.Model):
     PRIORITY_CHOICES = ((True, 'active'),
@@ -222,7 +226,6 @@ class AppschedulerUsers(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     created = models.DateTimeField()
-    last_login = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=1)
     ip = models.CharField(max_length=15, blank=True, null=True)
 

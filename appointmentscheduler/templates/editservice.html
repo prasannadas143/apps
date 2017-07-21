@@ -63,7 +63,7 @@ function showCheckboxes() {
 function assiosiated_employees(serviceid) {
     $.ajax({
             method:'get',
-            url:"/services/associated_employee_names/" + serviceid,
+            url:"/appointmentschduler/associated_employee_names/" + serviceid  ,
             data: { },
             dataType: "json",
            
@@ -92,8 +92,8 @@ function assiosiated_employees(serviceid) {
         
 function delete_image(serviceid) {
     $.ajax({
-            method:'get',
-            url:"/services/deleteimage/" + serviceid,
+            method:'DELETE',
+            url:"/appointmentschduler/deleteimage/" + serviceid ,
             data: { },
             success:function(response){
                 console.log(response);
@@ -142,7 +142,7 @@ function delete_image(serviceid) {
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
     <div ng-app="ServiceMod">
 
-  <form  class="form pj-form ng-pristine ng-invalid ng-invalid-required"  name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}"  method="post"  >{% csrf_token %}
+  <form  class="form pj-form ng-pristine ng-invalid ng-invalid-required"  name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:editservice' appscheduleinst.id %}"  method="post"  >{% csrf_token %}
 
 
           <label class="title">
@@ -194,7 +194,7 @@ function delete_image(serviceid) {
                   <p><label for="id_photo">service image</label>
                 </a> <br> <input type="file" name="photoname" id="id_photo"></p>
                 {% if appscheduleinst.service_img.name != defaultimg %}
-                        <button onclick="delete_image( {{  appscheduleinst.id|safe }} )">Delete image</button>
+                        <button onclick="delete_image( {{  appscheduleinst.id }} )">Delete image</button>
                 {% endif %}
 
                </div>
