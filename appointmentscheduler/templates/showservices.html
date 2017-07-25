@@ -326,7 +326,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
           alert("no rows selected");
      }
        $.ajax({
-                url: "{% url 'appointmentschduler:deleteservices' %}",
+                url: "{% url 'appointmentschduler:delete_services' %}",
                 method: 'POST',
                 data : {
                         "rowids":rowids,
@@ -373,7 +373,7 @@ $('#datatables tbody').on('click', 'button', function () {
     $('#confirm').on('click', '#delete', function (e) {
 
         $.ajax({
-              url: "/appointmentschduler/deleteservice/" + id ,
+              url: "/appointmentschduler/deleteservice/" + id + "/",
               method: 'POST'
           }).success(function (data, textStatus, jqXHR) {
               // location.reload();

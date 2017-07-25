@@ -84,8 +84,8 @@ function listemployees() {
       });
   }
       
-
-    function check_duplicated_name() {
+var invalid_svcname = true;
+function check_duplicated_name() {
 
     $.ajax({
             method:'get',
@@ -102,8 +102,10 @@ function listemployees() {
                           servicename= servicelist[i].name.toUpperCase(); 
                           if (servicename == textvalue) {
                              alert("service name exist");
+                             invalid_svcname = false ;
                              return false;
                           }
+                          invalid_svcname = true ;
                       }
 
                 }
@@ -112,7 +114,14 @@ function listemployees() {
       });
   }  
 
-
+function validateserviceform() {
+   
+    if( ! invalid_svcname ) {
+        alert("service already exist");
+        return false; 
+    }
+    return true;
+}   
       
     
 
@@ -124,8 +133,8 @@ function listemployees() {
 <span class="notice-info">&nbsp;</span> <span class="block bold">Add a service</span>
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
-    <div ng-app="ServiceMod">
-     <form class="form pj-form ng-pristine ng-invalid ng-invalid-required"   name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post"> {% csrf_token %}
+    <div>{{ form.errors|default:"" }}</div>
+     <form class="form pj-form"   ng-app="ServiceMod" name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:addservice' %}" method="post"   onsubmit="return validateserviceform()" > {% csrf_token %}
      <p>
             <label class="title">
                 Service name:</label>
@@ -258,7 +267,6 @@ function listemployees() {
       </div>
    </p>
    </form>
-   </div>
    
 
 

@@ -80,7 +80,9 @@ function listServices() {
             }
       });
   }
-        
+ 
+ var invalid_phone = true;	
+       
 function check_duplicated_phoneno() {
 
     $.ajax({
@@ -98,8 +100,11 @@ function check_duplicated_phoneno() {
                           phoneno= listphones[i].phone.trim(); 
                           if (phoneno == textvalue) {
                              alert("phone numer already exist");
+                             invalid_phone = false;
                              return false;
                           }
+                         invalid_phone = true;
+
                       }
 
                 }
@@ -108,7 +113,9 @@ function check_duplicated_phoneno() {
       });
   }  
 
-  function check_duplicated_email() {
+var invalid_email = true;
+
+function check_duplicated_email() {
 
     $.ajax({
             method:'get',
@@ -126,8 +133,11 @@ function check_duplicated_phoneno() {
                           email= listemails[i].email.trim(); 
                           if (email == textvalue) {
                              alert("Email already exist");
+							 invalid_email = false;
                              return false;
                           }
+						  invalid_email = true;
+
                       }
 
                 }
@@ -138,13 +148,22 @@ function check_duplicated_phoneno() {
 
 
 
-function setsubscribe() {
+function validateemployeeform() {
 
 	    var is_subscribed = document.getElementById("is_subscribed");
 	     is_subscribed.value = is_subscribed.checked ? 1: 0 ;
 
 	    var is_subscribed_sms = document.getElementById("is_subscribed_sms");
 	     is_subscribed_sms.value = is_subscribed_sms.checked ? 1: 0 ;
+	     if( ! invalid_email ) {
+	     	alert("Email already exist");
+	     	return false;	
+	     }
+	     if( ! invalid_phone ) {
+	     	alert("Phone no already exist");
+	     	return false;	
+	     }
+
 	     return true;
 }
 
@@ -168,9 +187,9 @@ function setsubscribe() {
             <div class="notice-box">
 			<span class="notice-info">&nbsp;</span>
 			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
-			<div>{{ form.errors|default:"" }}</div>
+<div>{{ form.errors|default:"" }}</div>
 
-         <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post" >
+         <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post"  onsubmit="return validateemployeeform()"  >
 		<input name="employee_create" value="1" type="hidden">
 		<input style="display:none">
 		<input style="display:none" type="password">
@@ -271,10 +290,9 @@ function setsubscribe() {
 		<p>
 			<label class="title">&nbsp;</label>
 			
-        	<input  type="submit" value="Save" class="pj-button"  class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="frmCreateEmployee.$invalid " onclick="setsubscribe()">
+        	<input  type="submit" value="Submit" class="pj-button"  class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="frmCreateEmployee.$invalid " >
      
-			<input value="Cancel" ng-click=CancelForm()  class="pj-button" type="button">
-		</p>
+			</p>
 	</form>
 
 

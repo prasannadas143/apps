@@ -83,12 +83,13 @@ def edit_service(request,id):
                 if hasattr(post, key):
                     setattr(post, key , request.POST[key])
             if ( 'photoname' in request.FILES and request.FILES['photoname'] is not None):
-                # imagepath = appscheduleobj.service_img.file.name
-                if appscheduleobj.service_img.name != defaultimg:
-                    os.remove(os.path.dirname(appscheduleobj.service_img.path))
+                # implement code once permission issue gets fixes
+                # if appscheduleobj.service_img.name != request.FILES['photoname']:
+                #     os.remove(os.path.dirname(appscheduleobj.service_img.path))
                 appscheduleobj.service_img=request.FILES['photoname']
-                appscheduleobj.save()
-
+            else :
+                appscheduleobj.avatar = defaultimg
+            appscheduleobj.save()
             post.save()
             service_instance = form.instance
             for key, value in request.POST.items():
@@ -102,8 +103,7 @@ def edit_service(request,id):
             return HttpResponseRedirect('/appointmentschduler/showservices/')
     else :
         form = ServiceForm( instance=appscheduleobj )
-        emp_service= appscheduleobj.emp_service.all()
-        return render(request, template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
+    return render(request, template_name, {'form': form, 'appscheduleinst' : appscheduleobj,"defaultimg" : defaultimg})
 
 @requires_csrf_token
 def deleteimage(request,id):
@@ -114,9 +114,13 @@ def deleteimage(request,id):
     oldimagepath=  os.path.dirname(appscheduleobj.service_img.path)
 
     appscheduleobj.service_img = defaultimg   
-    if oldimage!= defaultimg:
-        os.remove( oldimagepath )
-    return  HttpResponse(json.dumps(defaultimg), content_type='application/json')
+    employee_default_img = '/media/' + defaultimg       
+
+    appscheduleobj.save()
+    # implement code after permission issue got fixed
+    # if oldimage!= defaultimg:
+    #     os.remove( oldimagepath )
+    return  HttpResponse(json.dumps(employee_default_img), content_type='application/json')
 
 @ensure_csrf_cookie
 def delete_service(request,id=None):
