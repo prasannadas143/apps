@@ -209,49 +209,84 @@ function delete_image(employeeid) {
 			
 <div>"{{ form.errors|default:"" }}"</div>
 
-<form ng-app="ServiceMod" ng-controller="EmployeeCtrl"  action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post" id="frmCreateEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate"   onsubmit="return setsubscribe()" >
-		<input name="employee_create" value="1" type="hidden">
-		<input style="display:none">
-		<input style="display:none" type="password">
-					<p class="pj-multilang-wrap" data-index="1" style="display: ">
-				<label class="title">Employee name:</label>
-				<span class="inline_block">
+<form ng-app="ServiceMod"   action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post" name="frmeditEmployee" id="frmeditEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate"   onsubmit="return setsubscribe()" >
 
-				  <input id="id_emp_name" maxlength="100" name="emp_name"  type="text"  value="{{ appscheduleinst.emp_name }}" required="" />
+		<label class="title">Employee name:</label>
+		<span class="inline_block">
 
-            </span>
-			</p>
-					<p>
+			<input id="id_emp_name" maxlength="100" name="emp_name"  ng-model="emp_name"  ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/"  ng-init='emp_name="{{appscheduleinst.emp_name}}"'  type="text" value="{{appscheduleinst.emp_name}}" required />
+
+		</span>
+		<span ng-messages="frmeditEmployee.emp_name.$error" style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
+		</span>
+
+		 <div ng-messages="frmeditEmployee.emp_name.$error"  ng-show="frmeditEmployee.emp_name.$invalid && !frmeditEmployee.emp_name.$pristine " style="color:maroon" role="alert" >
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+                <div ng-message="pattern">Must be a valid emp name</div>
+         </div>
+		</p>
+		<p>
 			<label class="title">Notes:</label>
-			  <input id="id_emp_notes" maxlength="100" name="emp_notes"  type="text" value="{{ appscheduleinst.emp_notes }}" />
+			 <span class="inline_block">
+                   <input id="id_emp_notes" maxlength="100" name="emp_notes" ng-model="emp_notes" ng-minlength="4" ng-maxlength="200" type="text" ng-init='emp_notes="{{appscheduleinst.emp_notes}}"' value="{{ appscheduleinst.emp_notes }}"/>
+            </span>
+             <div ng-messages="frmeditEmployee.emp_notes.$error"  ng-show="frmeditEmployee.emp_notes.$invalid && !frmeditEmployee.emp_notes.$pristine" style="color:maroon" role="alert">
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+            </div>
 				
 		</p>
 		<p style="position: relative">
 			<label class="title">Email</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-				 <input id="id_email" maxlength="600" name="email"  type="text" value="{{ appscheduleinst.email }}"  onblur='check_duplicated_email("{{ appscheduleinst.email }}")''  required="" />
+				 <input id="id_email" name="email" name="email" type="email" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" ng-init='email="{{appscheduleinst.email}}"' value="{{ appscheduleinst.email }}"  onblur='check_duplicated_email("{{ appscheduleinst.email }}")''  required />
 			</span>
+
+			<span ng-messages="frmeditEmployee.email.$error" style="color:maroon" role="alert">
+			  <span ng-message="required">This field is required</span>
+			  <span ng-message="email">Your email address is invalid</span>
+              <span ng-message="pattern">Your email is invalid </span>
+			</span>
+
 			<span style="position: absolute; top: 7px; left: 405px">
 				<label>
 				<input id="is_subscribed" maxlength="600" name="is_subscribed"  type="checkbox" value="{{ appscheduleinst.is_subscribed }}"  {% if appscheduleinst.is_subscribed == 1 %} checked {% endif %} required="" />
 
 				Send email when new booking is made</label>
 			</span>
+
 		</p>
+
 		<p>
 			<label class="title">Password</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
-				<input id="id_password" maxlength="10" name="password"  type="password" value="{{ appscheduleinst.password }}" required="" />
+				<input id="id_password"  name="password" ng-model="password"  
+				ng-init='password="{{appscheduleinst.password}}"'  type="password" ng-minlength=6 value="{{ appscheduleinst.password }}" required />
+			</span>
+
+			<span ng-messages="frmeditEmployee.password.$error"  style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
+          		  <span ng-message="minlength">Your field is too short </span>
 			</span>
 		</p>
 		<p style="position: relative">
 			<label class="title">Phone</label>
-				<span class="pj-form-field-custom pj-form-field-custom-before">
+			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
-				<input id="id_phone" maxlength="600" name="phone"  type="text" value="{{ appscheduleinst.phone }}" onblur='check_duplicated_phoneno("{{ appscheduleinst.phone }}")'  required="" />
+				<input id="id_phone"  name="phone"  type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{12}$/"  	 value="{{ appscheduleinst.phone }}" 
+				ng-init='phone="{{appscheduleinst.phone}}"' 
+				onblur='check_duplicated_phoneno("{{ appscheduleinst.phone }}")'  required />
 			</span>
+
+			<span ng-messages="frmeditEmployee.phone.$error"   style="color:maroon" role="alert">
+				  <span ng-message="required">This field is required</span>
+				  <span ng-message="pattern">Must be a valid phone number</span>
+			</span>
+			
 			<span style="position: absolute; top: 7px; left: 405px">
 				<label>
 					<input id="is_subscribed_sms" maxlength="600" name="is_subscribed_sms"  type="checkbox" value="{{ appscheduleinst.is_subscribed_sms }}"   {% if appscheduleinst.is_subscribed_sms == 1 %} checked {% endif %}  />
@@ -299,7 +334,7 @@ function delete_image(employeeid) {
         </p>
 		<p>
 			<label class="title">&nbsp;</label>
-			<input value="submit" class="pj-button" type="submit" >
+			<input  type="submit" value="Submit" class="pj-button"  class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="frmeditEmployee.$invalid " >		
 		</p>
 	</form>
  

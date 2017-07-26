@@ -190,61 +190,72 @@ function validateemployeeform() {
 <div>{{ form.errors|default:"" }}</div>
 
          <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post"  onsubmit="return validateemployeeform()"  >
-		<input name="employee_create" value="1" type="hidden">
-		<input style="display:none">
-		<input style="display:none" type="password">
-					<p class="pj-multilang-wrap" data-index="1" style="display: ">
+		
 				<label class="title">Employee name:</label>
 				<span class="inline_block">
-                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="emp_name" type="text" required />
-            	</span>
-            	<span ng-messages="frmCreateEmployee.emp_name.$error" style="color:maroon" role="alert">
+                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="emp_name" ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/" type="text" required />
+      	</span>
+      	<span ng-messages="frmCreateEmployee.emp_name.$error" style="color:maroon" role="alert">
 				  <span ng-message="required">This field is required</span>
 				</span>
-
+        <div ng-messages="frmCreateEmployee.emp_name.$error"  ng-show="frmCreateEmployee.emp_name.$invalid && !frmCreateEmployee.emp_name.$pristine " style="color:maroon" role="alert" >
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+                <div ng-message="pattern">Must be a valid emp name</div>
+         </div>
 			</p>
-					<p>
-			<label class="title">Notes:</label>
-			   {{form.emp_notes}}
-				
-		</p>
+			
+      <p>
+			   <label class="title">Notes:</label>
+
+          <span class="inline_block">
+                   <input id="id_emp_notes" maxlength="100" name="emp_notes" ng-model="emp_notes" ng-minlength="4" ng-maxlength="200" type="text"  />
+            </span>
+             <div ng-messages="frmCreateEmployee.emp_notes.$error"  ng-show="frmCreateEmployee.emp_notes.$invalid && !frmCreateEmployee.emp_notes.$pristine" style="color:maroon" role="alert">
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+            </div>
+	  	</p>
+
 		<p style="position: relative">
-			<label class="title">Email</label>
-			<span class="pj-form-field-custom pj-form-field-custom-before">
-				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-			   		<input id="id_email" maxlength="254" name="email" type="email" ng-model="id_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
-			   			 onblur="check_duplicated_email()" required />
-			</span>
+  			<label class="title">Email</label>
+  			<span class="pj-form-field-custom pj-form-field-custom-before">
+  				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
+  			   		<input id="id_email" maxlength="254" name="email" type="email" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
+  			   			 onblur="check_duplicated_email()" required />
+  			</span>
 
 
-			<span ng-messages="frmCreateEmployee.email.$error" style="color:maroon" role="alert">
-			  <span ng-message="required">This field is required</span>
-			  <span ng-message="email">Your email address is invalid</span>
-			</span>
+  			<span ng-messages="frmCreateEmployee.email.$error" style="color:maroon" role="alert">
+  			  <span ng-message="required">This field is required</span>
+  			  <span ng-message="email">Your email  is invalid</span>
+          <span ng-message="pattern">Your email is invalid </span>
 
+  			</span>
 
-
-			<span style="position: absolute; top: 7px; left: 405px">
-				<label><input name="is_subscribed" id="is_subscribed" type="checkbox"   value="0" >
-				Send email when new booking is made</label>
-			</span>
+  			<span style="position: absolute; top: 7px; left: 405px">
+  				<label><input name="is_subscribed" id="is_subscribed" type="checkbox"   value="0" >
+  				Send email when new booking is made</label>
+  			</span>
 		</p>
 		<p>
 			<label class="title">Password</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
-			   		<input id="id_password" name="password" type="password" ng-model="password" required />
+			   		<input id="id_password" name="password" type="password" ng-model="password" ng-minlength=6 required />
 			</span>
 			<span ng-messages="frmCreateEmployee.password.$error"  style="color:maroon" role="alert">
 				  <span ng-message="required">This field is required</span>
+          <span ng-message="minlength">Your field is too short </span>
 			</span>
+
 		</p>
 		<p style="position: relative">
 			<label class="title">Phone</label>
 				<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr>
 				</span>
-					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{10,13}$/"  	 	required onblur="check_duplicated_phoneno()" />
+					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{12}$/"  	 	 onblur="check_duplicated_phoneno()" required/>
 				</span>
 
 				<span ng-messages="frmCreateEmployee.phone.$error"   style="color:maroon" role="alert">

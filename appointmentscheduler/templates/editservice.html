@@ -163,7 +163,7 @@ function check_duplicated_name(current_svcname) {
           <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="50" ng-pattern="/^\w+$/"  ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name('{{appscheduleinst.service_name}}')"  required  />
+                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="100" ng-pattern="/^\w+$/"  ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name('{{appscheduleinst.service_name}}')"  required  />
 
             </span>
            
@@ -175,6 +175,8 @@ function check_duplicated_name(current_svcname) {
               <div ng-messages="serviceform.service_name.$error"  ng-show="serviceform.service_name.$invalid && !serviceform.service_name.$pristine " style="color:maroon" role="alert" >
                 <div ng-message="minlength">Your field is too short   </div>
                 <div ng-message="maxlength">Your field is too long</div>
+                <div ng-message="pattern">Must be a valid Service name</div>
+
               </div>
  
         </p>
