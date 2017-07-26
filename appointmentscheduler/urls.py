@@ -27,5 +27,4 @@ urlpatterns = [
     url(r'^PaymentOptions/$', Payments.PaymentOptions, name="PaymentOptions"),
     url(r'^BookingFormOptions/$', BookingForm.BookingFormOptions, name="BookingFormOptions"), 
     url(r'associated_service_names/(?P<id>\d+)/$', employees.associated_service_names, name="assiosiated_services"),
- 
 ]
