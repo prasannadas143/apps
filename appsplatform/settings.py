@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'djng',
     'bootstrap3',
     'appointmentscheduler',
+    'appointmentscheduler.templatetags',
 
 ]
 

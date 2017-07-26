@@ -2,6 +2,8 @@
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
+{% load get_item %}
+
 {% block title %}
 {% endblock %}
 {% block extraHeader %}
@@ -21,7 +23,7 @@
     <div class="col-sm-6">
     <select name="{{ items.o_bf_name_id }}">
     {% for entry in items.o_bf_name %}
-    <option {% if entry == items.o_bf_name_selected %}  selected {% endif %} value="{{ entry }}">'{{ items.showlabels[entry.id]}}
+    <option {% if entry == items.o_bf_name_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
@@ -34,7 +36,7 @@
     <div class="col-sm-6">
     <select name="{{ items.o_bf_zip_id }}">
     {% for entry in items.o_bf_zipList %}
-    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}</option>
     {% endfor %}
     </select>
     </div>
@@ -45,7 +47,7 @@
     <div class="col-sm-6">
     <select name="{{ items.o_bf_zip_id }}">
     {% for entry in items.o_bf_zipList %}
-    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}</option>
     {% endfor %}
     </select>
     </div>

@@ -38,7 +38,6 @@ def BookingFormOptions(request):
    # you can remove the preview assignment (form =request.POST)
    BookingFormdata = dict()
    if request.method == 'POST':
-      pdb.set_trace();
       for field in request.POST.keys():
          newstep = request.POST[field.strip()]
          update_value(field, tab_id , newstep.strip() )
@@ -47,7 +46,6 @@ def BookingFormOptions(request):
 
       item = AppschedulerOptions.objects.filter(tab_id=4)
 
-      pdb.set_trace();
 
       #o_bf_name
       o_bf_zipList = item[11].value.split('::')
