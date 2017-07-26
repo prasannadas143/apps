@@ -2,12 +2,10 @@ from django.conf.urls import url
 
 from .views import service,employees
 from .views.Options import General
-from .views.Options.Booking import Options,Payments
+from .views.Options.Booking import Options,Payments,BookingForm
 
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
-
-    
     url(r'addservice/$', service.add_service , name="addservice"),
     url(r'^editservice/(?P<id>\d+)/$', service.edit_service, name="edit_service"),
     url(r'^addemployee/$', employees.add_Employee, name="addemployee"),
@@ -26,6 +24,8 @@ urlpatterns = [
     url(r'^updateGeneral/$', General.updateGeneral, name="updateGeneral"),
     url(r'^BookingOptions/$', Options.BookingOptions, name="BookingOptions"),
     url(r'associated_employee_names/(?P<id>\d+)/$', service.associated_employee_names, name="assiosiated_employees"),
+    url(r'^PaymentOptions/$', Payments.PaymentOptions, name="PaymentOptions"),
+    url(r'^BookingFormOptions/$', BookingForm.BookingFormOptions, name="BookingFormOptions"), 
     url(r'associated_service_names/(?P<id>\d+)/$', employees.associated_service_names, name="assiosiated_services"),
  
 ]

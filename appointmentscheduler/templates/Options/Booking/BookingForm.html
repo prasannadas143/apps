@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}
+{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+<div id="BookingFormOptions">
+	   <h2>Booking Form</h2>
+
+
+    <form class="form-horizontal" role="form" method="POST" action="{% url 'appointmentschduler:PaymentOptions' %}" onsubmit="updateform()">
+
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="o_bf_name">Name</label>
+
+    <div class="col-sm-6">
+    <select name="{{ items.o_bf_name_id }}">
+    {% for entry in items.o_bf_name %}
+    <option {% if entry == items.o_bf_name_selected %}  selected {% endif %} value="{{ entry }}">'{{ items.showlabels[entry.id]}}
+    </option>
+    {% endfor %}
+    </select>
+    </div>{% if entry == items.o_bf_name_selecteds  %} selected {% endif %}
+    </div>
+
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="o_bf_name">Zip</label>
+    <div class="col-sm-6">
+    <select name="{{ items.o_bf_zip_id }}">
+    {% for entry in items.o_bf_zipList %}
+    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+    {% endfor %}
+    </select>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="o_bf_name">Zip</label>
+    <div class="col-sm-6">
+    <select name="{{ items.o_bf_zip_id }}">
+    {% for entry in items.o_bf_zipList %}
+    <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+    {% endfor %}
+    </select>
+    </div>
+    </div>
+
+
+    </form>
+
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    //set initial state.
+    function updateform() {
+     return true ;
+  }
+});
+    
+</script>
+
+ {% endblock %}
