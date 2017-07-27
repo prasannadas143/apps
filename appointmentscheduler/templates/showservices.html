@@ -14,7 +14,6 @@
    <input type="button" value="All"   id="all"  />
 
 
-<table>
    <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
 
 <table id="datatables" class="table table-hover">
@@ -35,18 +34,16 @@
 
   
 <button type="button" id="multicheckbox"  >Delete </button>
-</table>
-    <div class="modal fade" id="confirm" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Are you sure?</h4>
-                </div>
-                <div class="modal-body">
-                    <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
-                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-                </div>
+<div class="modal fade" id="confirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
             </div>
         </div>
     </div>

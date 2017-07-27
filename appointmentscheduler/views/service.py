@@ -31,7 +31,7 @@ def show_services(request):
     # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
     services = AppschedulerServices.objects.all()
     services_info=[]
-    for service in services:
+    for service in reversed(list(services)):
         data=dict()
         data['id'] = service.pk
         data['service_name'] = service.service_name

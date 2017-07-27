@@ -15,6 +15,9 @@ urlpatterns = [
     url(r'^deleteservices/$', service.delete_services, name="delete_services"),
     url(r'^employeelist/$', employees.employee_List, name="employeelist"),
     url(r'^editemployee/(?P<id>\d+)/$', employees.edit_Employee, name="editEmployee"),
+    url(r'^delete_employee/(?P<id>\d+)/$', employees.delete_employee, name="deleteemployee"),
+    url(r'^delete_employees/$', employees.delete_employees, name="deleteemployees"),
+    
     url(r'^getemployees/$', employees.get_Employees, name="getemployees"),
     url(r'^listemployeesname/$', service.employee_names, name="listemployeesname"),
     url(r'^listServicesName/$', employees.services_names, name="listServicesName"),

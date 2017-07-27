@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="326cc73a-ce2e-4673-932f-df4f5ba397a5" name="Default" comment="initial commit">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/templatetags/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/templatetags/get_item.py" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/appsplatform/test_scripts.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/appointmentscheduler/migrations/0001_initial.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/templates/Options/Booking/BookingForm.html" afterPath="$PROJECT_DIR$/appointmentscheduler/templates/Options/Booking/BookingForm.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/views/Options/Booking/BookingForm.py" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/Booking/BookingForm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appsplatform/settings.py" afterPath="$PROJECT_DIR$/appsplatform/settings.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -47,8 +41,8 @@
       <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/appsplatform/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1263">
-              <caret line="43" column="38" lean-forward="true" selection-start-line="43" selection-start-column="38" selection-end-line="43" selection-end-column="38" />
+            <state relative-caret-position="1103">
+              <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -464,7 +458,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-16" y="-16" width="3872" height="2092" extended-state="6" />
+    <frame x="-16" y="-16" width="3872" height="2092" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -800,8 +794,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/appsplatform/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1263">
-          <caret line="43" column="38" lean-forward="true" selection-start-line="43" selection-start-column="38" selection-end-line="43" selection-end-column="38" />
+        <state relative-caret-position="1103">
+          <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="22" />
           <folding />
         </state>
       </provider>

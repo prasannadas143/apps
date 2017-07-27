@@ -116,6 +116,11 @@ class AppschedulerEmployees(models.Model):
         # managed = False
         db_table = 'appscheduler_employees'
 
+    def service_count_in_employee(self):
+        return self.appschedulerservices_set.count() 
+
+    service_count = property( service_count_in_employee )
+
   
 
 class AppschedulerEmployeesServices(models.Model):

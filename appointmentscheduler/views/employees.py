@@ -19,6 +19,8 @@ from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
+from django.utils.safestring import mark_safe
+
 
 
 
@@ -31,11 +33,42 @@ def services_names(request):
 
 @csrf_exempt
 def employee_List(request):
-    employees = AppschedulerEmployees.objects.all()
     # DON'T USE
-    template_name = "employeelist.html"
-    return render_to_response(template_name, {'employees': employees})
+    # for sevice in services:
+    #     service_json = instance_to_dict(services)
+    #     services_json.append( service_json )
+    template_name="employeelist.html"
+    # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
+    employees = AppschedulerEmployees.objects.all()
+    employees_info=[]
+    for employee in  reversed(list(employees)):
+        data=dict()
+        data['id'] = employee.pk
+        if employee.avatar.name != '' :
+            data['avatar'] = employee.avatar.url
+        data['emp_name'] = employee.emp_name
+        data['email'] = employee.email
+        data['phone'] = str(employee.phone)
+        data['service_count'] = employee.service_count
+        data['is_active'] = int(employee.is_active)
+        employees_info.append(data)
+    
+    return render(request, template_name, { "employees" : mark_safe(employees_info) } )   
 
+@csrf_exempt
+def delete_employee(request,id=None):
+    aservc=AppschedulerEmployees.objects.get(id=id)
+    aservc.delete()
+    return HttpResponse(status=204)
+
+
+@csrf_exempt
+def delete_employees(request):
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
+        aservc=AppschedulerEmployees.objects.get(id=id)
+        aservc.delete()
+    return HttpResponse(status=204)
 
 @ensure_csrf_cookie
 def list_phones(request):
@@ -52,12 +85,6 @@ def list_emails(request):
     listemails = [dict([("email",str(employee.email)), ("id",employee.id)]) for employee in employees ]
 
     return HttpResponse(json.dumps(listemails), content_type='application/json')
-
-@csrf_exempt
-def delete_employee(request,id=None):
-    aservc=AppschedulerEmployees.objects.get(id=id)
-    aservc.delete()
-    return HttpResponseRedirect('/services/employeelist/')
 
 @csrf_exempt
 def add_Employee(request):
