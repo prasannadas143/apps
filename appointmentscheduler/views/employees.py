@@ -33,14 +33,24 @@ def services_names(request):
 
 @csrf_exempt
 def employee_List(request):
-    # DON'T USE
-    # for sevice in services:
-    #     service_json = instance_to_dict(services)
-    #     services_json.append( service_json )
+
     template_name="employeelist.html"
-    # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
-    employees = AppschedulerEmployees.objects.all()
+
+    return render(request, template_name)   
+
+@csrf_exempt
+def getemployees(request):
     employees_info=[]
+    querydata = request.POST['querydata']
+    if querydata == "all":
+        employees = AppschedulerEmployees.objects.all()
+    elif querydata == "active":
+        employees = AppschedulerEmployees.objects.filter(is_active = 1 )
+    elif querydata == "inactive":
+        employees = AppschedulerEmployees.objects.filter(is_active = 0 )
+    else:
+        employees = AppschedulerEmployees.objects.all()
+
     for employee in  reversed(list(employees)):
         data=dict()
         data['id'] = employee.pk
@@ -53,7 +63,7 @@ def employee_List(request):
         data['is_active'] = int(employee.is_active)
         employees_info.append(data)
     
-    return render(request, template_name, { "employees" : mark_safe(employees_info) } )   
+    return  HttpResponse(json.dumps({"data" :employees_info }), content_type='application/json')   
 
 @csrf_exempt
 def delete_employee(request,id=None):

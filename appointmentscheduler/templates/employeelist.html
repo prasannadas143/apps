@@ -49,24 +49,24 @@
 <script type="text/javascript">
 
 
-  var data = {{ employees|safe }} ;
-  var employees_info = data;
-  console.log( employees_info );
+var getfilter = "all";
+ 
   var rows_selected = [];
-  draw_datatable(0);
+  draw_datatable();
 
 $("#active").click(function(){
-   active = 1;
-   draw_datatable(active);
+   getfilter = "active";
+   draw_datatable();
+
 });
 
 $("#inactive").click(function(){
-   active = 2;
-   draw_datatable(active);
+   getfilter = "inactive";
+   draw_datatable();
 });
 $("#all").click(function(){
-   active = 0;
-   draw_datatable(active);
+   getfilter = "all";
+   draw_datatable();
 });
 
 function getCookie(name) {
@@ -99,25 +99,27 @@ $.ajaxSetup({
 });
 
 var table ;
-function draw_datatable(active) {
+function draw_datatable() {
 
   if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
      table.destroy();
   }
 
    table = $('#datatables').DataTable({
-       
-        "data":  employees_info,
+
+        "processing": true,
+        "ajax": {
+            "url": "/appointmentschduler/getemployees/",
+            "data": function(d) {
+              d.querydata = getfilter
+            },
+
+            "type": "POST"
+        },        
+
         "createdRow": function( row, data, dataIndex ) {
                         $(row).attr('id', data.id);
-                        $(row).find('td').eq(6).attr("data-search", data.is_active);
-                         if (data.is_active == 0 && active == 1) {
-                             jQuery(row).hide();
-                          }
-                          else if(data.is_active == 1 && active == 2) {
-                             jQuery(row).hide();
-                          }
-
+                       
            },
        
       "columnDefs": [ 
@@ -125,7 +127,7 @@ function draw_datatable(active) {
             {
               'targets': 0,
               'searchable': true,
-              'orderable': true,
+              'orderable': false,
               'className': 'dt-body-center',
               "data": null,
               render: function ( data, type, row ) {
@@ -135,6 +137,8 @@ function draw_datatable(active) {
             {
              'targets':1,
               "data": "avatar",
+              'orderable': false,
+
                render:function (data, type, row, meta){
              // If data will be displayed
                 return '<img height="50" width="50" src="' + data + '">';
@@ -198,7 +202,9 @@ function draw_datatable(active) {
             
             {
               'targets':6,
-              "data": null,
+              "data": null,        
+              'orderable': false,
+
               "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
               '<button type="button" class="btn btn-danger">Delete</button>'
             }
@@ -225,7 +231,7 @@ let id = 0;
     // Check/uncheck all checkboxes in the table
     var rows = table.rows({ 'search': 'applied' }).nodes();
     $('input[type="checkbox"]', rows).prop('checked', this.checked);
- });
+  });
 
 
 
@@ -300,6 +306,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
  
    // Handle click on "Select all" control
    $('thead input[name="select_all-records"]', table.table().container()).on('click', function(e){
+      alert("head called");
       if(this.checked){
          $('#datatables tbody input[type="checkbox"]:not(:checked)').trigger('click');
       } else {

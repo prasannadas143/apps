@@ -51,25 +51,24 @@
 
 <script type="text/javascript">
 
-
-  var data = {{ services|safe }} ;
-  var services_info = data;
-  console.log( services_info );
+var getfilter = "all";
+ 
   var rows_selected = [];
-  draw_datatable(0);
+  draw_datatable();
 
 $("#active").click(function(){
-   active = 1;
-   draw_datatable(active);
+   getfilter = "active";
+   draw_datatable();
+
 });
 
 $("#inactive").click(function(){
-   active = 2;
-   draw_datatable(active);
+   getfilter = "inactive";
+   draw_datatable();
 });
 $("#all").click(function(){
-   active = 0;
-   draw_datatable(active);
+   getfilter = "all";
+   draw_datatable();
 });
 
 function getCookie(name) {
@@ -102,7 +101,7 @@ $.ajaxSetup({
 });
 
 var table ;
-function draw_datatable(active) {
+function draw_datatable() {
 
   if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
      table.destroy();
@@ -110,25 +109,27 @@ function draw_datatable(active) {
 
    table = $('#datatables').DataTable({
        
-        "data":  services_info,
+        "processing": true,
+        "ajax": {
+            "url": "/appointmentschduler/listservices/",
+            "data": function(d) {
+              d.querydata = getfilter
+            },
+
+            "type": "POST"
+        },        
+
         "createdRow": function( row, data, dataIndex ) {
                         $(row).attr('id', data.id);
-                        $(row).find('td').eq(6).attr("data-search", data.is_active);
-                         if (data.is_active == "False" && active == 1) {
-                             jQuery(row).hide();
-                          }
-                          else if(data.is_active == "True" && active == 2) {
-                             jQuery(row).hide();
-                          }
-
-           },
+           
+          },
        
-      "columnDefs": [ 
+        "columnDefs": [ 
 
             {
               'targets': 0,
               'searchable': true,
-              'orderable': true,
+              'orderable': false,
               'className': 'dt-body-center',
               "data": null,
               render: function ( data, type, row ) {
@@ -205,7 +206,7 @@ function draw_datatable(active) {
             'rowCallback': function(row, data, dataIndex){
              // Get row ID
              var rowId = data[0];
-     
+            
              // If row ID is in the list of selected row IDs
                if($.inArray(rowId, rows_selected) !== -1){
                   $(row).find('input[type="checkbox"]').prop('checked', true);

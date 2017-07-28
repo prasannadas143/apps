@@ -29,8 +29,27 @@ def show_services(request):
     #     services_json.append( service_json )
     template_name="showservices.html"
     # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
-    services = AppschedulerServices.objects.all()
+    
+    return render(request, template_name )   
+
+@csrf_exempt
+def list_services(request):
+    # DON'T USE
+    # for sevice in services:
+    #     service_json = instance_to_dict(services)
+    #     services_json.append( service_json )
+    # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
     services_info=[]
+    querydata = request.POST['querydata']
+    if querydata == "all":
+        services = AppschedulerServices.objects.all()
+    elif querydata == "active":
+        services = AppschedulerServices.objects.filter(is_active = 1 )
+    elif querydata == "inactive":
+        services = AppschedulerServices.objects.filter(is_active = 0 )
+    else:
+        services = AppschedulerServices.objects.all()
+
     for service in reversed(list(services)):
         data=dict()
         data['id'] = service.pk
@@ -41,8 +60,7 @@ def show_services(request):
         data['total'] = service.total
         data['is_active'] = str(service.is_active)
         services_info.append(data)
-    
-    return render(request, template_name, { "services" : mark_safe(services_info) } )   
+    return  HttpResponse(json.dumps({"data" :services_info }), content_type='application/json')   
 
 
 
