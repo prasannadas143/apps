@@ -32,7 +32,7 @@ def show_services(request):
     
     return render(request, template_name )   
 
-@csrf_exempt
+@ensure_csrf_cookie
 def list_services(request):
     # DON'T USE
     # for sevice in services:
@@ -40,7 +40,7 @@ def list_services(request):
     #     services_json.append( service_json )
     # services = AppschedulerServices.objects.values('id', 'service_name', 'price', 'length',  'is_active')
     services_info=[]
-    querydata = request.POST['querydata']
+    querydata = request.GET['querydata']
     if querydata == "all":
         services = AppschedulerServices.objects.all()
     elif querydata == "active":
@@ -140,7 +140,7 @@ def deleteimage(request,id):
     #     os.remove( oldimagepath )
     return  HttpResponse(json.dumps(employee_default_img), content_type='application/json')
 
-@ensure_csrf_cookie
+@requires_csrf_token
 def delete_service(request,id=None):
     aservc=AppschedulerServices.objects.get(id=id)
     aservc.delete()

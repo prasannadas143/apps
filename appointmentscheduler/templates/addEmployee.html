@@ -189,7 +189,7 @@ function validateemployeeform() {
 			<span class="block bold">Add an employee</span><span class="block">Fill in the form below to add a new employee. You can select the service that this employee does. You can also configure it so an email and/or sms notification is sent to the employee when a booking is made. Each employee can access the Appointment Scheduler and manage his/her bookings only.</span><a href="#" class="notice-close"></a>		</div>
 <div>{{ form.errors|default:"" }}</div>
 
-         <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post"  onsubmit="return validateemployeeform()"  >
+         <form   id="frmCreateEmployee" class="form pj-form" name="frmCreateEmployee" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate" action="{% url 'appointmentschduler:addemployee' %}" ng-app="ServiceMod" method="post"  onsubmit="return validateemployeeform()"  >{% csrf_token %}
 		
 				<label class="title">Employee name:</label>
 				<span class="inline_block">

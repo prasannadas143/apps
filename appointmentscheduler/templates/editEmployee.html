@@ -209,7 +209,7 @@ function delete_image(employeeid) {
 			
 <div>"{{ form.errors|default:"" }}"</div>
 
-<form ng-app="ServiceMod"   action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post" name="frmeditEmployee" id="frmeditEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate"   onsubmit="return setsubscribe()" >
+<form ng-app="ServiceMod"   action="{% url 'appointmentschduler:editEmployee' appscheduleinst.id %}" method="post" name="frmeditEmployee" id="frmeditEmployee" class="form pj-form" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate"   onsubmit="return setsubscribe()" >{% csrf_token %}
 
 		<label class="title">Employee name:</label>
 		<span class="inline_block">

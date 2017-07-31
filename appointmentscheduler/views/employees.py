@@ -24,24 +24,24 @@ from django.utils.safestring import mark_safe
 
 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def services_names(request):
     services = AppschedulerServices.objects.all()
     # DON'T USE
     serviceslist = [dict([("name",service.service_name), ("id",service.id)]) for service in services ]
     return HttpResponse(json.dumps(serviceslist), content_type='application/json')
 
-@csrf_exempt
+@requires_csrf_token
 def employee_List(request):
 
     template_name="employeelist.html"
 
     return render(request, template_name)   
 
-@csrf_exempt
+@requires_csrf_token
 def getemployees(request):
     employees_info=[]
-    querydata = request.POST['querydata']
+    querydata = request.GET['querydata']
     if querydata == "all":
         employees = AppschedulerEmployees.objects.all()
     elif querydata == "active":
@@ -65,14 +65,14 @@ def getemployees(request):
     
     return  HttpResponse(json.dumps({"data" :employees_info }), content_type='application/json')   
 
-@csrf_exempt
+@ensure_csrf_cookie
 def delete_employee(request,id=None):
     aservc=AppschedulerEmployees.objects.get(id=id)
     aservc.delete()
     return HttpResponse(status=204)
 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def delete_employees(request):
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
@@ -96,7 +96,7 @@ def list_emails(request):
 
     return HttpResponse(json.dumps(listemails), content_type='application/json')
 
-@csrf_exempt
+@requires_csrf_token
 def add_Employee(request):
     # DON'T USE
     if request.method == 'POST':
@@ -127,10 +127,10 @@ def add_Employee(request):
         form = EmployeeForm()
 
     template_name = "addEmployee.html"
-    return render_to_response(template_name, {'form': form})
+    return render(request, template_name, {'form': form})
 
 
-@csrf_exempt
+@requires_csrf_token
 def edit_Employee(request, id):
     template_name = "editEmployee.html"
     appscheduleobj = AppschedulerEmployees.objects.get(id=id)
@@ -166,9 +166,9 @@ def edit_Employee(request, id):
             return HttpResponseRedirect('/appointmentschduler/employeelist/')
     else:
         form = EmployeeForm(instance=appscheduleobj)
-    return render_to_response(template_name, {'form': form, 'appscheduleinst': appscheduleobj, "defaultimg" : defaultimg })
+    return render(request,template_name, {'form': form, 'appscheduleinst': appscheduleobj, "defaultimg" : defaultimg })
 
-
+@csrf_exempt
 def get_Employees(request):
     employee_List = AppschedulerEmployees.objects.all()
     data = {'employeelist': employee_List}
@@ -189,7 +189,7 @@ def associated_service_names(request,id):
         servicelist.append(service_info)
     return HttpResponse(json.dumps(servicelist), content_type='application/json')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def deleteemployeeimage(request,id):
     #Implemented with angula js
     appscheduleobj=AppschedulerEmployees.objects.get(id=id)

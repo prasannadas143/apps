@@ -13,7 +13,7 @@
    <input type="button" value="Active"   id="active"  />
    <input type="button" value="Inactive"   id="inactive"  />
    <input type="button" value="All"   id="all"  />
-  <input type="button" onclick="location.href='{% url 'appointmentschduler:addemployee' %}'"  value="Add Employee" />
+  <input type="button" onclick="location.href='{% url 'appointmentschduler:addemployee' %}'"  value="Add Employee" />{% csrf_token %}
 <table style="width: 90%;" id="datatables" class="table table-hover">
  <thead>
         <tr>
@@ -114,7 +114,7 @@ function draw_datatable() {
               d.querydata = getfilter
             },
 
-            "type": "POST"
+            "type": "GET"
         },        
 
         "createdRow": function( row, data, dataIndex ) {

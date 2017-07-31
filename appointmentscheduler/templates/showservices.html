@@ -14,7 +14,7 @@
    <input type="button" value="All"   id="all"  />
 
 
-   <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />
+   <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />{% csrf_token %}
 
 <table id="datatables" class="table table-hover">
         <thead>
@@ -87,9 +87,14 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             // Only send the token to relative URLs i.e. locally.
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         }
@@ -116,7 +121,7 @@ function draw_datatable() {
               d.querydata = getfilter
             },
 
-            "type": "POST"
+            "type": "GET"
         },        
 
         "createdRow": function( row, data, dataIndex ) {
