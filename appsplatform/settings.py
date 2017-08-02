@@ -66,7 +66,11 @@ ROOT_URLCONF = 'appsplatform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['appointmentscheduler/templates'],
+        'DIRS': [os.path.join("appointmentscheduler", 'templates'), 
+                os.path.join("appointmentscheduler", 'templates','WorkingTime'),
+                os.path.join("appointmentscheduler", 'templates',"Options"),
+                 os.path.join("appointmentscheduler", 'templates',"Options","Booking") ],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

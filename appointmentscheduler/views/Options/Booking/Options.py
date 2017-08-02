@@ -90,7 +90,7 @@ def BookingOptions(request):
 
       }
       # Then, do a redirect for example
-   return render_to_response ('Options/Booking/Options.html', {'items':items ,"message":message })
+   return render(request,'Options.html', {'items':items ,"message":message })
 
 
 

@@ -277,7 +277,6 @@ class AppschedulerWorkingTimes(models.Model):
     sunday_lunch_from = models.TimeField(blank=True, null=True)
     sunday_lunch_to = models.TimeField(blank=True, null=True)
     sunday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-
     class Meta:
         # managed = False
         db_table = 'appscheduler_working_times'

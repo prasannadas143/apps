@@ -77,7 +77,7 @@ def PaymentOptions(request):
       }
       paymentdata['items'] = items
       # Then, do a redirect for example
-   return render_to_response ('Options/Booking/Payments.html', paymentdata)
+   return render(request,'Payments.html', paymentdata)
 
 
 
