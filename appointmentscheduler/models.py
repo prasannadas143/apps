@@ -282,6 +282,16 @@ class AppschedulerWorkingTimes(models.Model):
         db_table = 'appscheduler_working_times'
         unique_together = (('foreign_id', 'type'),)
 
+class AppschedulerCountries(models.Model):
+    CountryName = models.CharField(max_length=200, blank=False, null=False,unique=True)
+    Alpha2 = models.CharField(max_length=6,blank=True, null=True)
+    Alpha3 = models.CharField(max_length=6, blank=True, null=True)
+    status = models.BooleanField(default=True)
+
+    class Meta:
+        # managed = False
+        db_table = 'appscheduler_countries'
+        unique_together = (('CountryName'),)
 
 # class DjangoMigrations(models.Model):
     # app = models.CharField(max_length=255)

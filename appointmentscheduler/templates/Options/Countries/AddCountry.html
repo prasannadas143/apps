@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<div id="CountryFormOptions">
+	<h2 align="center">Add Country</h2>
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" action="{% url 'appointmentschduler:addCountry' %}">
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="CountryName">Country Name</label>
+    <div class="col-sm-6">
+       <input id="CountryName" class="CountryName" maxlength="6" name="CountryName" type="text"   />
+       <div class="CountryName-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha2">Alpha 2</label>
+    <div class="col-sm-6">
+	<input id="Alpha2" maxlength="6" class="Alpha2"  name="Alpha2"  type="text"  />
+	 <div class="Alpha2-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha3">Alpha 3</label>
+    <div class="col-sm-6">
+	<input id="Alpha3" maxlength="6" class="Alpha3" name="Alpha3"  type="text"   />
+	 <div class="Alpha3-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="status">status</label>
+    <div class="col-sm-6">
+	<input id="status" maxlength="6" name="status"  type="checkbox" checked="true" />
+    </div>
+    </div>
+
+
+    <div class="form-group">
+    <div class="col-sm-12" align="center">
+	<input type="submit" name="Save" value="Save">
+	<input type="button" name="countrylist" onclick="ShowCountryLsit();" value="Back to country list">
+    </div>
+    </div>
+
+
+</form>
+</div>
+
+
+<script type="text/javascript">
+
+function ValidateForm(){
+ 
+ $('.CountryName-msg').html('');
+ $('.Alpha2-msg').html('');
+ $('.Alpha3-msg').html('');
+ var isValidForm=true;
+
+if($('.CountryName').val().trim()=="")
+{
+	isValidForm=false;
+	$('.CountryName-msg').html("Please enter Country Name")
+}
+
+if($('.Alpha2').val().trim()=="")
+{
+	isValidForm=false;
+	$('.Alpha2-msg').html("Please enter Alpha 2")
+}
+
+if($('.Alpha3').val().trim()=="")
+{
+	isValidForm=false;
+	$('.Alpha3-msg').html("Please enter Alpha 3")
+}
+
+if(isValidForm)
+{
+	 return true;
+}
+else
+{
+	 return false;
+}
+
+}
+
+
+function ShowCountryLsit(){
+window.location.href="/appointmentschduler/CountryTemplate";
+}
+
+</script>
+
+<style type="text/css">
+	.red{
+		color: Red;
+	}
+
+</style>
+
+{% endblock %}

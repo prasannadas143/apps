@@ -4,6 +4,7 @@ from .views import service,employees
 from .views.Options import General
 from .views.Options.Booking import Options,Payments,BookingForm
 from .views.Options.WorkingTime import Default
+from .views.Options.Countries import Countries
 
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
@@ -32,5 +33,10 @@ urlpatterns = [
     url(r'^PaymentOptions/$', Payments.PaymentOptions, name="PaymentOptions"),
     url(r'^BookingFormOptions/$', BookingForm.BookingFormOptions, name="BookingFormOptions"), 
     url(r'^WorkingTimeOptions/$', Default.WorkingTimeOptions, name="WorkingTimeOptions"),
+    url(r'^addCountry/$', Countries.addCountry, name="addCountry"),
+    url(r'^CountryList/$', Countries.CountriesList, name="CountryList"),
+    url(r'^CountryTemplate/$', Countries.CountryTemplate, name="CountryTemplate"),
+    url(r'^editCountry/(?P<id>\d+)/$', Countries.editCountry, name="editCountry"),
+    url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
     url(r'associated_service_names/(?P<id>\d+)/$', employees.associated_service_names, name="assiosiated_services"),
 ]

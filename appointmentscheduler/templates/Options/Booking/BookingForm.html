@@ -13,7 +13,7 @@
 <div id="BookingFormOptions">
 	<h2>Booking Form</h2>
 
-    <form class="form-horizontal" role="form" method="POST" action="{% url 'appointmentschduler:PaymentOptions' %}" onsubmit="updateform()">
+    <form class="form-horizontal" role="form" method="POST" action="{% url 'appointmentschduler:BookingFormOptions' %}">
 
     <div class="form-group">
     <label class="col-sm-6 control-label " for="o_bf_name">Name</label>
@@ -83,7 +83,7 @@
 
 
     <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_notes">Notes</label>
+   <label class="col-sm-6 control-label " for="o_bf_notes">Notes</label>
     <div class="col-sm-6">
     <select name="{{ items.o_bf_notes_id }}">
     {% for entry in items.o_bf_notes %}
@@ -183,15 +183,5 @@
 </form>
 
 </div>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-    //set initial state.
-    function updateform() {
-     return true ;
-  }
-});
-    
-</script>
 
  {% endblock %}

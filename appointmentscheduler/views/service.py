@@ -20,7 +20,6 @@ from django.utils.safestring import mark_safe
 from django.db.models import Count
 
 
-
 @requires_csrf_token
 def show_services(request):
     # DON'T USE

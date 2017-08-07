@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+<div id="CountryFormOptions">
+	<h2 align="center">Edit Country</h2>
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" action="/appointmentschduler/editCountry/{{appscheduleCountry.id}}/">
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label" for="CountryName">Country Name</label>
+    <div class="col-sm-6">
+    <input id="CountryName" maxlength="6" name="CountryName" class="CountryName" type="text"  value="{{appscheduleCountry.CountryName}}"  />
+     <div class="CountryName-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha2">Alpha 2</label>
+    <div class="col-sm-6">
+	<input id="Alpha2" maxlength="6" name="Alpha2"  class="Alpha2"  type="text"  value="{{appscheduleCountry.Alpha2}}" />
+     <div class="Alpha2-msg red"></div>
+    </div>
+    </div>
+
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha3">Alpha 3</label>
+    <div class="col-sm-6">
+	<input id="Alpha3" maxlength="6" name="Alpha3"  class="Alpha3"   type="text"    value="{{appscheduleCountry.Alpha3}}"/>
+     <div class="Alpha3-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="status">Status</label>
+    <div class="col-sm-6">
+     <input id="status" maxlength="6" name="status"  type="checkbox" {% if appscheduleCountry.status  %} checked {% endif %} />
+    </div>
+    </div>
+   
+<br>
+
+    <div class="form-group">
+    <div class="col-sm-12" align="center">
+	<input type="submit" name="Save" value="Update">
+    <input type="button" name="countrylist" onclick="ShowCountryLsit();" value="Back to country list">
+    </div>
+    </div>
+
+</form>
+</div>
+
+
+<script type="text/javascript">
+
+function ValidateForm(){
+ 
+ $('.CountryName-msg').html('');
+ $('.Alpha2-msg').html('');
+ $('.Alpha3-msg').html('');
+ var isValidForm=true;
+
+if($('.CountryName').val().trim()=="")
+{
+    isValidForm=false;
+    $('.CountryName-msg').html("Please enter Country Name")
+}
+
+if($('.Alpha2').val().trim()=="")
+{
+    isValidForm=false;
+    $('.Alpha2-msg').html("Please enter Alpha 2")
+}
+
+if($('.Alpha3').val().trim()=="")
+{
+    isValidForm=false;
+    $('.Alpha3-msg').html("Please enter Alpha 3")
+}
+
+if(isValidForm)
+{
+     return true;
+}
+else
+{
+     return false;
+}
+
+}
+
+function ShowCountryLsit(){
+window.location.href="/appointmentschduler/CountryTemplate";
+}
+
+//alert({{ appscheduleCountry.status }});
+
+</script>
+
+<style type="text/css">
+    .red{
+        color: Red;
+    }
+</style>
+
+{% endblock %}
