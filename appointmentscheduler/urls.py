@@ -5,6 +5,8 @@ from .views.Options import General
 from .views.Options.Booking import Options,Payments,BookingForm
 from .views.Options.WorkingTime import Default
 from .views.Options.Countries import Countries
+from .views.Options.Invoice import Invoice
+
 
 urlpatterns = [
     url(r'^showservices/$', service.show_services, name="showservices"),
@@ -38,5 +40,6 @@ urlpatterns = [
     url(r'^CountryTemplate/$', Countries.CountryTemplate, name="CountryTemplate"),
     url(r'^editCountry/(?P<id>\d+)/$', Countries.editCountry, name="editCountry"),
     url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
+    url(r'^Company/$', Invoice.Company, name="Company"),
     url(r'associated_service_names/(?P<id>\d+)/$', employees.associated_service_names, name="assiosiated_services"),
 ]

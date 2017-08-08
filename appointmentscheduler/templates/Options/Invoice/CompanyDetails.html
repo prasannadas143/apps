@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+
+<div id="CountryFormOptions">
+	<h2 align="center">Company Details</h2>
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" action="{% url 'appointmentschduler:Company' %}">
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_CompanyName">Company Name</label>
+    <div class="col-sm-6">
+       <input id="CompanyName" class="CompanyName text-width" maxlength="250" name="o_CompanyName" type="text"  value="{{items.o_CompanyName}}"   />
+       <div class="CompanyName-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Name">Name</label>
+    <div class="col-sm-6">
+       <input id="Name" class="Name  text-width" maxlength="500" name="o_Name" type="text"  value="{{items.o_Name}}"     />
+       <div class="Name-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_StreetAddress">Street Address</label>
+    <div class="col-sm-6">
+     <textarea id="StreetAddress" name="o_StreetAddress" class="StreetAddress  text-width" >{{items.o_StreetAddress}}</textarea>
+       <div class="StreetAddress-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Country">Country</label>
+    <div class="col-sm-6">
+       <input id="Country" class="Country   text-width"  name="o_Country" type="text"   value="{{items.o_Country}}"   />
+       <div class="Country-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_City">City</label>
+    <div class="col-sm-6">
+       <input id="City" class="City   text-width" name="o_City" type="text"   value="{{items.o_City}}" />
+       <div class="City-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_State">State</label>
+    <div class="col-sm-6">
+       <input id="State" class="State   text-width" name="o_State" type="text"   value="{{items.o_State}}"   />
+       <div class="State-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Zip">Zip</label>
+    <div class="col-sm-6">
+       <input id="Zip" class="Zip   text-width"  name="o_Zip" type="text"   value="{{items.o_Zip}}"   />
+       <div class="Zip-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Phone">Phone</label>
+    <div class="col-sm-6">
+       <input id="Phone" class="Phone   text-width" name="o_Phone" type="text"    value="{{items.o_Phone}}"  />
+       <div class="Phone-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Fax">Fax</label>
+    <div class="col-sm-6">
+       <input id="Fax" class="Fax   text-width"  name="o_Fax" type="text"   value="{{items.o_Fax}}"   />
+       <div class="Fax-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Email">Email</label>
+    <div class="col-sm-6">
+       <input id="Email" class="Email   text-width"  name="o_Email" type="text"   value="{{items.o_Email}}"   />
+       <div class="Email-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_Website">Website</label>
+    <div class="col-sm-6">
+       <input id="Website" class="Website   text-width"  name="o_Website" type="text"    value="{{items.o_Website}}"   />
+       <div class="Website-msg red"></div>
+    </div>
+</div>
+
+
+ <div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="submit"> <i class="ace-icon fa fa-check"></i> Save </button>
+ </div>
+ </div>
+
+</form>
+</div>
+
+<script type="text/javascript">
+
+function ValidateForm(){
+  
+ $('.CompanyName-msg').html('');
+ $('.Name-msg').html('');
+ $('.StreetAddress-msg').html('');
+ $('.Country-msg').html('');
+ $('.City-msg').html('');
+ $('.State-msg').html('');
+ $('.Zip-msg').html('');
+ $('.Phone-msg').html('');
+ $('.Fax-msg').html('');
+ $('.Email-msg').html('');
+ $('.Website-msg').html('');
+
+var isValidForm=true;
+if($('.CompanyName').val().trim()==""){
+	isValidForm=false;
+	$('.CompanyName-msg').html("Please enter Company Name")
+}
+if($('.Name').val().trim()==""){
+	isValidForm=false;
+	$('.Name-msg').html("Please enter Name")
+}
+if($('.StreetAddress').val().trim()==""){
+	isValidForm=false;
+	$('.StreetAddress-msg').html("Please enter Street Address")
+}
+if($('.Country').val().trim()==""){
+	isValidForm=false;
+	$('.Country-msg').html("Please Select Country")
+}
+if($('.City').val().trim()==""){
+	isValidForm=false;
+	$('.City-msg').html("Please enter City")
+}
+if($('.State').val().trim()==""){
+	isValidForm=false;
+	$('.State-msg').html("Please enter State")
+}
+if($('.Zip').val().trim()==""){
+	isValidForm=false;
+	$('.Zip-msg').html("Please enter Zip")
+}
+if($('.Phone').val().trim()==""){
+	isValidForm=false;
+	$('.Phone-msg').html("Please enter Phone")
+}
+if($('.Fax').val().trim()==""){
+	isValidForm=false;
+	$('.Fax-msg').html("Please enter Fax")
+}
+if($('.Email').val().trim()==""){
+	isValidForm=false;
+	$('.Email-msg').html("Please enter Email")
+}
+else
+{
+var emailAddress= $('.Email').val().trim();
+  var isValidEmailAddress=  isValidEmail(emailAddress);
+  if(!isValidEmailAddress)
+  {
+  	isValidForm=false;
+  	$('.Email-msg').html("Please enter valid Email")
+  }
+}
+
+
+if($('.Website').val().trim()==""){
+	isValidForm=false;
+	$('.Website-msg').html("Please enter Website")
+}
+else
+{
+  var webAddress= $('.Website').val().trim();
+  var isValidWebAddress=  isValidUrl(webAddress);
+  if(!isValidWebAddress)
+  {
+  	isValidForm=false;
+  	$('.Website-msg').html("Please enter valid Website")
+  }
+}
+
+if(isValidForm){
+	 return true;
+}
+else{
+	 return false;
+}
+
+}
+function isValidUrl(s) {
+	var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+	return regexp.test(s);
+}
+
+function isValidEmail(emailAddress)
+{
+    var atpos = emailAddress.indexOf("@");
+    var dotpos = emailAddress.lastIndexOf(".");
+    if (atpos<1 || dotpos<atpos+2 || dotpos+2>=emailAddress.length) {
+        return false;
+    }
+    else{
+    	 return true;
+    }
+}
+</script>
+<style type="text/css">
+	
+.text-width{
+width: 50%;
+}
+.red{
+        color: Red;
+    }
+</style>
+
+{% endblock %}
