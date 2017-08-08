@@ -77,19 +77,16 @@ class AppschedulerCalendars(models.Model):
 
 
 class AppschedulerDates(models.Model):
-    foreign_id = models.IntegerField(blank=True, null=True)
-    type = models.CharField(max_length=8, blank=True, null=True)
-    date = models.DateField()
-    start_time = models.TimeField(blank=True, null=True)
-    end_time = models.TimeField(blank=True, null=True)
-    start_lunch = models.TimeField(blank=True, null=True)
-    end_lunch = models.TimeField(blank=True, null=True)
-    is_dayoff = models.CharField(max_length=1, blank=True, null=True)
+    date = models.DateTimeField(unique=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    start_launch = models.DateTimeField(blank=True, null=True)
+    end_launch = models.DateTimeField(blank=True, null=True)
+    is_dayoff = models.BooleanField(default=False )
 
     class Meta:
         # managed = False
         db_table = 'appscheduler_dates'
-        unique_together = (('foreign_id', 'type', 'date'),)
 
 
 def employee_img_location(instance, filename):

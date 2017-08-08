@@ -141,6 +141,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "assets")
 STATICFILES_DIRS = (
 os.path.join(BASE_DIR, "static"),
 )
+GEOIP_PATH = os.path.join(BASE_DIR,  'geopath')
+
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
