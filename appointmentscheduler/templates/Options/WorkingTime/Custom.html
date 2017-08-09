@@ -10,15 +10,12 @@
 function SubmitForm(id)
 
 {
-	alert(id);
 	if(id) {
-	     alert(" go and edit form ")
 
 	     document.forms['custotimeform'].action='/appointmentschduler/editcustomtime/' + id + '/';
 	     document.forms['custotimeform'].submit();
 	}
 	else {
-	     alert(" go ahead")
          document.forms['custotimeform'].action='/appointmentschduler/CustomTimeOptions/' ;
 	     document.forms['custotimeform'].submit();
 	}
