@@ -135,7 +135,7 @@ def WorkingTimeOptionsEdit(request):
     weeksrecords_visitor = list()
     errdict = dict()
     if request.method == "POST":
-        weeksday = ["Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Friday", "Saturday","Sunday" ]
+        weeksday = ["Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday","Sunday" ]
         for day in weeksday :
             errors=""
             request.POST.clear()
@@ -215,27 +215,26 @@ def WorkingTimeOptionsEdit(request):
                             errors += "End launch time needs to be more than start launch time \n"
                         if  not ((start_time_instance < start_launch_instance) and  (end_launch_instance < end_time_instance)) :
                             errors += "Launch time needs to be between  start and end working hours  \n"
-            dateobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
-            form = customtimeform(request.POST or None , instance=dateobj)
-            if errors :
-                form.errors["customerror"] = errors
-            if form.is_valid():
-                message = "Customtime saved"
-                form.save()
-            updatedobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
-            weekrecord_visitor = dict()
-            datetime_local = updatedobj.date.astimezone(pytz.timezone(user_timezone[0]))
-            weekrecord_visitor['start_date'] = datetime_local.strftime('%Y-%m-%d')
-            weekrecord_visitor['start_time'] = convert_to_local(updatedobj.start_time,user_timezone)
-            weekrecord_visitor['end_time'] =  convert_to_local(updatedobj.end_time,user_timezone)
-            weekrecord_visitor['start_launch'] = convert_to_local(updatedobj.start_launch,user_timezone)
-            weekrecord_visitor['end_launch'] = convert_to_local(updatedobj.end_launch,user_timezone)
-            weekrecord_visitor["week_day"] = datetime_local.strftime('%A')
-            weekrecord_visitor['is_dayoff'] = updatedobj.is_dayoff
-            weeksrecords_visitor.append(weekrecord_visitor)
-            if errors:
-                errdict[weekrecord_visitor["week_day"]] = errors
-
+                dateobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
+                form = customtimeform(request.POST or None , instance=dateobj)
+                if errors :
+                    form.errors["customerror"] = errors
+                if form.is_valid():
+                    message = "Customtime saved"
+                    form.save()
+                updatedobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
+                weekrecord_visitor = dict()
+                datetime_local = updatedobj.date.astimezone(pytz.timezone(user_timezone[0]))
+                weekrecord_visitor['start_date'] = datetime_local.strftime('%Y-%m-%d')
+                weekrecord_visitor['start_time'] = convert_to_local(updatedobj.start_time,user_timezone)
+                weekrecord_visitor['end_time'] =  convert_to_local(updatedobj.end_time,user_timezone)
+                weekrecord_visitor['start_launch'] = convert_to_local(updatedobj.start_launch,user_timezone)
+                weekrecord_visitor['end_launch'] = convert_to_local(updatedobj.end_launch,user_timezone)
+                weekrecord_visitor["week_day"] = datetime_local.strftime('%A')
+                weekrecord_visitor['is_dayoff'] = updatedobj.is_dayoff
+                weeksrecords_visitor.append(weekrecord_visitor)
+                if errors:
+                    errdict[weekrecord_visitor["week_day"]] = errors
 
     contents = dict()
     contents["weeksrecord"] = weeksrecords_visitor
