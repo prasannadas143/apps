@@ -48,10 +48,12 @@ urlpatterns = [
     url(r'^editcustomtime/(?P<id>\d+)/$', DefaultTime.CustomtimeOptions, name="editcustomtimes"),
 
     url(r'^WorkingTimeOptions/$', Default.WorkingTimeOptions, name="WorkingTimeOptions"),
+    url(r'^WorkingTimeOptionsEdit/$', Default.WorkingTimeOptionsEdit, name="WorkingTimeOptionsEdit"),
     url(r'^addCountry/$', Countries.addCountry, name="addCountry"),
     url(r'^CountryList/$', Countries.CountriesList, name="CountryList"),
     url(r'^CountryTemplate/$', Countries.CountryTemplate, name="CountryTemplate"),
     url(r'^editCountry/(?P<id>\d+)/$', Countries.editCountry, name="editCountry"),
     url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
     url(r'^Company/$', Invoice.Company, name="Company"),
+    
 ]

@@ -62,17 +62,17 @@ def CustomtimeOptions(request, id=None):
 				
 			if 'is_dayoff' in request.POST :
 				is_dayoff = request.POST['is_dayoff']
-				dayoff_string = custom_date + ' ' + "00:00 AM"
-				datetime_indayoff  = dparser.parse(dayoff_string)
-				request.POST['date'] = custom_date_instace
-				request.POST['start_time'] = datetime_indayoff
-				request.POST['end_time'] = datetime_indayoff
-				request.POST['start_launch'] = datetime_indayoff
-				request.POST['end_launch'] = datetime_indayoff
+				time = "00:00 AM"
+				request.POST['date'] = convert_to_ust(custom_date,time,ip)
+				request.POST['start_time'] = convert_to_ust(custom_date,time,ip)
+				request.POST['end_time'] = convert_to_ust(custom_date,time,ip)
+				request.POST['start_launch'] = convert_to_ust(custom_date,time,ip)
+				request.POST['end_launch'] = convert_to_ust(custom_date,time,ip)
 
 			else :
 				end_time_instance = start_time_instance = end_launch_instance = start_launch_instance = None
 				request.POST['is_dayoff'] = 0
+				request.POST['date'] = convert_to_ust(custom_date,"00:00 AM",ip)
 				if not request.POST['start_time']:
 					errors += "Start time is required \n"
 				else :
