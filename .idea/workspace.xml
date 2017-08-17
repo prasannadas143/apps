@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="326cc73a-ce2e-4673-932f-df4f5ba397a5" name="Default" comment="initial commit">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/middleware.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/templates/Options/Booking/EmailNotification.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/templates/Options/SMS/SMSConfig.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/Booking/EmailNotification.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/SMS/SMS.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/SMS/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/templates/Options/Countries/CountriesList.html" afterPath="$PROJECT_DIR$/appointmentscheduler/templates/Options/Countries/CountriesList.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/templates/addEmployee.html" afterPath="$PROJECT_DIR$/appointmentscheduler/templates/addEmployee.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/urls.py" afterPath="$PROJECT_DIR$/appointmentscheduler/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/Default.py" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/Default.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/DefaultTime.py" afterPath="$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/DefaultTime.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,8 +17,8 @@
       <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/appsplatform/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="800">
-              <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+            <state relative-caret-position="720">
+              <caret line="58" column="0" lean-forward="true" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -37,24 +27,24 @@
       <file leaf-file-name="Default.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/Default.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1056">
-              <caret line="48" column="46" lean-forward="false" selection-start-line="48" selection-start-column="46" selection-end-line="48" selection-end-column="46" />
+            <state relative-caret-position="1016">
+              <caret line="47" column="46" lean-forward="false" selection-start-line="47" selection-start-column="46" selection-end-line="47" selection-end-column="46" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
-                <marker date="1502969656435" expanded="true" signature="1505:1535" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="6142:12373" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="6298:12045" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="6425:12045" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="6864:12045" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="7035:7592" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="7616:10627" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="8007:8395" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="8537:8911" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="9063:9468" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="9618:10017" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="10053:10627" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="10916:10997" ph="..." />
-                <marker date="1502969656435" expanded="true" signature="12383:13482" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="1505:1535" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="6028:12259" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="6184:11931" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="6311:11931" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="6750:11931" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="6921:7478" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="7502:10513" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="7893:8281" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="8423:8797" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="8949:9354" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="9504:9903" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="9939:10513" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="10802:10883" ph="..." />
+                <marker date="1502971591669" expanded="true" signature="12269:13368" ph="..." />
               </folding>
             </state>
           </provider>
@@ -64,43 +54,43 @@
         <entry file="file://$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/DefaultTime.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="9532">
-              <caret line="247" column="0" lean-forward="false" selection-start-line="247" selection-start-column="0" selection-end-line="247" selection-end-column="0" />
+              <caret line="248" column="0" lean-forward="false" selection-start-line="248" selection-start-column="0" selection-end-line="248" selection-end-column="0" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
-                <marker date="1502969656449" expanded="true" signature="858:2178" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="1443:2079" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="2245:6295" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="2435:5500" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="2484:5179" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="2640:3043" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="3054:5179" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="3347:3602" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="3693:3947" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="4049:4335" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="4435:4708" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="4728:5179" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="5202:5320" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="5453:5500" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="5523:6200" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="6340:7640" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="6625:6770" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="6780:7077" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="6867:7077" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7023:7077" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7100:7316" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7181:7316" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7339:7562" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7421:7562" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7682:8440" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7716:7760" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="7876:7933" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8080:8310" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8385:8440" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8542:8671" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8697:8797" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8833:8933" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="8986:9156" ph="..." />
-                <marker date="1502969656449" expanded="true" signature="9055:9123" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="858:2208" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="1473:2109" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="2275:6325" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="2465:5530" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="2514:5209" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="2670:3073" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="3084:5209" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="3377:3632" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="3723:3977" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="4079:4365" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="4465:4738" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="4758:5209" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="5232:5350" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="5483:5530" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="5553:6230" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="6370:7670" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="6655:6800" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="6810:7107" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="6897:7107" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7053:7107" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7130:7346" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7211:7346" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7369:7592" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7451:7592" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7712:8470" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7746:7790" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="7906:7963" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="8110:8340" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="8415:8470" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="8572:8701" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="8727:8827" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="8863:8963" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="9016:9186" ph="..." />
+                <marker date="1502971584182" expanded="true" signature="9085:9153" ph="..." />
               </folding>
             </state>
           </provider>
@@ -176,9 +166,9 @@
         <option value="$PROJECT_DIR$/appointmentscheduler/views/employees.py" />
         <option value="$PROJECT_DIR$/appointmentscheduler/templates/Options/Booking/Payments.html" />
         <option value="$PROJECT_DIR$/appointmentscheduler/templatetags/appscheduler_templates.py" />
-        <option value="$PROJECT_DIR$/appsplatform/settings.py" />
         <option value="$PROJECT_DIR$/appointmentscheduler/templates/Options/WorkingTime/Default.html" />
         <option value="$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/Default.py" />
+        <option value="$PROJECT_DIR$/appsplatform/settings.py" />
       </list>
     </option>
   </component>
@@ -477,6 +467,7 @@
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.033405174" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -799,8 +790,8 @@
     <entry file="file://$PROJECT_DIR$/appointmentscheduler/templatetags/get_item.py" />
     <entry file="file://$PROJECT_DIR$/appsplatform/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="800">
-          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+        <state relative-caret-position="720">
+          <caret line="58" column="0" lean-forward="true" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -814,24 +805,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/appointmentscheduler/views/Options/WorkingTime/Default.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1056">
-          <caret line="48" column="46" lean-forward="false" selection-start-line="48" selection-start-column="46" selection-end-line="48" selection-end-column="46" />
+        <state relative-caret-position="1016">
+          <caret line="47" column="46" lean-forward="false" selection-start-line="47" selection-start-column="46" selection-end-line="47" selection-end-column="46" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
-            <marker date="1502969656435" expanded="true" signature="1505:1535" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="6142:12373" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="6298:12045" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="6425:12045" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="6864:12045" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="7035:7592" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="7616:10627" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="8007:8395" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="8537:8911" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="9063:9468" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="9618:10017" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="10053:10627" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="10916:10997" ph="..." />
-            <marker date="1502969656435" expanded="true" signature="12383:13482" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="1505:1535" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="6028:12259" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="6184:11931" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="6311:11931" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="6750:11931" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="6921:7478" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="7502:10513" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="7893:8281" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="8423:8797" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="8949:9354" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="9504:9903" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="9939:10513" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="10802:10883" ph="..." />
+            <marker date="1502971591669" expanded="true" signature="12269:13368" ph="..." />
           </folding>
         </state>
       </provider>
