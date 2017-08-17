@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'appointmentscheduler.middleware.VisitorDetails',
+
 ]
 
 X_FRAME_OPTIONS = 'DENY'
@@ -66,8 +68,8 @@ ROOT_URLCONF = 'appsplatform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join("appointmentscheduler", 'templates'), 
-               
+        'DIRS': [os.path.join("appointmentscheduler", 'templates'),
+
                 os.path.join("appointmentscheduler", 'templates',"Options"),
                 os.path.join("appointmentscheduler", 'templates',"Options","Booking") ],
 
@@ -134,6 +136,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'daspython@gmail.com'
+EMAIL_HOST_PASSWORD = "Putu2#orissa"
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
