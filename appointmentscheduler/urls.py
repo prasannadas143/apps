@@ -2,10 +2,11 @@ from django.conf.urls import url
 
 from .views import service,employees
 from .views.Options import General
-from .views.Options.Booking import Options,Payments,BookingForm
+from .views.Options.Booking import Options,Payments,BookingForm,EmailNotification
 from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
+from .views.Options.SMS import SMS
 
 
 urlpatterns = [
@@ -19,8 +20,6 @@ urlpatterns = [
     url(r'^listServicesName/$', employees.services_names, name="listServicesName"),
     url(r'^deleteimage/(?P<id>\d+)/$', service.deleteimage, name="delete_service_image"),
     url(r'associated_employee_names/(?P<id>\d+)/$', service.associated_employee_names, name="assiosiated_employees"),
-
- 
     url(r'^addemployee/$', employees.add_Employee, name="addemployee"),
     url(r'^deleteemployeeimage/(?P<id>\d+)/$', employees.deleteemployeeimage, name="deleteemployeeimage"),
     url(r'^employeelist/$', employees.employee_List, name="employeelist"),
@@ -55,5 +54,8 @@ urlpatterns = [
     url(r'^editCountry/(?P<id>\d+)/$', Countries.editCountry, name="editCountry"),
     url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
     url(r'^Company/$', Invoice.Company, name="Company"),
-    
+    url(r'^SMSConfig/$', SMS.SMSConfig, name="SMSConfig"),
+    url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
+    url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
+    url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
 ]
