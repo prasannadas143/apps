@@ -255,7 +255,7 @@ function validateemployeeform() {
 				<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr>
 				</span>
-					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{12}$/"  	 	 onblur="check_duplicated_phoneno()" required/>
+					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{10,12}$/"  	 	 onblur="check_duplicated_phoneno()" required/>
 				</span>
 
 				<span ng-messages="frmCreateEmployee.phone.$error"   style="color:maroon" role="alert">

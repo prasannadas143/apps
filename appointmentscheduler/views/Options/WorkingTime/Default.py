@@ -38,8 +38,9 @@ def convert_to_local(dateandtime,local_timezone):
 @csrf_exempt    
 def WorkingTimeOptions(request):
     global user_timezone
-    ip = get_ip_address_from_request(request)   
-    user_timezone = getusertimezone(ip)
+    # ip = get_ip_address_from_request(request)
+    # user_timezone = getusertimezone(ip)
+    user_timezone = request.session['visitor_timezone']
     visitor_tz = pytz.timezone(str(user_timezone[0]))
     # get time now for the specific timezone 
     visitor_time = datetime.datetime.now(visitor_tz)
@@ -128,8 +129,9 @@ def WorkingTimeOptions(request):
 @csrf_exempt    
 def WorkingTimeOptionsEdit(request):
     global user_timezone
-    ip = get_ip_address_from_request(request)   
-    user_timezone = getusertimezone(ip)
+    # ip = get_ip_address_from_request(request)
+    # user_timezone = getusertimezone(ip)
+    user_timezone = request.session['visitor_timezone']
     request.POST._mutable= True
     formparams= request.POST.dict()
     weeksrecords_visitor = list()

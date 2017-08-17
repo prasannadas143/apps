@@ -30,8 +30,7 @@ def ShowCustomtimes(request):
         customrecords = AppschedulerDates.objects.filter(is_dayoff = 0 )
     else:
         customrecords = AppschedulerDates.objects.all()
-    ip = get_ip_address_from_request(request)
-    user_timezone = getusertimezone(ip)
+    user_timezone = request.session['visitor_timezone']
     for customtime in reversed(list(customrecords)):
         data=dict()
         data['id'] = customtime.pk	
