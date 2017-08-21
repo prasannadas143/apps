@@ -38,9 +38,7 @@ def convert_to_local(dateandtime,local_timezone):
 @csrf_exempt    
 def WorkingTimeOptions(request):
     global user_timezone
-    # ip = get_ip_address_from_request(request)
-    # user_timezone = getusertimezone(ip)
-    user_timezone = request.session['visitor_timezone']
+    user_timezone =request.session['visitor_timezone']
     visitor_tz = pytz.timezone(str(user_timezone[0]))
     # get time now for the specific timezone 
     visitor_time = datetime.datetime.now(visitor_tz)
@@ -64,7 +62,7 @@ def WorkingTimeOptions(request):
         day = nextday.day
         # check ust datenextdaytime is available in "customtime " DB
         adate = None
-        adates = AppschedulerDates.objects.filter(date__year = year  )
+        adates = AppschedulerDates.objects.filter(date__year = year, visitor_timezone = user_timezone[0]  )
 
         for dt in adates:
             getvisitortime = dt.date.astimezone(pytz.timezone(user_timezone[0]))
@@ -108,7 +106,7 @@ def WorkingTimeOptions(request):
             weekrecord_ust["start_date"] = ust_start_date
             weekrecord_ust["is_dayoff"] = 0
             adt =AppschedulerDates(date=ust_start_date, start_time=ust_start_time, end_time=ust_end_time,
-              start_launch=ust_start_launch, end_launch=ust_end_launch, is_dayoff=0  )
+              start_launch=ust_start_launch, end_launch=ust_end_launch, is_dayoff=0, visitor_timezone=user_timezone[0]  )
             adt.save()
             weeksrecords_ust.append(weekrecord_ust)
         else :
@@ -129,8 +127,6 @@ def WorkingTimeOptions(request):
 @csrf_exempt    
 def WorkingTimeOptionsEdit(request):
     global user_timezone
-    # ip = get_ip_address_from_request(request)
-    # user_timezone = getusertimezone(ip)
     user_timezone = request.session['visitor_timezone']
     request.POST._mutable= True
     formparams= request.POST.dict()
@@ -158,10 +154,10 @@ def WorkingTimeOptionsEdit(request):
                     is_dayoff = formparams[is_dayoff_key]
                     time = "00:00 AM"
                     request.POST['date'] = getust(custom_date)
-                    request.POST['start_time'] = convert_to_ust(custom_date,time,ip)
-                    request.POST['end_time'] = convert_to_ust(custom_date,time,ip)
-                    request.POST['start_launch'] = convert_to_ust(custom_date,time,ip)
-                    request.POST['end_launch'] = convert_to_ust(custom_date,time,ip)
+                    request.POST['start_time'] = convert_to_ust(custom_date,time,user_timezone)
+                    request.POST['end_time'] = convert_to_ust(custom_date,time,user_timezone)
+                    request.POST['start_launch'] = convert_to_ust(custom_date,time,user_timezone)
+                    request.POST['end_launch'] = convert_to_ust(custom_date,time,user_timezone)
                     request.POST['is_dayoff'] = is_dayoff
 
                 else :
@@ -173,7 +169,7 @@ def WorkingTimeOptionsEdit(request):
                         errors += "Start time is required \n"
                     else :
                         start_time = formparams[start_time_key]
-                        start_time_instance = convert_to_ust(custom_date,start_time,ip )
+                        start_time_instance = convert_to_ust(custom_date,start_time,user_timezone )
                         if not start_time_instance:
                             errors += "Start time is not in valid format "
                         else :
@@ -184,7 +180,7 @@ def WorkingTimeOptionsEdit(request):
                         errors += "End time is required \n"
                     else :
                         end_time = formparams[end_time_key]
-                        end_time_instance = convert_to_ust(custom_date,end_time,ip )
+                        end_time_instance = convert_to_ust(custom_date,end_time,user_timezone )
                         if not end_time_instance:
                             errors += "End time is not in valid format \n"
                         else :
@@ -194,7 +190,7 @@ def WorkingTimeOptionsEdit(request):
                         errors += "Start launch time is required\n"
                     else :
                         start_launch = formparams[launch_from_key]
-                        start_launch_instance = convert_to_ust(custom_date,start_launch,ip )
+                        start_launch_instance = convert_to_ust(custom_date,start_launch,user_timezone )
                         if not start_launch_instance:
                             errors += "Start launch is not in valid format \n"
                         else :
@@ -205,7 +201,7 @@ def WorkingTimeOptionsEdit(request):
                         errors += "End Launch time is required\n"
                     else :          
                         end_launch = formparams[launch_to_key]
-                        end_launch_instance = convert_to_ust(custom_date,end_launch,ip )
+                        end_launch_instance = convert_to_ust(custom_date,end_launch,user_timezone )
                         if not end_launch_instance:
                             errors += "End launch is not in valid format \n"
                         else :
@@ -217,14 +213,15 @@ def WorkingTimeOptionsEdit(request):
                             errors += "End launch time needs to be more than start launch time \n"
                         if  not ((start_time_instance < start_launch_instance) and  (end_launch_instance < end_time_instance)) :
                             errors += "Launch time needs to be between  start and end working hours  \n"
-                dateobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
+                dateobj = AppschedulerDates.objects.filter(date=request.POST['date'],visitor_timezone=user_timezone[0])[0]
                 form = customtimeform(request.POST or None , instance=dateobj)
+                form.instance.visitor_timezone = user_timezone[0]
                 if errors :
                     form.errors["customerror"] = errors
                 if form.is_valid():
                     message = "Customtime saved"
                     form.save()
-                updatedobj = AppschedulerDates.objects.filter(date=request.POST['date'])[0] 
+                updatedobj = AppschedulerDates.objects.filter(date=request.POST['date'], visitor_timezone=user_timezone[0])[0]
                 weekrecord_visitor = dict()
                 datetime_local = updatedobj.date.astimezone(pytz.timezone(user_timezone[0]))
                 weekrecord_visitor['start_date'] = datetime_local.strftime('%Y-%m-%d')

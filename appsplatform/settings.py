@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 ]
 
-MIDDLEWARE_CLASSES  = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,8 +68,8 @@ ROOT_URLCONF = 'appsplatform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join("appointmentscheduler", 'templates'), 
-               
+        'DIRS': [os.path.join("appointmentscheduler", 'templates'),
+
                 os.path.join("appointmentscheduler", 'templates',"Options"),
                 os.path.join("appointmentscheduler", 'templates',"Options","Booking") ],
 

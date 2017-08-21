@@ -314,7 +314,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
           alert("no rows selected");
      }
        $.ajax({
-                url: "{% url 'appointmentschduler:deleteCountry' %}",
+                url: "{% url 'appointmentschduler:delete_services' %}",
                 method: 'POST',
                 data : {
                         "rowids":rowids,
