@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from .views import service,employees,bookings
 
 from .views import service,employees
 from .views.Options import General
@@ -55,5 +56,10 @@ urlpatterns = [
     url(r'^editCountry/(?P<id>\d+)/$', Countries.editCountry, name="editCountry"),
     url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
     url(r'^Company/$', Invoice.Company, name="Company"),
-    
+
+    url(r'^bookings/$', bookings.show_bookings, name="bookings"),
+    url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
+    url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
+    url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
+
 ]

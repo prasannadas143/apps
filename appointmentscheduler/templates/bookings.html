@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
+
+       <input type="button" onclick="location.href='{% url 'appointmentschduler:addbooking' %}'"  value="Add Booking" />{% csrf_token %}
+
+{% endblock %}

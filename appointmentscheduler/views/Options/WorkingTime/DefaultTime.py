@@ -14,44 +14,44 @@ from pytz import country_timezones
 import dateutil.parser as dparser
 
 
-timezone = 'America/Los_Angeles' 
 
 @requires_csrf_token
 def ShowCustomtimes(request):
-    customtimes_info =[]
-    querydata = "all"
-    if 'querydata' in request.GET:
-    	querydata = request.GET['querydata']
-    if querydata == "all":
-        customrecords = AppschedulerDates.objects.all()
-    elif querydata == "yes":
-        customrecords = AppschedulerDates.objects.filter(is_dayoff = 1 )
-    elif querydata == "no":
-        customrecords = AppschedulerDates.objects.filter(is_dayoff = 0 )
-    else:
-        customrecords = AppschedulerDates.objects.all()
-    ip = get_ip_address_from_request(request)
-    user_timezone = getusertimezone(ip)
-    for customtime in reversed(list(customrecords)):
-        data=dict()
-        data['id'] = customtime.pk	
-        datetime_in_pacific = customtime.date.astimezone(pytz.timezone(user_timezone[0]))
+	customtimes_info =[]
+	querydata = "all"
+	global user_timezone
+	user_timezone = request.session['visitor_timezone']
+	if 'querydata' in request.GET:
+		querydata = request.GET['querydata']
+	if querydata == "all":
+		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0] )
+	elif querydata == "yes":
+		customrecords = AppschedulerDates.objects.filter(is_dayoff = 1 ,visitor_timezone = user_timezone[0])
+	elif querydata == "no":
+		customrecords = AppschedulerDates.objects.filter(is_dayoff = 0,visitor_timezone = user_timezone[0] )
+	else:
+		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0])
 
-        data['date'] = datetime_in_pacific.strftime('%Y-%m-%d')
-        data['start_time'] = convert_to_local(customtime.start_time,user_timezone)
-        data['end_time'] =  convert_to_local(customtime.end_time,user_timezone)
-        data['start_launch'] = convert_to_local(customtime.start_launch,user_timezone)
-        data['end_launch'] = convert_to_local(customtime.end_launch,user_timezone)
-        data['is_dayoff'] = str(customtime.is_dayoff)
-        customtimes_info.append(data)
-    return  HttpResponse(json.dumps({"data" :customtimes_info }), content_type='application/json')   
+	for customtime in reversed(list(customrecords)):
+		data=dict()
+		data['id'] = customtime.pk
+		datetime_in_pacific = customtime.date.astimezone(pytz.timezone(user_timezone[0]))
+
+		data['date'] = datetime_in_pacific.strftime('%Y-%m-%d')
+		data['start_time'] = convert_to_local(customtime.start_time,user_timezone)
+		data['end_time'] =  convert_to_local(customtime.end_time,user_timezone)
+		data['start_launch'] = convert_to_local(customtime.start_launch,user_timezone)
+		data['end_launch'] = convert_to_local(customtime.end_launch,user_timezone)
+		data['is_dayoff'] = str(customtime.is_dayoff)
+		customtimes_info.append(data)
+	return  HttpResponse(json.dumps({"data" :customtimes_info }), content_type='application/json')
 
 
 @requires_csrf_token
 def CustomtimeOptions(request, id=None):
 	template_name = os.path.join('Options','WorkingTime','Custom.html')
-	ip = get_ip_address_from_request(request)
-	request.session['visitorip'] = ip
+	global user_timezone
+	user_timezone = request.session['visitor_timezone']
 	errors = ""
 	if request.method == "POST":
 		if not request.POST['date'] :
@@ -63,21 +63,21 @@ def CustomtimeOptions(request, id=None):
 			if 'is_dayoff' in request.POST :
 				is_dayoff = request.POST['is_dayoff']
 				time = "00:00 AM"
-				request.POST['date'] = convert_to_ust(custom_date,time,ip)
-				request.POST['start_time'] = convert_to_ust(custom_date,time,ip)
-				request.POST['end_time'] = convert_to_ust(custom_date,time,ip)
-				request.POST['start_launch'] = convert_to_ust(custom_date,time,ip)
-				request.POST['end_launch'] = convert_to_ust(custom_date,time,ip)
+				request.POST['date'] = convert_to_ust(custom_date,time,user_timezone)
+				request.POST['start_time'] = convert_to_ust(custom_date,time,user_timezone)
+				request.POST['end_time'] = convert_to_ust(custom_date,time,user_timezone)
+				request.POST['start_launch'] = convert_to_ust(custom_date,time,user_timezone)
+				request.POST['end_launch'] = convert_to_ust(custom_date,time,user_timezone)
 
 			else :
 				end_time_instance = start_time_instance = end_launch_instance = start_launch_instance = None
 				request.POST['is_dayoff'] = 0
-				request.POST['date'] = convert_to_ust(custom_date,"00:00 AM",ip)
+				request.POST['date'] = convert_to_ust(custom_date,"00:00 AM",user_timezone)
 				if not request.POST['start_time']:
 					errors += "Start time is required \n"
 				else :
 					start_time = request.POST['start_time']
-					start_time_instance = convert_to_ust(custom_date,start_time,ip )
+					start_time_instance = convert_to_ust(custom_date,start_time,user_timezone )
 					if not start_time_instance:
 						errors += "Start time is not in valid format "
 					request.POST['start_time'] = start_time_instance
@@ -87,7 +87,7 @@ def CustomtimeOptions(request, id=None):
 					errors += "End time is required \n"
 				else :
 					end_time = request.POST['end_time']
-					end_time_instance = convert_to_ust(custom_date,end_time,ip )
+					end_time_instance = convert_to_ust(custom_date,end_time,user_timezone )
 					if not end_time_instance:
 						errors += "End time is not in valid format \n"
 					else :
@@ -97,7 +97,7 @@ def CustomtimeOptions(request, id=None):
 					errors += "Start launch time is required\n"
 				else :
 					start_launch = request.POST['start_launch']
-					start_launch_instance = convert_to_ust(custom_date,start_launch,ip )
+					start_launch_instance = convert_to_ust(custom_date,start_launch,user_timezone )
 					if not start_launch_instance:
 						errors += "Start launch is not in valid format \n"
 					else :
@@ -108,7 +108,7 @@ def CustomtimeOptions(request, id=None):
 					errors += "End Launch time is required\n"
 				else :			
 					end_launch = request.POST['end_launch']
-					end_launch_instance = convert_to_ust(custom_date,end_launch,ip )
+					end_launch_instance = convert_to_ust(custom_date,end_launch,user_timezone )
 					if not end_launch_instance:
 						errors += "End launch is not in valid format \n"
 					else :
@@ -126,7 +126,7 @@ def CustomtimeOptions(request, id=None):
 			form = customtimeform( request.POST or None , instance=dateobj )
 		else :
 			form = customtimeform(request.POST or None )
-
+		form.instance.visitor_timezone = user_timezone[0]
 		if errors :
 			form.errors["customerror"] = errors
 		if form.is_valid():
@@ -134,7 +134,7 @@ def CustomtimeOptions(request, id=None):
 			form.save()
 	elif id is not None :
 		dateobj = AppschedulerDates.objects.get(id=id)
-		user_timezone = getusertimezone(ip)
+		user_timezone = request.session['visitor_timezone']
 		data=dict()
 		data['id'] = dateobj.pk	
 		datetime_in_pacific = dateobj.date.astimezone(pytz.timezone(user_timezone[0]))
@@ -188,7 +188,7 @@ def get_ip_address_from_request(request):
         ip_address = '127.0.0.1'
     return ip_address
 
-def convert_to_ust(custom_date,time,ip):
+def convert_to_ust(custom_date,time,user_timezone):
 
 	format = '%Y-%m-%d %H:%M %p'
 		# try:
@@ -203,7 +203,6 @@ def convert_to_ust(custom_date,time,ip):
 	date_string = custom_date + ' ' + time
 
 	#Get the timezone 
-	user_timezone = getusertimezone(ip)
 
 
 	#Convert user timezone to utc timezone 

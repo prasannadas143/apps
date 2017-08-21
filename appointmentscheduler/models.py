@@ -77,13 +77,13 @@ class AppschedulerCalendars(models.Model):
 
 
 class AppschedulerDates(models.Model):
-    date = models.DateTimeField(unique=True)
+    date = models.DateTimeField()
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     start_launch = models.DateTimeField(blank=True, null=True)
     end_launch = models.DateTimeField(blank=True, null=True)
     is_dayoff = models.BooleanField(default=False )
-
+    visitor_timezone =  models.CharField(max_length=32,default='Europe/Istanbul',blank=False)
     class Meta:
         # managed = False
         db_table = 'appscheduler_dates'
