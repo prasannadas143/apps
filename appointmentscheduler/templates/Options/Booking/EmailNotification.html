@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<div id="CountryFormOptions">
+
+<h2 align="center">Save Email Settings</h2>
+<div id="CountryFormOptions" class="form-horizontal">
+
+<div class="form-group">
+    <label class="col-sm-6 control-label" for="FromEmailAddress">From Email Address</label>
+    <div class="col-sm-6">
+       <input id="o_FromEmail" class="FromEmailAddress text-width" maxlength="250" name="o_FromEmail" type="text"  value="{{items.o_FromEmail}}"   />
+       <div class="FromEmailAddress-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_FromEmailPassword">From  Password</label>
+    <div class="col-sm-6">
+       <input id="o_FromEmailPassword" class="FromPassword text-width" maxlength="250" name="o_FromEmailPassword" type="Password"  value="{{items.o_FromEmailPassword}}"   />
+       <div class="FromPassword-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="button" onclick="return EmailSettingsValidation();"> <i class="ace-icon fa fa-check"></i> Save  Mail Settings </button>
+ </div>
+ </div>
+</div>
+
+</div>
+
+
+<div id="CountryFormOptions">
+<h2 align="center">Send Email Using SMTP</h2>
+ <form class="form-horizontal" role="form" method="POST">
+
+<div id="CountryFormOptions" class="form-horizontal">
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="Email Address">TO Email Address</label>
+    <div class="col-sm-6">
+       <input id="EmailAddress" class="EmailAddress text-width" maxlength="250" name="EmailAddress" type="text"  value="{{items.EmailAddress}}"   />
+       <div class="EmailAddress-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="Subject">Subject</label>
+    <div class="col-sm-6">
+       <input id="Subject" class="Subject text-width" maxlength="250" name="Subject" type="text"  value="{{items.Subject}}"   />
+       <div class="Subject-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="Body">Body</label>
+    <div class="col-sm-6">
+    <textarea  id="Body" class="Body text-width" maxlength="250" name="Body" type="text" >
+	{{items.Body}}
+    </textarea>
+       <div class="Body-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="button" onclick="return EmailConfigValidation();"> <i class="ace-icon fa fa-check"></i> Send Message </button>
+ </div>
+ </div>
+
+</div>
+
+</form>
+
+</div>
+
+
+<div class="modal fade" id="messageStatus" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="Ok">Ok</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+function EmailSettingsValidation()
+{
+
+var isValidForm=true;
+$('.FromEmailAddress-msg').html('');
+$('.FromPassword-msg').html('');
+
+if($('.FromEmailAddress').val().trim()==""){
+	isValidForm=false;
+	$('.FromEmailAddress-msg').html("Please enter From Email Address")
+}
+else
+{
+var emailAddress= $('.FromEmailAddress').val().trim();
+  var isValidEmailAddress=  isValidEmail(emailAddress);
+  if(!isValidEmailAddress)
+  {
+  	isValidForm=false;
+  	$('.FromEmailAddress-msg').html("Please enter valid Email")
+  }
+}
+
+if($('.FromPassword').val().trim()==""){
+	isValidForm=false;
+	$('.FromPassword-msg').html("Please enter Password")
+}
+
+if(isValidForm)
+{
+  $.ajax({
+  url: "{% url 'appointmentschduler:SaveMailSettings' %}",
+  method: 'POST',
+  data : {
+          "o_FromEmail":$('.FromEmailAddress').val(),
+          "o_FromEmailPassword":$('.FromPassword').val()
+         },
+  }).success(function (data, jqXHR) 
+  {
+        $('.modal-title').text('Email Setting Saved successfully');
+        $("#messageStatus").modal();
+
+  }).error(function (jqXHR, errorThrown) {
+  	alert('Hi error');
+     $('.modal-title').text('Setting not Saved');
+        $("#messageStatus").modal();
+    }); 
+}
+
+}
+
+
+
+function EmailConfigValidation()
+{
+
+ $('.EmailAddress-msg').html('');
+ $('.Subject-msg').html('');
+ $('.Body-msg').html('');
+
+var isValidForm=true;
+if($('.EmailAddress').val().trim()==""){
+	isValidForm=false;
+	$('.EmailAddress-msg').html("Please enter Email Address")
+}
+else
+{
+var emailAddress= $('.EmailAddress').val().trim();
+  var isValidEmailAddress=  isValidEmail(emailAddress);
+  if(!isValidEmailAddress)
+  {
+  	isValidForm=false;
+  	$('.EmailAddress-msg').html("Please enter valid Email")
+  }
+}
+
+
+if($('.Subject').val().trim()==""){
+	isValidForm=false;
+	$('.Subject-msg').html("Please enter Subject")
+}
+
+if($('.Body').val().trim()==""){
+	isValidForm=false;
+	$('.Body-msg').html("Please enter Body")
+}
+
+if(isValidForm)
+{
+  
+  $.ajax({
+  url: "{% url 'appointmentschduler:SendMail' %}",
+  method: 'POST',
+  data : {
+          "EmailAddress":$('.EmailAddress').val(),
+          "Subject":$('.Subject').val(),
+          "Body":$('.Body').val(),
+         },
+  }).success(function (data, jqXHR) 
+  {
+        $('.modal-title').text('Email sent successfully');
+        $("#messageStatus").modal();
+
+  }).error(function (jqXHR, errorThrown) {
+     $('.modal-title').text('Email not sent');
+        $("#messageStatus").modal();
+    }); 
+}
+
+}
+
+
+function isValidEmail(emailAddress)
+{
+    var atpos = emailAddress.indexOf("@");
+    var dotpos = emailAddress.lastIndexOf(".");
+    if (atpos<1 || dotpos<atpos+2 || dotpos+2>=emailAddress.length) {
+        return false;
+    }
+    else{
+    	 return true;
+    }
+}
+	
+</script>
+
+<style type="text/css">
+	
+.text-width{
+width: 50%;
+}
+.red{
+        color: Red;
+    }
+</style>
+{% endblock %}

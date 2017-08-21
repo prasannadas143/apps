@@ -10,16 +10,67 @@
 function SubmitForm(id)
 
 {
-	if(id) {
+return false;
+var isValidForm=true;
 
-	     document.forms['custotimeform'].action='/appointmentschduler/editcustomtime/' + id + '/';
-	     document.forms['custotimeform'].submit();
-	}
-	else {
-         document.forms['custotimeform'].action='/appointmentschduler/CustomTimeOptions/' ;
-	     document.forms['custotimeform'].submit();
-	}
-     return true;
+$(".clsdate-msg").html('');
+$(".start_time-msg").html('');
+$(".end_time-msg").html('');
+$(".start_launch-msg").html('');
+$(".end_launch-msg").html('');
+
+var date=$(".clsdate").val();
+var start_time=$(".start_time").val();
+var end_time=$(".end_time").val();
+var start_launch=$(".start_launch").val();
+var end_launch=$(".end_launch").val();
+
+if(date=="")
+{
+isValidForm=false;
+$(".clsdate-msg").html('Please enter Date');
+}
+if(start_time=="")
+{
+isValidForm=false;
+$(".start_time-msg").html('Please enter Start Time');
+}
+if(end_time=="")
+{
+isValidForm=false;
+$(".end_time-msg").html('Please enter End Time');
+}
+
+if(start_launch=="")
+{
+isValidForm=false;
+$(".start_launch-msg").html('Please enter Start Launch Time');
+}
+
+if(end_launch=="")
+{
+isValidForm=false;
+$(".end_launch-msg").html('Please enter End Launch Time');
+}
+
+
+
+if(isValidForm)
+{
+  if(id) {
+       document.forms['custotimeform'].action='/appointmentschduler/editcustomtime/' + id + '/';
+       document.forms['custotimeform'].submit();
+        }
+  else {
+       document.forms['custotimeform'].action='/appointmentschduler/CustomTimeOptions/' ;
+       document.forms['custotimeform'].submit();
+      }
+return true;
+}
+else
+{
+  return false;
+}
 
 }
 </script>
@@ -33,19 +84,22 @@ function SubmitForm(id)
 	<p>
 		<label class="title">Date</label>
 		<span class="pj-form-field-custom pj-form-field-custom-after">
-			<input type="date" name="date" id="date" {% if id != None %} value="{{ dateobj.date }}" {% endif %} >
-		</span>
+			<input type="date" name="date" class="clsdate" id="date" {% if id != None %} value="{{ dateobj.date }}" {% endif %} >
+	    <div class="clsdate-msg red"></div>
+  	</span>
 	</p>
 	<p class="business" style="display: block;">
 		<label class="title">Start Time</label>
 		<span class="inline-block">
-			<input name="start_time" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker" aria-required="true" id="tp1501527266049" {% if id != None %} value="{{ dateobj.start_time }}" {% endif %} >
+			<input name="start_time" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker start_time" aria-required="true" id="tp1501527266049" {% if id != None %} value="{{ dateobj.start_time }}" {% endif %} >
+       <div class="start_time-msg red"></div>
 		</span>
 	</p>
 	<p class="business" style="display: block;">
 		<label class="title">End Time</label>
 		<span class="inline-block">
-			<input name="end_time" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker" aria-required="true" id="tp1501527266050"  {% if id != None %} value="{{ dateobj.end_time }}" {% endif %} >
+			<input name="end_time" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker end_time" aria-required="true" id="tp1501527266050"  {% if id != None %} value="{{ dateobj.end_time }}" {% endif %} >
+       <div class="end_time-msg red"></div>
 		</span>
 	</p>
 
@@ -58,13 +112,16 @@ function SubmitForm(id)
 	<p class="business" style="display: block;">
 		<label class="title">Lunch from</label>
 		<span class="inline-block">
-			<input name="start_launch" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker" aria-required="true" id="tp1501527266051"  {% if id != None %} value="{{ dateobj.start_launch }}" {% endif %}>
+			<input name="start_launch" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker start_launch" aria-required="true" id="tp1501527266051"  {% if id != None %} value="{{ dateobj.start_launch }}" {% endif %}>
+
+       <div class="start_launch-msg red"></div>
 		</span>
 	</p>
 	<p class="business" style="display: block;">
 		<label class="title">Lunch to</label>
 		<span class="inline-block">
-			<input name="end_launch" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker" aria-required="true" id="tp1501527266052"  {% if id != None %} value="{{ dateobj.end_launch }}" {% endif %}>
+			<input name="end_launch" type="text" class="pj-timepicker pj-form-field w80 required hasTimepicker end_launch" aria-required="true" id="tp1501527266052"  {% if id != None %} value="{{ dateobj.end_launch }}" {% endif %}>
+       <div class="end_launch-msg red"></div>
 		</span>
 	</p>
 </div>
@@ -454,16 +511,18 @@ $('#datatables tbody').on('click', 'button', function () {
           });         
   });
 
-      
-
-   
-
-
-
-
-
-
 
 </script>
+
+
+<style type="text/css">
+    
+.text-width{
+width: 50%;
+}
+.red{
+        color: Red;
+    }
+</style>
 
 {% endblock %}
