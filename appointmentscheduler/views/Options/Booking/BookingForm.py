@@ -17,6 +17,7 @@ from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
+from json import dump, load
 
 def update_value(field_id, tab_id, newstep):
    item = AppschedulerOptions.objects.get(tab_id=int(tab_id), id = int(field_id))
@@ -126,7 +127,6 @@ def BookingFormOptions(request):
    "o_bf_address_2":o_bf_address_2,"o_bf_address_2_selected":o_bf_address_2_selected,"o_bf_address_2_id":o_bf_address_2_id,
    "o_bf_address_1":o_bf_address_1,"o_bf_address_1_selected":o_bf_address_1_selected,"o_bf_address_1_id":o_bf_address_1_id,
    "showlabels": showlabels}
-   BookingFormdata['items'] = items
-   # Then, do a redirect for example
-   return render(request,'BookingForm.html', BookingFormdata)
 
+   BookingFormdata['items'] = items
+   return render(request,'BookingForm.html', BookingFormdata)

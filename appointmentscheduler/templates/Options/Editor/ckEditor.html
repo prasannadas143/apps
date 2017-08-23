@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Editor Template</title>
+        <script src="https://cdn.ckeditor.com/4.7.2/standard/ckeditor.js"></script>
+    </head>
+    <body>
+
+     <form class="form-horizontal" role="form" method="POST">
+     <textarea name="editor1" class="editor1"></textarea>
+
+ <div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="button" onclick="return Validation();"> <i class="ace-icon fa fa-check"></i> Save Template </button>
+ </div>
+ </div>
+        <script>
+            CKEDITOR.replace( 'editor1' );
+
+        </script>
+        
+        </form>
+    </body>
+
+
+
+<div class="modal fade" id="messageStatus" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="Ok">Ok</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
+</html>
+<script type="text/javascript">
+            
+function Validation()
+{
+    var isValidForm=true;
+    var data = CKEDITOR.instances.editor1.getData();
+    if(data=="")
+    {
+        isValidForm=false;
+        alert("Please enter Template");
+    }
+    if(isValidForm)
+    {
+
+    $.ajax({
+  url: "{% url 'appointmentschduler:SaveTemplate' %}",
+  method: 'POST',
+  data : {
+          "TemplateData":data,
+         },
+  }).success(function (data, jqXHR) 
+  {
+        $('.modal-title').text('Template saved successfully');
+        $("#messageStatus").modal();
+  }).error(function (jqXHR, errorThrown) {
+     $('.modal-title').text('Template is not saved');
+        $("#messageStatus").modal();
+    }); 
+
+    return true;
+    }
+    else
+    {
+         return false;
+    }
+ 
+}
+
+        </script>
+{% endblock %}

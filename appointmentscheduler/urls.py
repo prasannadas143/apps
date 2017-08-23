@@ -7,6 +7,7 @@ from .views.Options.Booking import Options,Payments,BookingForm
 from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
+from .views.Options.Editor import ckEditor
 
 
 urlpatterns = [
@@ -61,5 +62,6 @@ urlpatterns = [
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
-
+    url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
+    url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate")
 ]
