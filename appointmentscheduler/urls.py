@@ -61,5 +61,5 @@ urlpatterns = [
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
-
+    url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice")
 ]

@@ -160,6 +160,12 @@ def employee_in_booking(request):
             del hour["interval_ust"]
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
+def get_serviceprice(request):
+    serviceid = request.GET.get('serviceid')
+    appscheduleobj = AppschedulerServices.objects.get(id=serviceid)
+    price = appscheduleobj.price
+    return HttpResponse(json.dumps({"price" : str(price)}), content_type='application/json')
+  
 
 def getust( date_string,user_timezone):
     visitor_tz = pytz.timezone(str(user_timezone[0]))

@@ -327,6 +327,10 @@ span.onclick = function() {
 
 }
 
+$('body').on('click', 'input.deleteDep', function() {
+   $(this).parents('tr').remove();  
+});
+
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
@@ -368,18 +372,31 @@ function addservices() {
 	employeename = $('#employeeidselected').val();
 	employeeid = $('#employeeidselected').attr("name");
 	// get price for the service 
+	   $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:getserviceprice'  %}",
+            data: { "serviceid" : serviceid},
+            async: false,
+
+            success:function(response){
+                // console.log(response);
+                serviceprice =eval(response.price);
+                alert(serviceprice);
+
+          	}
+          });     
 	service_date = $('#servicedate_updated').val()
 	start_time = $('#starttime').val();
 	if ($('#addservicedata tr').length < 2 ) {
 	    $('#addservices').append('<table id="addservicedata" class="table table-striped table-bordered table-hover"  id="policy_table"  cellspacing="0" width="100%" ></table>');
 	     table = $('#addservices').children();
 	    table.append('<tr><th>Service/Employee</th><th>Date/Time</th><th>Price</th></tr>');
-	    table.append('<tr><td>' + servicedetails_name + employeename + '</td><td>' + service_date +start_time + '</td><td>Price</td></tr>');
+	    table.append('<tr><td>' + servicedetails_name + employeename + '</td><td>' + service_date +start_time + '</td><td>' + serviceprice + '</td>  <td> <input type="button" class="deleteDep" value="Delete"/></td></tr>');
 
 	}
 	else {
 
-	    table.append('<tr><th>' + servicedetails_name + employeename + '</th><th>' + service_date +start_time + '</th><th>Price</th></tr>');
+	    table.append('<tr><th>' + servicedetails_name + employeename + '</th><th>' + service_date +start_time + '</th><th>' + serviceprice + '</th><td> <input type="button" class="deleteDep" value="Delete"/></td></tr>');
 	}
 	alert($('#addservicedata tr').length);
 
