@@ -62,6 +62,7 @@ urlpatterns = [
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
+    url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
     url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate")
 ]
