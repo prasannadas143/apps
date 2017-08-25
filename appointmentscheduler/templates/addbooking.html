@@ -121,9 +121,11 @@
 
 
 					</div>
+					<div id="servicesdetails"></div>
 					<p>
 						<label class="title">&nbsp;</label>
 						<input type="button" value="+ Add service" class="pj-button item-add" id="myBtn">
+						<div id="addservices"> </div>
 						<div id="myModal" class="modal">
 
 							  <!-- Modal content -->
@@ -157,13 +159,16 @@
 								<div class="modal-body">
 
 								  <input type="text" name="servicedate_updated" id="servicedate_updated" class="pj-form-field w500" value="{{ defaultdate }}">
-									<select name="servicedetails" id="servicedetails" onclick="selectedservice();">
+									<select name="servicedetails" id="servicedetails" onchange="selectedservice();">
 									</select>
 									<div class="asContainer" id="employeedetails">
+									<div>   Start Time: <input type="text" name="starttime" id="starttime"></div>
+									<div id="duration">   End Time: <input type="text" name="endtime" id="endtime"></div>
+									<div>   Employee name: <input type="text" name="employeeid" id="employeeidselected"></div>
 
-										<div class="asEmployeeName">Amanda Cheng</div>
-										<div class="asEmployeeAvatar">   		</div>
-										<div class="asEmployeeInfo"> 	<div class="asEmployeeTimeslots"> </div>  </div>
+										<div class="asEmployeeInfo" id="asEmployeeInfo"> <div class="asEmployeeTimeslots"> </div> </div>
+										<input type="button" id="addemployeeinfo" value="Add">
+
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -308,15 +313,18 @@ var btn = document.getElementById("myBtn");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
-
+var addservice = document.getElementById("addemployeeinfo");
 // When the user clicks the button, open the modal
 btn.onclick = function() {
     modal.style.display = "block";
+    listServices();
 }
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
     modal.style.display = "none";
+
+
 }
 
 // When the user clicks anywhere outside of the modal, close it
@@ -324,23 +332,72 @@ window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
+    if (event.target == serviceModal) {
+        serviceModal.style.display = "none";
+    }
+
 }
 
 // When the user clicks the button, open the modal
 services.onchange = function() {
+    modal.style.display = "none";
+
     serviceModal.style.display = "block";
+    $('#servicedate_updated').val($('#servicedate').val())
+    selectedservice();
+    get_employee_details();
+}
+
+addservice.onclick = function() {
+    serviceModal.style.display = "none";
+	time_st = $('#starttime').val();
+	time_end = $('#endtime').val();
+	empid = $('#employeeidselected').val();
+	if ( ( time_st == undefined || !Boolean( time_st.trim() ) ) || ( time_st == undefined || !Boolean( time_st.trim() ) ) || ( time_st == undefined || !Boolean( time_st.trim() ) ) ) {
+		alert("Add  time");
+		return false ;
+	}
+
+    addservices()
 
 }
-<!--$('#serviceModal').on('load', function() {-->
-	<!--alert("hello")-->
-	<!--selectedservice();-->
-<!--})-->
+
+function addservices() {
+	servicedetails_id =  $('#servicedetails :selected').val();
+	servicedetails_name =  $('#servicedetails :selected').text();
+	employeename = $('#employeeidselected').val();
+	employeeid = $('#employeeidselected').attr("name");
+	// get price for the service 
+	service_date = $('#servicedate_updated').val()
+	start_time = $('#starttime').val();
+	if ($('#addservicedata tr').length < 2 ) {
+	    $('#addservices').append('<table id="addservicedata" class="table table-striped table-bordered table-hover"  id="policy_table"  cellspacing="0" width="100%" ></table>');
+	     table = $('#addservices').children();
+	    table.append('<tr><th>Service/Employee</th><th>Date/Time</th><th>Price</th></tr>');
+	    table.append('<tr><td>' + servicedetails_name + employeename + '</td><td>' + service_date +start_time + '</td><td>Price</td></tr>');
+
+	}
+	else {
+
+	    table.append('<tr><th>' + servicedetails_name + employeename + '</th><th>' + service_date +start_time + '</th><th>Price</th></tr>');
+	}
+	alert($('#addservicedata tr').length);
+
+	 $("#services").val("");
+    $("#servicedetails").val("");
+    $('#asEmployeeInfo').html("");
+    $('#starttime').val("");
+    $('#endtime').val("");
+    $('#employeeidselected').val("");
+	document.getElementById("servicedetails").innerHTML = "";
+	document.getElementById("services").innerHTML = "";
 
 
-$(document).ready(function() {
-  // Handler for .ready() called.
-  listServices() ;
-});
+}
+
+
+
+
 
 function listServices() {
 
@@ -354,7 +411,7 @@ function listServices() {
                 var serviceName ="";
                 var $select = $('#services');
 
-                $select.append('<option value="" disabled selected>Please select a service...</option>')
+                $select.append('<option value=""  selected>Please select a service...</option>')
 
                 if (servicelist != null &&  servicelist.length > 0  ){
                       for (var i = 0; i <  servicelist.length; i++)
@@ -368,8 +425,8 @@ function listServices() {
       });
   }
 
-
-  function selectedservice() {
+ function selectedservice() {
+ 	
     $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:listServicesName'  %}",
@@ -381,8 +438,15 @@ function listServices() {
                 var serviceName ="";
                 var $select = $('#servicedetails');
 				serviceid =  $('#services :selected').val();
+				servicedetails_id =  $('#servicedetails :selected').val();
+				if (servicedetails_id != undefined && Boolean( servicedetails_id.trim() ) ){
+
+					if (serviceid != servicedetails_id) {
+						serviceid = servicedetails_id;
+					}
+				}
                 if (servicelist != null &&  servicelist.length > 0  ){
-                $select.append('<option value="" disabled selected>Please select a service...</option>')
+                $select.append('<option value=""  selected>Please select a service...</option>')
 
 				   $.each(servicelist, function(key, val){
 							if (val.id == serviceid) {
@@ -398,10 +462,11 @@ function listServices() {
 
             }
       });
+}
 
-		serviceid =  $('#servicedetails :selected').val();
+function  get_employee_details() {
+		serviceid =  $('#services :selected').val();
 		servicedate =  $('#servicedate_updated').val();
-		alert(serviceid);
        $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:employeeinbooking'  %}",
@@ -414,17 +479,38 @@ function listServices() {
             success:function(data){
                 // console.log(response);
 
-	             var employeedetails = data;
-	            
+	            var employeedetails = data;
+	            if(employeedetails.error_message != undefined) {
+					alert(employeedetails.error_message) ;  
+					modal.style.display = "none";
+				    serviceModal.style.display = "none";
+				    $("#services").val("");
+				    $("#servicedetails").val("");
+				    return false ;
+
+				}     
 	            var output="";
 	            for (var i in employeedetails) 
 	            {
-	                output+="<div><span>" + employeedetails[i].name  + "</span>";
+	                output+="<div><span id=" + employeedetails[i].id + ">" + employeedetails[i].name  + "</span>";
 	                output +='<span> <img src=' + employeedetails[i].image + ' alt="Smiley face" height="42" width="42"></span>';
 	                 for (var j in employeedetails[i].workinghours) 
 		            {
-		                output+="<span>" + employeedetails[i].workinghours[j].interval  + "</span>";
-		                
+		            	 if (employeedetails[i].workinghours[j].status == "on" ) {
+		            	 	start_hour = employeedetails[i].workinghours[j].interval
+		            	 	end_hour = employeedetails[i].workinghours[j].end_hour
+		            		start_hour_id =	start_hour.replace(/\s+/g,"")
+		            		end_hour_id =	end_hour.replace(/\s+/g,"")
+		            		span_id= start_hour_id + "," + end_hour_id
+
+		                	output+='<span style="color:blue;" id=\"' + span_id + '\" onclick="addtotime(this)" >' + start_hour  + "</span>&nbsp;&nbsp;";
+	
+
+		            	}
+		                else {
+		                    output+="<span>" + employeedetails[i].workinghours[j].interval  + "</span>&nbsp;&nbsp;";
+		                }
+
 		                
 
 		            }
@@ -432,11 +518,31 @@ function listServices() {
 
 	            }
 	            
-	            $('#employeedetails').html(output);
+	            $('#asEmployeeInfo').html(output);
 
             }
       });
   }
+
+ function addtotime(obj) {
+ 	var res = obj.id.split(",");
+ 	start_t = res[0];
+ 	end_t = res[1];
+     var start_t = start_t.replace(/(AM|PM)/g," $1");
+     var end_t = end_t.replace(/(AM|PM)/g, " $1");
+
+
+ 	$('#starttime').val(start_t);
+ 	 $('#endtime').val(end_t);
+ 	 pdiv = $(obj).parent('div');
+     empspan = $('span:first', pdiv);
+     employeename = empspan.text();
+     employeeid = empspan.attr("id");
+
+ 	 $('#employeeidselected').val(employeename);
+ 	 $('#employeeidselected').attr("name", employeeid);
+
+ }
 </script>
 
 
