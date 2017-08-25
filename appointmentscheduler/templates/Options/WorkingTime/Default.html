@@ -23,7 +23,7 @@
       {% endif %}
     </div>
   {% endif %}
- <form class="form-horizontal" action="{% url 'appointmentschduler:WorkingTimeOptionsEdit' %}" role="form" method="POST">
+ <form class="form-horizontal" action="{% url 'appointmentschduler:WorkingTimeOptionsEdit' %}" onsubmit="return ValidateForm()" role="form" method="POST">
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -44,11 +44,24 @@
                     {% if eachdayschd.is_dayoff == 1 %}
                         checked
                     {% endif %} /></td>
-                    <td><input class="form-control time-picker" type="text" name="{{ eachdayschd.week_day }}_from" value="{{ eachdayschd.start_time }}" /></td>
-                    <td><input class="form-control time-picker" type="text" name="{{ eachdayschd.week_day }}_to" value="{{ eachdayschd.end_time }}" /></td>
-                    <td><input class="form-control time-picker" type="text" name="{{ eachdayschd.week_day }}_launch_from" value="{{ eachdayschd.start_launch }}" /></td>
-                    <td><input class="form-control time-picker" type="text" name="{{ eachdayschd.week_day }}_launch_to" value="{{ eachdayschd.end_launch }}" /></td>
+                    <td><input class="form-control time-picker clsInputs_from" type="text" name="{{ eachdayschd.week_day }}_from" value="{{ eachdayschd.start_time }}" />
+                    <div class="clsInputs-msg_from red"></div>
+
+                    </td>
+                    <td><input class="form-control time-picker  clsInputs_to" type="text" name="{{ eachdayschd.week_day }}_to" value="{{ eachdayschd.end_time }}" />
+                    <div class="clsInputs-msg_to red"></div>
+
+                    </td>
+                    <td><input class="form-control time-picker  clsInputs_lunch_from" type="text" name="{{ eachdayschd.week_day }}_launch_from" value="{{ eachdayschd.start_launch }}" />
+                    <div class="clsInputs-msg_lunch_from red"></div>
+
+                    </td>
+                    <td>
+                    <input class="form-control time-picker  clsInputs_lunch_to" type="text" name="{{ eachdayschd.week_day }}_launch_to" value="{{ eachdayschd.end_launch }}" />
+                    <div class="clsInputs-msg_lunch_to red"></div>
+                    </td>
                     <input  type="hidden" name="{{ eachdayschd.week_day }}_date" value="{{ eachdayschd.start_date }}" />
+                    
                 </tr>
                 {% endfor %}
            
@@ -64,4 +77,98 @@
             </div>
         </div>
     </form>
+
+
+
+<div class="modal fade" id="messageStatus" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="Ok">Ok</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+function ValidateForm() 
+{
+var isValidForm=true;
+
+$(".table-condensed").find("tbody").find('.clsInputs-msg_from').html('');
+$(".table-condensed").find("tbody").find('.clsInputs-msg_to').html('');
+$(".table-condensed").find("tbody").find('.clsInputs-msg_lunch_from').html('');
+$(".table-condensed").find("tbody").find('.clsInputs-msg_lunch_to').html('');
+
+$(".table-condensed").find("tbody").find('tr').each (function() {
+var clsInputs_fromVal = $(this).find('.clsInputs_from').val();
+var clsInputs_toVal = $(this).find('.clsInputs_to').val();
+var clsInputs_lunch_fromVal = $(this).find('.clsInputs_lunch_from').val();
+var clsInputs_lunch_toVal = $(this).find('.clsInputs_lunch_to').val();
+
+
+if(clsInputs_fromVal=="")
+{
+isValidForm=false;
+$(this).find('.clsInputs-msg_from').html('Please enter Start Time');
+}
+
+if(clsInputs_toVal=="")
+{
+
+isValidForm=false;
+$(this).find('.clsInputs-msg_to').html('Please enter End Time');
+
+}
+
+if(clsInputs_lunch_fromVal=="")
+{
+    isValidForm=false;
+    $(this).find('.clsInputs-msg_lunch_from').html('Please enter Lunch from');
+}
+
+if(clsInputs_lunch_toVal=="")
+{ 
+    isValidForm=false;
+    $(this).find('.clsInputs-msg_lunch_to').html('Please enter Lunch to');
+}
+
+ clsInputs_fromVal = "";
+ clsInputs_toVal = "";
+ clsInputs_lunch_fromVal ="";
+ clsInputs_lunch_toVal = "";
+
+});
+
+if(isValidForm)
+{
+    return true;
+} 
+else
+{
+    return false;
+}
+
+
+}
+</script>
+
+<style type="text/css">
+    
+.text-width{
+width: 50%;
+}
+.red{
+        color: Red;
+    }
+</style>
+
+
+
      {% endblock %}
