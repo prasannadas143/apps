@@ -36,7 +36,6 @@ def employee_in_booking(request):
     serviceid = request.GET['serviceid']
     servicedate = request.GET['servicedate']
     user_timezone = request.session['visitor_timezone']
-
     # convert the book date to ust time
     usttime = getust(servicedate, user_timezone)
     year = usttime.year
@@ -52,7 +51,6 @@ def employee_in_booking(request):
         if getvisitortime.date().day == day and getvisitortime.date().month == month:
             booktime = dt
             break
-
     #Create dateobj  if the date is not available in DB
     if not booktime :
         usttime = getust(servicedate,user_timezone)
@@ -74,7 +72,7 @@ def employee_in_booking(request):
         adt.save()
     else :
         if booktime.is_dayoff:
-            return HttpResponse({"error_message" : "Today is off" })
+            return HttpResponse(json.dumps({"error_message" : "Today is off" }), content_type='application/json')
         else :
             start_time = booktime.start_time
             end_time = booktime.end_time
@@ -104,9 +102,7 @@ def employee_in_booking(request):
         if svc_end_time <= end_time  and not ((svc_end_time > start_launch) and (svc_end_time < end_launch)):
             workinghour['status'] = "on"
         workinghour['interval'] = workinghour['interval'].astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
-        # for interval_count in range(len(workinghours)):
-        # svc_start_time = workinghours[interval_count]
-
+       
 
     #Get all employee related to service
     employees = AppschedulerEmployees.objects.all()
@@ -123,7 +119,45 @@ def employee_in_booking(request):
 
         employee_info = dict([("name", employee.emp_name), ("id", employee.id),("image", employee.avatar.url),("workinghours" , workinghours)])
         employeelist.append(employee_info)
+        # Validate  the end_time and enable  the start_time
+        times = [] 
+        svc_duration = 60
 
+        for hour in employee_info["workinghours"] :
+            datestr=servicedate + " " + hour["interval"]
+            hour["interval_ust"] = getust(datestr,user_timezone)
+        times = employee_info["workinghours"]
+        times_count = len(times) 
+        i = 0
+        while i < times_count-1:
+            svc_end_time = times[i]["interval_ust"] + timedelta(minutes=svc_duration)
+            cnt1 = i + 1
+            flag = 0
+            for j in range(cnt1, times_count)  :
+                if svc_end_time <= times[j]["interval_ust"] :
+                    if times[j-1]["status"] == 'on':
+                        times[i]["end_hour"] = times[j]["interval"]
+                        break;
+                    elif times[j]["status"] == 'off' :
+                        cnt2 = i
+                        for k in range(cnt2,j+1) :
+                            times[k]["status"] = "off"
+                        cnt3= j+1
+                        for p in range(cnt3, times_count-1):
+                            if times[p]['status'] ==    'on':
+                                i = p
+                                flag = 1
+                                break 
+                
+                    if flag:
+                        break
+                elif j == times_count-1:
+                    times[i]["status"] = "off"
+
+            if not flag:
+                i = i+1
+        for hour in employee_info["workinghours"] :
+            del hour["interval_ust"]
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
 
