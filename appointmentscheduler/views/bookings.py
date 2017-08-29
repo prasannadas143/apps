@@ -10,7 +10,7 @@ from django.core import serializers
 from django.core.files import File
 from django.utils.safestring import mark_safe
 from django.db.models import Count
-from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, AppschedulerDates
+from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, AppschedulerDates,AppschedulerCountries
 from datetime import datetime
 from pytz import country_timezones, timezone
 from tzlocal import get_localzone
@@ -18,18 +18,39 @@ import re,pytz,calendar
 from datetime import datetime, timedelta
 import dateutil.parser as dparser
 
+
 @requires_csrf_token
 def show_bookings(request):
     template_name = "bookings.html"
-
-    return render(request, template_name)
+   
+    return render(request, template_name, customer_data)
 
 @requires_csrf_token
 def addbooking(request):
     template_name = "addbooking.html"
     bookingid = "BI" + str(uuid.uuid1().node)
     todaydate= datetime.now().strftime("%Y-%m-%d")
-    return render(request, template_name,{"bookingid" : bookingid,"defaultdate" : todaydate })
+    customer_fields = {
+        "c_country": "yes",
+        "c_state" : "required",
+        "c_city" : "required",
+        "c_zip"  : "required",
+        "c_name"  : "required",
+        "c_email" : "required",
+        "c_phone" : "required",
+        "c_address1" : "required",
+        "c_address2" : "required"
+    }
+    # pdb.set_trace() 
+    Countries = AppschedulerCountries.objects.filter(status = 1 )
+    country_info = []
+    for Country in reversed(list(Countries)):
+        data=dict()
+        data['id'] = Country.id
+        data['CountryName'] = Country.CountryName
+        country_info.append(data)
+    return render(request, template_name,{"bookingid" : bookingid,"defaultdate" : todaydate ,
+        "customer_fields" : customer_fields, "countries" : country_info})
 
 @ensure_csrf_cookie
 def employee_in_booking(request):
@@ -72,7 +93,7 @@ def employee_in_booking(request):
         adt.save()
     else :
         if booktime.is_dayoff:
-            return HttpResponse(json.dumps({"error_message" : "Today is off" }), content_type='application/json')
+            return HttpResponse(json.dumps({"error_message" : "This date is off" }), content_type='application/json')
         else :
             start_time = booktime.start_time
             end_time = booktime.end_time
@@ -158,13 +179,30 @@ def employee_in_booking(request):
                 i = i+1
         for hour in employee_info["workinghours"] :
             del hour["interval_ust"]
+
+
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
 def get_serviceprice(request):
-    serviceid = request.GET.get('serviceid')
-    appscheduleobj = AppschedulerServices.objects.get(id=serviceid)
-    price = appscheduleobj.price
-    return HttpResponse(json.dumps({"price" : str(price)}), content_type='application/json')
+    serviceids = request.GET.getlist('serviceids[]')
+    pdb.set_trace() 
+    (deposit, tax, total_price, total) = (0,0,0,0)
+    default_status_if_paid = "confirmed"
+    default_status_if_not_paid = "pending"
+
+    for serviceid in serviceids:
+        appscheduleobj = AppschedulerServices.objects.get(id=serviceid)
+        price = float(appscheduleobj.price)
+        total_price += price 
+        tax_percentage = 10
+        deposit_percentage = 30
+        deposit +=  price * (deposit_percentage/100)
+        tax += price * (tax_percentage/100)
+        total += price + tax
+    
+    return HttpResponse(json.dumps({"price" : str(price) , "total_price": total_price, "tax" : tax ,
+     "deposit" : deposit,"total" : total, "default_status_if_paid": default_status_if_paid,
+     "default_status_if_not_paid" : default_status_if_not_paid } ), content_type='application/json')
   
 
 def getust( date_string,user_timezone):
@@ -173,3 +211,6 @@ def getust( date_string,user_timezone):
     datetime_with_tz = visitor_tz.localize(datetime_without_tz, is_dst=None)
     datetime_in_utc  = datetime_with_tz.astimezone(pytz.utc)
     return datetime_in_utc
+
+
+

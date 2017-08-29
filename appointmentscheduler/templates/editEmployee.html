@@ -277,7 +277,7 @@ function delete_image(employeeid) {
 			<label class="title">Phone</label>
 			<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
-				<input id="id_phone"  name="phone"  type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{12}$/"  	 value="{{ appscheduleinst.phone }}" 
+				<input id="id_phone"  name="phone"  type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{10,14}$/"  	 value="{{ appscheduleinst.phone }}" 
 				ng-init='phone="{{appscheduleinst.phone}}"' 
 				onblur='check_duplicated_phoneno("{{ appscheduleinst.phone }}")'  required />
 			</span>
