@@ -93,4 +93,3 @@ def BookingOptions(request):
    return render(request,'Options.html', {'items':items ,"message":message })
 
 
-
