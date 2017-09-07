@@ -1,0 +1,10 @@
+django-phonenumber-field
+django-bootstrap3
+django-angular
+mysqlclient
+django-mysql
+Pillow
+tzlocal
+python-dateutil
+geoip2
+django-easy-timezones

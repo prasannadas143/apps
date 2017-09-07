@@ -93,37 +93,34 @@
 <span class="notice-info">&nbsp;</span>
 <span class="block bold">Add a booking</span>
     <span class="block">Fill in the form below to add a new booking. Under Clients tab you can enter information about the client. </span>
+    <div> "{{ form.errors }}" </div>
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
-           action="{% url 'appointmentschduler:addbooking' %}" method="post"   onsubmit="return validatebookingform()" > {% csrf_token %}
+           action="{% url 'appointmentschduler:addbooking' %}" method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
             <fieldset class="fieldset white">
 					<legend>Booking details</legend>
 					<div class="float_left w450">
 						<p>
 							<label class="title">Unique ID:</label>
-							<input type="text" name="uuid" id="uuid" class="pj-form-field w100 required" value="{{ bookingid }}" aria-required="true" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAfBJREFUWAntVk1OwkAUZkoDKza4Utm61iP0AqyIDXahN2BjwiHYGU+gizap4QDuegWN7lyCbMSlCQjU7yO0TOlAi6GwgJc0fT/fzPfmzet0crmD7HsFBAvQbrcrw+Gw5fu+AfOYvgylJ4TwCoVCs1ardYTruqfj8fgV5OUMSVVT93VdP9dAzpVvm5wJHZFbg2LQ2pEYOlZ/oiDvwNcsFoseY4PBwMCrhaeCJyKWZU37KOJcYdi27QdhcuuBIb073BvTNL8ln4NeeR6NRi/wxZKQcGurQs5oNhqLshzVTMBewW/LMU3TTNlO0ieTiStjYhUIyi6DAp0xbEdgTt+LE0aCKQw24U4llsCs4ZRJrYopB6RwqnpA1YQ5NGFZ1YQ41Z5S8IQQdP5laEBRJcD4Vj5DEsW2gE6s6g3d/YP/g+BDnT7GNi2qCjTwGd6riBzHaaCEd3Js01vwCPIbmWBRx1nwAN/1ov+/drgFWIlfKpVukyYihtgkXNp4mABK+1GtVr+SBhJDbBIubVw+Cd/TDgKO2DPiN3YUo6y/nDCNEIsqTKH1en2tcwA9FKEItyDi3aIh8Gl1sRrVnSDzNFDJT1bAy5xpOYGn5fP5JuL95ZjMIn1ya7j5dPGfv0A5eAnpZUY3n5jXcoec5J67D9q+VuAPM47D3XaSeL4AAAAASUVORK5CYII=&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;">
+							<input type="text" name="uuid" id="uuid" class="pj-form-field w100 required" value="{{ bookingid }}" aria-required="true" >
 						</p>
 						<p>
 							<label class="title">Status:</label>
 							<input type="text" name="booking_status" id="booking_status" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="pending">
 							<input type="hidden" name="default_status_if_paid" id="default_status_if_paid" value="">
 							<input type="hidden" name="default_status_if_not_paid" id="default_status_if_not_paid" value="">
-
-								
+							<input type="hidden" id="service_booked_id" name="service_booked_id" value="" >
+							<input type="hidden" id="svcdate" name="svcdate" value=""  >
+							<input type="hidden" id="svc_start_time" name="svc_start_time" value=""  >
+							<input type="hidden" id="svc_end_time" name="svc_end_time" value=""  >
+							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value=""  >
+							<input type="hidden" id="employeeid" name="employeeid"  value="" >
+														
 						</p>
 
 					</div>
 
-					<br class="clear_both">
-					<div class="t15"></div>
-					<div class="p">
-						<label class="title">Services:</label>
-						<div id="boxBookingItems"></div>
-						<input type="hidden" name="booking_items" value="">
-
-
-					</div>
-					<div id="servicesdetails"></div>
+				<div id="serviceerror"></div>
 					<p>
 						<label class="title">&nbsp;</label>
 						<input type="button" value="+ Add service" class="pj-button item-add" id="myBtn">
@@ -161,7 +158,7 @@
 								<div class="modal-body">
 
 								  <input type="text" name="servicedate_updated" id="servicedate_updated" class="pj-form-field w500" value="{{ defaultdate }}">
-									<select name="servicedetails" id="servicedetails" onchange="selectedservice();">
+									<select name="servicedetails" id="servicedetails">
 									</select>
 									<div class="asContainer" id="employeedetails">
 									<div>   Start Time: <input type="text" name="starttime" id="starttime"></div>
@@ -182,22 +179,7 @@
 						<input type="button" value="Recalculate the price" class="pj-button order-calc">
 					</p>
 					<div class="float_left w350 t15">
-						<p>
-							<label class="title">Payment method:</label>
-							<select name="payment_method" id="payment_method" class="pj-form-field w120 required" aria-required="true">
-								<option value="">-- Choose --</option>
-								<option value="authorize">Authorize.net</option><option value="bank">Bank account</option><option value="creditcard">Credit card</option>
-                                <option value="paypal">Paypal</option>
-                            </select>
-						</p>
-						<p class="erCC" style="display: none">
-							<label class="title">CC Type</label>
-							<span class="inline_block">
-								<select name="cc_type" class="pj-form-field w120">
-									<option value="">---</option>
-									<option value="maestro">Maestro</option><option value="amex">AmericanExpress</option><option value="mastercard">MasterCard</option><option value="visa">Visa</option>								</select>
-							</span>
-						</p>
+						
 						<p>
 							<label class="title">Price:</label>
 							<span class="pj-form-field-custom pj-form-field-custom-before">
@@ -244,15 +226,25 @@
 						<fieldset class="fieldset white">
 					<legend>Customer details</legend>
 					<div class="float_left w360">
-					   {% if customer_fields.c_country == "yes" %}
+					   {% if customer_fields.c_country in  'yes,required' %}
 						<p>
 							<label class="title">Country:</label>
-							<select name="c_country_id" id="c_country_id" class="pj-form-field w180 custom-chosen">
+							{% if customer_fields.c_country == "yes" %}
+							<select name="c_country" id="c_country" class="pj-form-field w180 custom-chosen" ng-model="c_country" >
+							{% elif customer_fields.c_country == "required"  %}
+							<select name="c_country" id="c_country" class="pj-form-field w180 custom-chosen" ng-model="c_country" required>
+							{% endif %}
+
 								<option value="">-- Choose --</option>
 								{% for country in countries %}
 								    <option value="{{ country.id }}">{{ country.CountryName }}</option>
 								{% endfor %}
 							</select>
+							<span ng-messages="addbooking.c_country.$error" style="color:maroon" role="alert">
+								  <span ng-message="required">This field is required</span>
+							</span>
+
+							
 						</p>
 						{% endif %}
 
@@ -368,7 +360,7 @@
 						{% if customer_fields.c_phone == "yes" %}
 								<input name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{10,14}$/"  >
 						{% elif customer_fields.c_phone == "required"  %}
-							<input  name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{10,14}$/"  required	 >
+							<input  name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{3,}$/"  required	 >
 						{% endif %}
 						</span>
 						<span ng-messages="addbooking.c_phone.$error" style="color:maroon" role="alert">
@@ -408,11 +400,34 @@
 					</span>
 				</p>
 	 			{% endif %}
+	 			<p>
+				
+ 				<span>
+ 				<label><input name="reminder_email" id="reminder_email"  type="checkbox" > Send reminder email  when new booking is made</label>
+ 				<input name="reminder_email_value" id="reminder_email_value"  type="hidden" >
+				</span>
+				<span >
+				<label><input name="reminder_sms" id="reminder_sms"  type="checkbox"  > Send SMS reminder sms new booking is made</label>
+				<input name="reminder_sms_value" id="reminder_sms_value"  type="hidden" >
+
+
+				</span>
+
+				<span>
+				<label><input name="subscribed_email" id="subscribed_email"  type="checkbox"  checked> Send SMS when new booking is made</label>
+				 <input name="subscribed_email_value" id="subscribed_email_value"  type="hidden" >
+
+				</span>
+				<span>
+				<label><input name="subscribed_sms" id="subscribed_sms"  type="checkbox" checked > Send Email when new booking is made</label>
+				 <input name="subscribed_sms_value" id="subscribed_sms_value"  type="hidden" >
+
+				</span>
 
 				<p>
 					<label class="title">&nbsp;</label>
 					<input type="submit" value="Save" class="pj-button">
-					<input type="button" value="Cancel" class="pj-button" onclick="window.location.href='http://demo.phpjabbers.com/1502894119_196/index.php?controller=pjAdminBookings&amp;action=pjActionIndex';">
+					
 				</p>
 
 				</fieldset>
@@ -430,11 +445,15 @@
 var modal = document.getElementById('myModal');
 
 // Get the button that opens the modal
+
+
 var btn = document.getElementById("myBtn");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 var addservice = document.getElementById("addemployeeinfo");
+var servicedetails = document.getElementById("servicedetails");
+
 // When the user clicks the button, open the modal
 btn.onclick = function() {
     modal.style.display = "block";
@@ -450,6 +469,7 @@ span.onclick = function() {
 
 $('body').on('click', 'input.deleteDep', function() {
    $(this).parents('tr').remove();  
+   btn.disabled = false;
 });
 
 // When the user clicks anywhere outside of the modal, close it
@@ -473,6 +493,14 @@ services.onchange = function() {
     get_employee_details();
 }
 
+servicedetails.onchange = function() {
+	$('#starttime').val("");
+	$('#endtime').val("");
+	$('#employeeidselected').val("");
+    selectedservice();
+    get_employee_details();
+}
+
 addservice.onclick = function() {
     serviceModal.style.display = "none";
 	time_st = $('#starttime').val();
@@ -485,6 +513,30 @@ addservice.onclick = function() {
 
     addservices()
 
+}
+
+function validatebookingform() {
+	var subscribed_email = document.getElementById("subscribed_email");
+	$('#subscribed_email_value').val(Number(subscribed_email.checked)) ;
+	
+	var subscribed_sms = document.getElementById("subscribed_sms");
+	$('#subscribed_sms_value').val(Number(subscribed_sms.checked)) ;
+
+
+	var reminder_email = document.getElementById("reminder_email");
+	$('#reminder_email_value').val(Number(reminder_email.checked)) ;
+
+	var reminder_sms = document.getElementById("reminder_sms");
+	$('#reminder_sms_value').val(Number(reminder_sms.checked)) ;
+
+
+	if ($('#addservicedata tr').length < 2 ) {
+
+			document.getElementById("serviceerror").innerHTML = "<b>Please Add service details</b>";
+			return false ;
+	}
+
+	return true;
 }
 
 function addservices() {
@@ -556,20 +608,24 @@ function addservices() {
 	     table = $('#addservices').children();
 	    table.append('<tr><th>Service/Employee</th><th>Date/Time</th><th>Price</th></tr>');
 	    table.append('<tr id=' + servicedetails_id + '><td>' + servicedetails_name + employeename + '</td><td>' + service_date +start_time + '</td><td>' + serviceprice + '</td>  <td> <input type="button" class="deleteDep" value="Delete"/></td></tr>');
+	    btn.disabled=true;
+	    $('#service_booked_id').val(servicedetails_id);
+	    $('#svc_start_time').val(start_time);
+	    $('#svc_end_time').val( $('#endtime').val());
+	    $('#svcdate').val(service_date);
+	    $('#servicedetails_name').val(servicedetails_name);
+	    $('#employeeid').val($('#employeeidselected').attr("name"));
 
 	}
-	else {
 
-	    table.append('<tr id=' + servicedetails_id + '><td>' + servicedetails_name + employeename + '</td><td>' + service_date +start_time + '</td><td>' + serviceprice + '</td><td> <input type="button" class="deleteDep" value="Delete"/></td></tr>');
-	}
-	alert($('#addservicedata tr').length);
+	// alert($('#addservicedata tr').length);
 
-	 $("#services").val("");
-    $("#servicedetails").val("");
-    $('#asEmployeeInfo').html("");
-    $('#starttime').val("");
-    $('#endtime').val("");
-    $('#employeeidselected').val("");
+	//  $("#services").val("");
+ //    $("#servicedetails").val("");
+ //    $('#asEmployeeInfo').html("");
+ //    $('#starttime').val("");
+ //    $('#endtime').val("");
+ //    $('#employeeidselected').val("");
 	document.getElementById("servicedetails").innerHTML = "";
 	document.getElementById("services").innerHTML = "";
 
@@ -626,9 +682,9 @@ function listServices() {
 					}
 				}
                 if (servicelist != null &&  servicelist.length > 0  ){
-                $select.append('<option value=""  selected>Please select a service...</option>')
+                	$select.append('<option value=""  selected>Please select a service...</option>')
 
-				   $.each(servicelist, function(key, val){
+				    $.each(servicelist, function(key, val){
 							if (val.id == serviceid) {
 
 							$select.append('<option selected value="' + val.id + '">' + val.name + '</option>');
@@ -647,6 +703,15 @@ function listServices() {
 function  get_employee_details() {
 		serviceid =  $('#services :selected').val();
 		servicedate =  $('#servicedate_updated').val();
+		 var $select = $('#servicedetails');
+		serviceid =  $('#services :selected').val();
+		servicedetails_id =  $('#servicedetails :selected').val();
+		if (servicedetails_id != undefined && Boolean( servicedetails_id.trim() ) ){
+
+			if (serviceid != servicedetails_id) {
+				serviceid = servicedetails_id;
+			}
+		}
        $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:employeeinbooking'  %}",
@@ -732,7 +797,7 @@ function  get_employee_details() {
  	default_status_if_paid = $('#default_status_if_paid').val();
  	default_status_if_not_paid = $('#default_status_if_not_paid').val();
 
-	total_price = $('#booking_price').val();
+	total_price = $('#booking_total').val();
  	 if( booking_deposit &&  Boolean( booking_deposit.trim()) ) {
 
 		if ( parseFloat(booking_deposit) < parseFloat(total_price) ){
@@ -752,6 +817,8 @@ function  get_employee_details() {
 	}
 
  }
+
+
 </script>
 
 

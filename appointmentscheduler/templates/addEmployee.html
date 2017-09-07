@@ -221,12 +221,12 @@ function validateemployeeform() {
   			<label class="title">Email</label>
   			<span class="pj-form-field-custom pj-form-field-custom-before">
   				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
-  			   		<input id="id_email" maxlength="254" name="email" type="email" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
+  			   		<input id="id_email" maxlength="254" name="email" type="email" ng-model="emp_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
   			   			 onblur="check_duplicated_email()" required />
   			</span>
 
 
-  			<span ng-messages="frmCreateEmployee.email.$error" style="color:maroon" role="alert">
+  			<span ng-messages="frmCreateEmployee.emp_email.$error" style="color:maroon" role="alert">
   			  <span ng-message="required">This field is required</span>
   			  <span ng-message="email">Your email  is invalid</span>
           <span ng-message="pattern">Your email is invalid </span>
@@ -255,7 +255,7 @@ function validateemployeeform() {
 				<span class="pj-form-field-custom pj-form-field-custom-before">
 				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr>
 				</span>
-					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{12}$/"  	 	 onblur="check_duplicated_phoneno()" required/>
+					<input id="id_phone" name="phone" type="tel"  ng-model="phone"   ng-pattern="/^\+[0-9]{3,}$/"  	 	 onblur="check_duplicated_phoneno()" required/>
 				</span>
 
 				<span ng-messages="frmCreateEmployee.phone.$error"   style="color:maroon" role="alert">
