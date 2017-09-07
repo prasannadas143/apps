@@ -16,56 +16,54 @@ from django.core import validators
 
 
 class AppschedulerBookings(models.Model):
-    uuid = models.CharField(unique=True, max_length=12, blank=True, null=True)
-    calendar_id = models.IntegerField(blank=True, null=True)
-    booking_price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    booking_total = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    booking_deposit = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    booking_tax = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    booking_status = models.CharField(max_length=9, blank=True, null=True)
-    payment_method = models.CharField(max_length=10, blank=True, null=True)
+    bookingid = models.CharField(unique=True, max_length=18, blank=True, null=True)
+    booking_price = models.DecimalField(max_digits=9, decimal_places=2, blank=False, null=False)
+    booking_total = models.DecimalField(max_digits=9, decimal_places=2, blank=False, null=False)
+    booking_deposit = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    booking_tax = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    booking_status = models.CharField(max_length=9, blank=False, null=False)
     c_name = models.CharField(max_length=255, blank=True, null=True)
-    c_email = models.CharField(max_length=255, blank=True, null=True)
-    c_phone = models.CharField(max_length=255, blank=True, null=True)
-    c_country_id = models.IntegerField(blank=True, null=True)
+    c_email = models.EmailField(unique=True, blank=False, null=False, validators=[validators.validate_email,])
+    c_phone = PhoneNumberField(unique=True,  blank=False, null=False)
+    country = models.ForeignKey(
+        'AppschedulerCountries',
+        on_delete=models.CASCADE,
+        related_name="countries", blank=True,null=True
+        
+    ) 
     c_city = models.CharField(max_length=255, blank=True, null=True)
     c_state = models.CharField(max_length=255, blank=True, null=True)
     c_zip = models.CharField(max_length=255, blank=True, null=True)
-    c_address_1 = models.CharField(max_length=255, blank=True, null=True)
-    c_address_2 = models.CharField(max_length=255, blank=True, null=True)
+    c_address_1 = models.TextField(blank=True, null=True)
+    c_address_2 = models.TextField(blank=True, null=True)
     c_notes = models.TextField(blank=True, null=True)
-    cc_type = models.CharField(max_length=255, blank=True, null=True)
-    cc_num = models.CharField(max_length=255, blank=True, null=True)
-    cc_exp_year = models.TextField(blank=True, null=True)  # This field type is a guess.
-    cc_exp_month = models.CharField(max_length=2, blank=True, null=True)
-    cc_code = models.CharField(max_length=255, blank=True, null=True)
-    txn_id = models.CharField(max_length=255, blank=True, null=True)
-    processed_on = models.DateTimeField(blank=True, null=True)
-    created = models.DateTimeField(blank=True, null=True)
-    locale_id = models.IntegerField(blank=True, null=True)
-    ip = models.CharField(max_length=15, blank=True, null=True)
-
+    created = models.DateTimeField(blank=False, null=False)
+    ip = models.GenericIPAddressField( blank=False, null=False)
+    date = models.DateTimeField(blank=False, null=False, auto_now_add=True)
+    service_start_time = models.DateTimeField(blank=False, null=False, auto_now_add=True)
+    service_end_time = models.DateTimeField(blank=False, null=False, auto_now_add=True)
+    subscribed_email = models.BooleanField(default=False)
+    subscribed_sms = models.BooleanField(default=False)
+    reminder_email = models.BooleanField(default=False)
+    reminder_sms = models.BooleanField(default=False)
+    employee = models.ForeignKey(
+        'AppschedulerEmployees',
+        on_delete=models.CASCADE,
+        related_name="employee", blank=True,null=True
+        
+    ) 
+    service = models.ForeignKey(
+        'AppschedulerServices',
+        on_delete=models.CASCADE,
+        related_name="service", blank=True,null=True
+        
+    ) 
+   
     class Meta:
         # managed = False
         db_table = 'appscheduler_bookings'
 
 
-class AppschedulerBookingsServices(models.Model):
-    tmp_hash = models.CharField(max_length=32, blank=True, null=True)
-    booking_id = models.IntegerField(blank=True, null=True)
-    service_id = models.IntegerField(blank=True, null=True)
-    employee_id = models.IntegerField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
-    start = models.TimeField(blank=True, null=True)
-    start_ts = models.IntegerField(blank=True, null=True)
-    total = models.SmallIntegerField(blank=True, null=True)
-    price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    reminder_email = models.IntegerField(blank=True, null=True)
-    reminder_sms = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_bookings_services'
 
 
 class AppschedulerCalendars(models.Model):
@@ -107,7 +105,7 @@ class AppschedulerEmployees(models.Model):
     is_subscribed = models.BooleanField(default=False)
     is_subscribed_sms = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-
+   
 
     class Meta:
         # managed = False

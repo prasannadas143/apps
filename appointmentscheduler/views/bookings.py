@@ -10,28 +10,30 @@ from django.core import serializers
 from django.core.files import File
 from django.utils.safestring import mark_safe
 from django.db.models import Count
-from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, AppschedulerDates,AppschedulerCountries
+from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, AppschedulerDates,AppschedulerCountries,AppschedulerBookings
 from datetime import datetime
 from pytz import country_timezones, timezone
 from tzlocal import get_localzone
 import re,pytz,calendar
 from datetime import datetime, timedelta
 import dateutil.parser as dparser
-
+from copy import deepcopy
+from appointmentscheduler.form.bookingform import BookingForm
 
 @requires_csrf_token
 def show_bookings(request):
     template_name = "bookings.html"
-   
-    return render(request, template_name, customer_data)
+    bookingdata = dict()
+
+    return render(request, template_name)
 
 @requires_csrf_token
 def addbooking(request):
     template_name = "addbooking.html"
-    bookingid = "BI" + str(uuid.uuid1().node)
-    todaydate= datetime.now().strftime("%Y-%m-%d")
+    bookingdetails = dict()
+    errors =""
     customer_fields = {
-        "c_country": "yes",
+        "c_country": "required",
         "c_state" : "required",
         "c_city" : "required",
         "c_zip"  : "required",
@@ -41,16 +43,135 @@ def addbooking(request):
         "c_address1" : "required",
         "c_address2" : "required"
     }
-    # pdb.set_trace() 
-    Countries = AppschedulerCountries.objects.filter(status = 1 )
-    country_info = []
-    for Country in reversed(list(Countries)):
-        data=dict()
-        data['id'] = Country.id
-        data['CountryName'] = Country.CountryName
-        country_info.append(data)
-    return render(request, template_name,{"bookingid" : bookingid,"defaultdate" : todaydate ,
-        "customer_fields" : customer_fields, "countries" : country_info})
+    if request.method == 'POST':
+        print("get the data");
+        formparams= request.POST.dict()
+        request.POST._mutable = True
+        request.POST.clear()
+        request.POST["bookingid"] = formparams['uuid']
+        # verify price from form is same  with DB
+        serviceid = formparams["service_booked_id"]
+        price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
+        booking_price = formparams["booking_price"]   
+        if round(float(booking_price),2)== round(float(price_db),2):
+            request.POST['booking_price'] = booking_price
+        else :
+            return HttpResponse(status=403)
+
+        booking_tax = formparams["booking_tax"]  
+        tax_percentage = 10
+        tax = price_db * round(float(tax_percentage/100),2)
+
+        if round(float(tax),2) == round(float(booking_tax),2):
+            request.POST['booking_tax'] = booking_price
+        else :
+            return HttpResponse(status=403)
+
+        total = round(float(price_db),2) + round(float(tax),2)
+        booking_total = round(float( formparams["booking_total"] ) ,2)
+        if round(float(total),2) == round(float(booking_total),2):
+            request.POST['booking_total'] = booking_total
+        else :
+            return HttpResponse(status=403)
+
+        booking_deposit = round(float(formparams['booking_deposit']),2)
+        request.POST['booking_deposit'] = booking_deposit
+        expected_deposit_percentage = 20
+        expected_booking_deposit = round(booking_total * float(expected_deposit_percentage/100),2)
+        if not booking_deposit  >= expected_booking_deposit:
+            error += "need minimum booking deposit"
+
+        status = formparams['booking_status']
+        default_status_if_paid = "confirmed"
+        default_status_if_not_paid = "pending"
+
+        if round(float(booking_deposit),2) >= round(float(booking_total),2) :
+            request.POST["booking_status"] = default_status_if_paid
+        else :
+            request.POST["booking_status"] = default_status_if_not_paid
+
+        # if formparams["c_country"] is not None:
+        #     request.POST["c_country"] = formparams["c_country"]
+        # if customer_fields["c_country"]  == "required":
+        #     if not request.POST["c_country"]:
+        #         errors += "Country field required"
+        user_timezone = request.session['visitor_timezone']
+
+        servicedate = formparams['servicedate']
+        request.POST['date'] = getust(servicedate,user_timezone)
+
+        service_start_time =  servicedate + " " +  formparams['svc_start_time'] 
+        request.POST['service_start_time'] = getust(service_start_time,user_timezone)
+
+
+        service_end_time =  servicedate + " " +  formparams['svc_end_time']
+        request.POST['service_end_time'] = getust(service_end_time,user_timezone)
+
+        employee_id = formparams['employeeid']
+        country_id = formparams['c_country']
+        serviceobj =  AppschedulerServices.objects.filter(id = serviceid)[0]
+        employeeobj =  AppschedulerEmployees.objects.filter(id = employee_id)[0]
+        countryobj =  AppschedulerCountries.objects.filter(id = country_id)[0]
+
+
+        request.POST['subscribed_email'] = formparams['subscribed_email_value']
+        request.POST['subscribed_sms'] = formparams['subscribed_sms_value']
+        request.POST['reminder_email'] = formparams['reminder_email_value']
+        request.POST['reminder_sms'] = formparams['reminder_sms_value']
+        request.POST['ip'] =  request.session['visitor_ip'] 
+        request.POST['created'] = getust(str(datetime.now()), user_timezone)
+        for field,value in customer_fields.items():
+
+            if field in formparams and  formparams[field] is not None:
+                if field != 'c_country':
+                    request.POST[field] = formparams[field]
+                if customer_fields[field]  == "required":
+                    if not customer_fields[field]:
+                        errors += field + " field required"
+       
+        form = BookingForm(request.POST or None )
+
+        if errors :
+            form.errors["customerror"] = errors
+
+        if form.errors:
+            return render(request, template_name, {"form" : form })
+
+        if form.is_valid():
+
+            bookingobj = form.save(commit=False)
+            bookingobj.service = serviceobj
+            bookingobj.employee = employeeobj
+            bookingobj.country = countryobj
+            message = "Booking data is saved" 
+            bookingobj.save()
+        return HttpResponseRedirect('/appointmentschduler/bookings/')
+
+    else :
+        bookingid = "BI" + str(uuid.uuid1().node)
+        todaydate= datetime.now().strftime("%Y-%m-%d")
+        appobjs = AppschedulerBookings.objects.all()
+        if len(appobjs) > 0:
+            lastbookingid = AppschedulerBookings.objects.latest('bookingid').bookingid
+
+            newid = int(lastbookingid[-8:]) + 1
+            bookingid = lastbookingid[:-8] + str(newid)
+
+        else :
+            bookingid = "BI" + str(uuid.uuid1().node)
+
+        Countries = AppschedulerCountries.objects.filter(status = 1 )
+        country_info = []
+        for Country in reversed(list(Countries)):
+            data=dict()
+            data['id'] = Country.id
+            data['CountryName'] = Country.CountryName
+            country_info.append(data)
+        bookingdetails["bookingid"] = bookingid
+        bookingdetails["defaultdate"] = todaydate 
+        bookingdetails["customer_fields"] = customer_fields
+        bookingdetails["countries"] = country_info    
+    return render(request, template_name, bookingdetails)
 
 @ensure_csrf_cookie
 def employee_in_booking(request):
@@ -58,10 +179,10 @@ def employee_in_booking(request):
     servicedate = request.GET['servicedate']
     user_timezone = request.session['visitor_timezone']
     # convert the book date to ust time
-    usttime = getust(servicedate, user_timezone)
-    year = usttime.year
-    month = usttime.month
-    day = usttime.day
+    svc_datetime = servicedate.split('-')
+    year = svc_datetime[0]
+    month = svc_datetime[1]
+    day = svc_datetime[1]
 
     # Prepare  timestamps from start_time to end_time with 30 min gap
     #Get the working hours for the given date
@@ -107,22 +228,23 @@ def employee_in_booking(request):
         # add times to working hours list
         intervaltime = dict()
         intervaltime['interval'] = next_time
-        intervaltime.setdefault('status', "unknown")
+        intervaltime.setdefault('status', "on")
         if next_time >= start_launch and next_time <= end_launch:
             intervaltime['status'] = "off"
         next_time = next_time + timedelta(minutes=30)
+        intervaltime['interval'] = intervaltime['interval'].astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
         workinghours.append(intervaltime)
 
     #Get the service duration
     serviceobj = AppschedulerServices.objects.filter(id=serviceid)[0]
     svc_duration = serviceobj.total
-    for workinghour in workinghours:
-        svc_start_time = workinghour['interval']
-        svc_end_time = svc_start_time + timedelta(minutes=svc_duration)
-        # filter the off time also "launch time " and "end time"  ( all employee )
-        if svc_end_time <= end_time  and not ((svc_end_time > start_launch) and (svc_end_time < end_launch)):
-            workinghour['status'] = "on"
-        workinghour['interval'] = workinghour['interval'].astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
+    # for workinghour in workinghours:
+    #     svc_start_time = workinghour['interval']
+    #     svc_end_time = svc_start_time + timedelta(minutes=svc_duration)
+    #     # filter the off time also "launch time " and "end time"  ( all employee )
+    #     if svc_end_time <= end_time  and not ((svc_end_time > start_launch) and (svc_end_time < end_launch)):
+    #         workinghour['status'] = "on"
+    #     workinghour['interval'] = workinghour['interval'].astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
        
 
     #Get all employee related to service
@@ -147,9 +269,10 @@ def employee_in_booking(request):
         for hour in employee_info["workinghours"] :
             datestr=servicedate + " " + hour["interval"]
             hour["interval_ust"] = getust(datestr,user_timezone)
-        times = employee_info["workinghours"]
+        times = deepcopy(employee_info["workinghours"])
         times_count = len(times) 
-        i = 0
+        i = 0 
+
         while i < times_count-1:
             svc_end_time = times[i]["interval_ust"] + timedelta(minutes=svc_duration)
             cnt1 = i + 1
@@ -166,17 +289,23 @@ def employee_in_booking(request):
                         cnt3= j+1
                         for p in range(cnt3, times_count-1):
                             if times[p]['status'] ==    'on':
-                                i = p
+                                times[p-1]['status']= 'on'
+                                i = p-1
                                 flag = 1
                                 break 
                 
                     if flag:
                         break
-                elif j == times_count-1:
+                elif svc_end_time > end_time:
                     times[i]["status"] = "off"
+                    break
 
             if not flag:
                 i = i+1
+            
+        times[times_count-1]["status"] = "off"
+        employee_info["workinghours"] = deepcopy(times) 
+
         for hour in employee_info["workinghours"] :
             del hour["interval_ust"]
 
@@ -185,7 +314,6 @@ def employee_in_booking(request):
 
 def get_serviceprice(request):
     serviceids = request.GET.getlist('serviceids[]')
-    pdb.set_trace() 
     (deposit, tax, total_price, total) = (0,0,0,0)
     default_status_if_paid = "confirmed"
     default_status_if_not_paid = "pending"
@@ -196,8 +324,8 @@ def get_serviceprice(request):
         total_price += price 
         tax_percentage = 10
         deposit_percentage = 30
-        deposit +=  price * (deposit_percentage/100)
-        tax += price * (tax_percentage/100)
+        deposit += round( price * (deposit_percentage/100), 2)
+        tax += round(price * (tax_percentage/100),2)
         total += price + tax
     
     return HttpResponse(json.dumps({"price" : str(price) , "total_price": total_price, "tax" : tax ,
