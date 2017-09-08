@@ -44,7 +44,6 @@ def addbooking(request):
         "c_address2" : "required"
     }
     if request.method == 'POST':
-        print("get the data");
         formparams= request.POST.dict()
         request.POST._mutable = True
         request.POST.clear()
@@ -99,7 +98,6 @@ def addbooking(request):
 
         servicedate = formparams['servicedate']
         request.POST['date'] = getust(servicedate,user_timezone)
-
         service_start_time =  servicedate + " " +  formparams['svc_start_time'] 
         request.POST['service_start_time'] = getust(service_start_time,user_timezone)
 
@@ -108,10 +106,14 @@ def addbooking(request):
         request.POST['service_end_time'] = getust(service_end_time,user_timezone)
 
         employee_id = formparams['employeeid']
-        country_id = formparams['c_country']
+        if customer_fields['c_country'] in ["yes", "required"]:
+            if 'c_country' in formparams and formparams['c_country']:
+                country_id = formparams['c_country']
+                countryobj =  AppschedulerCountries.objects.filter(id = country_id)[0]
+            else :
+                errors += "country field is required"
         serviceobj =  AppschedulerServices.objects.filter(id = serviceid)[0]
         employeeobj =  AppschedulerEmployees.objects.filter(id = employee_id)[0]
-        countryobj =  AppschedulerCountries.objects.filter(id = country_id)[0]
 
 
         request.POST['subscribed_email'] = formparams['subscribed_email_value']
@@ -142,7 +144,8 @@ def addbooking(request):
             bookingobj = form.save(commit=False)
             bookingobj.service = serviceobj
             bookingobj.employee = employeeobj
-            bookingobj.country = countryobj
+            if customer_fields['c_country']:
+                bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
         return HttpResponseRedirect('/appointmentschduler/bookings/')
@@ -180,9 +183,9 @@ def employee_in_booking(request):
     user_timezone = request.session['visitor_timezone']
     # convert the book date to ust time
     svc_datetime = servicedate.split('-')
-    year = svc_datetime[0]
-    month = svc_datetime[1]
-    day = svc_datetime[1]
+    year = int(svc_datetime[0].lstrip('0') )
+    month = int(svc_datetime[1].lstrip('0') )
+    day = int( svc_datetime[2].lstrip('0') )
 
     # Prepare  timestamps from start_time to end_time with 30 min gap
     #Get the working hours for the given date
@@ -269,6 +272,37 @@ def employee_in_booking(request):
         for hour in employee_info["workinghours"] :
             datestr=servicedate + " " + hour["interval"]
             hour["interval_ust"] = getust(datestr,user_timezone)
+
+
+        bookedtimes = []
+        empid = employee.id
+        #Get all bookings for the employee 
+        bookings = AppschedulerBookings.objects.filter(employee_id=empid)
+
+        #iterate all bookings and filter all booking for the requested date and the given employee.
+        
+        for bktm in bookings:
+            bookingtime_local = bktm.date.astimezone(pytz.timezone(user_timezone[0])).date()
+
+            if bookingtime_local.day == day and bookingtime_local.month == month and bookingtime_local.year == year:
+                service_start_time = bktm.service_start_time
+                service_end_time =  bktm.service_end_time
+                bookedtime = { "start_time" : service_start_time , "end_time" : service_end_time }
+                bookedtimes.append( bookedtime )
+                
+     
+        #Mark the already booked time as "off" from working hours.          
+                
+        for bkdtime in bookedtimes:
+            bktime_start = bkdtime["start_time"]
+            bktime_end = bkdtime["end_time"]
+            for wh in workinghours:
+                wh_ust = wh["interval_ust"]
+              
+                # Keep status as "off" if working hours comes in already booked time.
+                if wh_ust >= bktime_start   and wh_ust <= bktime_end :
+                    wh["status"] = "off"
+                    
         times = deepcopy(employee_info["workinghours"])
         times_count = len(times) 
         i = 0 
