@@ -58,7 +58,11 @@ class AppschedulerBookings(models.Model):
         related_name="service", blank=True,null=True
         
     ) 
-   
+    def get_duedate(self):
+        return self.date
+
+    duedate = property( get_duedate )  
+    
     class Meta:
         # managed = False
         db_table = 'appscheduler_bookings'

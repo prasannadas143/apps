@@ -24,8 +24,43 @@ from appointmentscheduler.form.bookingform import BookingForm
 def show_bookings(request):
     template_name = "bookings.html"
     bookingdata = dict()
+    bookings = AppschedulerBookings.objects.all()
+    user_timezone = request.session['visitor_timezone']
+    bookingsdetails = []
+    for booking in bookings:
+        bookingdetails = dict()
+        bookingdetails["bookingid"] = booking.id
+        bookingdetails["c_name"] = booking.c_name
+        bookingdetails["c_email"] = booking.c_email
+        bookingdetails["c_phone"] = str(booking.c_phone)
+        bookingdetails["booking_status"] = booking.booking_status
+        bookingdetails["total"] = float(booking.booking_total)
+        service_name = booking.service.service_name
+        bookingdetails["service_name"] = service_name
+        getvisitortime = booking.service_start_time.astimezone(pytz.timezone(user_timezone[0]))
+        format = '%Y-%m-%d %H:%M %p'
+        bookingdetails["booking_time"] = getvisitortime.strftime(format)
+        bookingsdetails.append( bookingdetails )
+    # pdb.set_trace()
 
-    return render(request, template_name)
+    return  HttpResponse(json.dumps({"data" :bookingsdetails }), content_type='application/json')   
+
+@requires_csrf_token
+def editbooking(request, id=None):
+    print("Edit booking")
+
+    return  HttpResponse(status=204)   
+
+@requires_csrf_token
+def deletebooking(request,id=None):
+    print("Delete booking")
+    return  HttpResponse(status=204)   
+
+@requires_csrf_token
+def deletebookings(request):
+    print("Delete bookings")
+    return  HttpResponse(json.dumps({"data" :"delete all bookings" }), content_type='application/json')   
+
 
 @requires_csrf_token
 def addbooking(request):
@@ -217,7 +252,7 @@ def employee_in_booking(request):
         adt.save()
     else :
         if booktime.is_dayoff:
-            return HttpResponse(json.dumps({"error_message" : "This date is off" }), content_type='application/json')
+            return HttpResponse(json.dumps({"error_message" : "This date is off" }) )
         else :
             start_time = booktime.start_time
             end_time = booktime.end_time
@@ -254,7 +289,12 @@ def employee_in_booking(request):
     employees = AppschedulerEmployees.objects.all()
     employeelist = []
     appscheduleobj = AppschedulerServices.objects.get(id=serviceid)
-    emp_service = appscheduleobj.emp_service.all()
+    emp_service = appscheduleobj.emp_service.all()  
+   
+    if not emp_service.count() :
+        return HttpResponse(json.dumps({"error_message" : "No employee is assiaciated with service" }) )
+
+
     for employee in emp_service:    
         # Mark it as off times also if  there is existing booking for the employee on the given time.
 
@@ -343,6 +383,17 @@ def employee_in_booking(request):
         for hour in employee_info["workinghours"] :
             del hour["interval_ust"]
 
+        # if no booking slots are available , show the error
+        is_bookings_slot_na = False
+        for employee in emp_service:    
+            for hour in employee_info["workinghours"] :
+                if hour['status'] == "on":
+                    is_bookings_slot_na = is_bookings_slot_na | True
+                    break
+            if  is_bookings_slot_na:
+                break       
+        if not  is_bookings_slot_na:
+            return HttpResponse( json.dumps({"error_message" : "slots are not available" }) )
 
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
