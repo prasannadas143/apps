@@ -8,6 +8,8 @@ from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
 from .views.Options.Editor import ckEditor
+from django.views.generic import TemplateView
+
 
 
 urlpatterns = [
@@ -58,7 +60,13 @@ urlpatterns = [
     url(r'^deleteCountry/(?P<id>\d+)/$', Countries.deleteCountry, name="deleteCountry"),
     url(r'^Company/$', Invoice.Company, name="Company"),
 
-    url(r'^bookings/$', bookings.show_bookings, name="bookings"),
+    url(r'^getbookings/$', bookings.show_bookings, name="bookings"),
+    url(r'^bookings/$', TemplateView.as_view(template_name='bookings.html'), name="bookings"),
+    url(r'^editbooking/(?P<id>\d+)/$', bookings.editbooking, name="editbooking"),
+    url(r'^deletebooking/(?P<id>\d+)/$', bookings.deletebooking, name="deletebooking"),
+    url(r'^deletebookings/$', bookings.deletebookings, name="delete_bookings"),
+
+     
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),

@@ -8,8 +8,6 @@
 {% block content %} 
 
 
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
    <input type="button" value="Active"   id="active"  />
    <input type="button" value="Inactive"   id="inactive"  />
    <input type="button" value="All"   id="all"  />
@@ -294,7 +292,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       }
  
        // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
+      // updateDataTableSelectAllCtrl(table);
       // Prevent click event from propagating to parent
       e.stopPropagation();
    });
