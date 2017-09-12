@@ -27,7 +27,7 @@ def show_bookings(request):
     bookings = AppschedulerBookings.objects.all()
     user_timezone = request.session['visitor_timezone']
     bookingsdetails = []
-    for booking in bookings:
+    for booking in  reversed(list(bookings)):
         bookingdetails = dict()
         bookingdetails["bookingid"] = booking.id
         bookingdetails["c_name"] = booking.c_name
@@ -41,15 +41,47 @@ def show_bookings(request):
         format = '%Y-%m-%d %H:%M %p'
         bookingdetails["booking_time"] = getvisitortime.strftime(format)
         bookingsdetails.append( bookingdetails )
-    # pdb.set_trace()
 
     return  HttpResponse(json.dumps({"data" :bookingsdetails }), content_type='application/json')   
 
 @requires_csrf_token
 def editbooking(request, id=None):
-    print("Edit booking")
+    if request.method == "POST":
+        # pdb.set_trace()
+        pass
 
-    return  HttpResponse(status=204)   
+
+    else :
+        print("Edit booking")
+        customer_fields = {
+        "c_country": "required",
+        "c_state" : "required",
+        "c_city" : "required",
+        "c_zip"  : "required",
+        "c_name"  : "required",
+        "c_email" : "required",
+        "c_phone" : "required",
+        "c_address_1" : "required",
+        "c_address_2" : "required"
+        }
+        template_name = "editbooking.html"
+        bookingdetails = dict()
+        bookings = AppschedulerBookings.objects.filter(id=id)[0];
+        bookingdetails = { "bookingdetails" : bookings }
+        Countries = AppschedulerCountries.objects.filter(status = 1 )
+        country_info = []
+        for Country in reversed(list(Countries)):
+            data=dict()
+            data['id'] = Country.id
+            data['CountryName'] = Country.CountryName
+            country_info.append(data)
+        todaydate= datetime.now().strftime("%Y-%m-%d")
+        bookingdetails["defaultdate"] = todaydate 
+        bookingdetails["customer_fields"] = customer_fields
+        bookingdetails["countries"] = country_info 
+    return render(request, template_name, bookingdetails)
+ 
+
 
 @requires_csrf_token
 def deletebooking(request,id=None):
@@ -75,8 +107,8 @@ def addbooking(request):
         "c_name"  : "required",
         "c_email" : "required",
         "c_phone" : "required",
-        "c_address1" : "required",
-        "c_address2" : "required"
+        "c_address_1" : "required",
+        "c_address_2" : "required"
     }
     if request.method == 'POST':
         formparams= request.POST.dict()
@@ -151,13 +183,15 @@ def addbooking(request):
         employeeobj =  AppschedulerEmployees.objects.filter(id = employee_id)[0]
 
 
-        request.POST['subscribed_email'] = formparams['subscribed_email_value']
-        request.POST['subscribed_sms'] = formparams['subscribed_sms_value']
-        request.POST['reminder_email'] = formparams['reminder_email_value']
-        request.POST['reminder_sms'] = formparams['reminder_sms_value']
+        request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
+        request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
+        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
+
         for field,value in customer_fields.items():
+            pdb.set_trace()
 
             if field in formparams and  formparams[field] is not None:
                 if field != 'c_country':
@@ -165,7 +199,6 @@ def addbooking(request):
                 if customer_fields[field]  == "required":
                     if not customer_fields[field]:
                         errors += field + " field required"
-       
         form = BookingForm(request.POST or None )
 
         if errors :
@@ -174,12 +207,13 @@ def addbooking(request):
         if form.errors:
             return render(request, template_name, {"form" : form })
 
+        pdb.set_trace()
         if form.is_valid():
 
             bookingobj = form.save(commit=False)
             bookingobj.service = serviceobj
             bookingobj.employee = employeeobj
-            if customer_fields['c_country']:
+            if 'c_country' in  customer_fields and  customer_fields['c_country']:
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()

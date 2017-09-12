@@ -96,35 +96,41 @@
     <div> "{{ form.errors }}" </div>
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
-           action="{% url 'appointmentschduler:addbooking' %}" method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
+           action='/appointmentschduler/editbooking/' + bookingdetails.id + "/"  method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
             <fieldset class="fieldset white">
 					<legend>Booking details</legend>
 					<div class="float_left w450">
 						<p>
 							<label class="title">Unique ID:</label>
-							<input type="text" name="uuid" id="uuid" class="pj-form-field w100 required" value="{{ bookingid }}" aria-required="true" >
+							<input type="text" name="uuid" id="uuid" class="pj-form-field w100 required" value="{{ bookingdetails.bookingid }}" aria-required="true" >
 						</p>
 						<p>
 							<label class="title">Status:</label>
-							<input type="text" name="booking_status" id="booking_status" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="pending">
+							<input type="text" name="booking_status" id="booking_status" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ bookingdetails.booking_status }}" >
 							<input type="hidden" name="default_status_if_paid" id="default_status_if_paid" value="">
 							<input type="hidden" name="default_status_if_not_paid" id="default_status_if_not_paid" value="">
-							<input type="hidden" id="service_booked_id" name="service_booked_id" value="" >
-							<input type="hidden" id="svcdate" name="svcdate" value=""  >
-							<input type="hidden" id="svc_start_time" name="svc_start_time" value=""  >
-							<input type="hidden" id="svc_end_time" name="svc_end_time" value=""  >
-							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value=""  >
-							<input type="hidden" id="employeeid" name="employeeid"  value="" >
+							<input type="hidden" id="service_booked_id" name="service_booked_id" value="{{ bookingdetails.service.id }}"  >
+							<input type="hidden" id="svcdate" name="svcdate" value="{{ bookingdetails.date }}"  >
+							<input type="hidden" id="svc_start_time" name="svc_start_time" 
+							value="{{ bookingdetails.service_start_time }}"  >
+							<input type="hidden" id="svc_end_time" name="svc_end_time" value="{{ bookingdetails.service_end_time }}" >
+							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value="{{ bookingdetails.service.emp_name }}" >
+							<input type="hidden" id="employeeid" name="employeeid"   value="{{ bookingdetails.employee.id }}" >
 														
 						</p>
 
 					</div>
 
-				<div id="serviceerror"></div>
+					<div id="serviceerror"></div>
 					<p>
 						<label class="title">&nbsp;</label>
 						<input type="button" value="+ Add service" class="pj-button item-add" id="myBtn">
-						<div id="addservices"> </div>
+						<div id="addservices"> <table id="addservicedata" class="table table-striped table-bordered table-hover"    cellspacing="0" width="100%" >	<tr><th>Service/Employee</th><th>Date/Time</th><th>Price</th><th> Action </th></tr>
+								<tr id= "{{ bookingdetails.service.id }}" ><td> {{ bookingdetails.service.service_name }}  {{ bookingdetails.employee.emp_name }} </td><td>
+								{{ bookingdetails.date }} {{ bookingdetails.service_start_time }}</td><td> {{ bookingdetails.booking_price }} </td>  <td> <input type="button" class="deleteDep" 
+								value="Delete"/></td></tr>
+							</table>
+						</div>
 						<div id="myModal" class="modal">
 
 							  <!-- Modal content -->
@@ -176,7 +182,7 @@
 							  </div>
 
 						</div>
-						<input type="button" value="Recalculate the price" class="pj-button order-calc">
+						
 					</p>
 					<div class="float_left w350 t15">
 						
@@ -184,14 +190,14 @@
 							<label class="title">Price:</label>
 							<span class="pj-form-field-custom pj-form-field-custom-before">
 								<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
-								<input type="text" name="booking_price" id="booking_price" class="pj-form-field number w90 required" aria-required="true">
+								<input type="text" name="booking_price" id="booking_price" class="pj-form-field number w90 required" value="{{ bookingdetails.booking_price }}" aria-required="true">
 							</span>
 						</p>
 						<p>
 							<label class="title">Deposit:</label>
 							<span class="pj-form-field-custom pj-form-field-custom-before">
 								<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
-								<input type="text" name="booking_deposit" id="booking_deposit" class="pj-form-field number w90" onblur="validate_deposit()">
+								<input type="text" name="booking_deposit" id="booking_deposit" class="pj-form-field number w90"  value="{{ bookingdetails.booking_deposit }}" onblur="validate_deposit()">
 								<input type="hidden" id="required_deposit" name="required_deposit" >
 
 							</span>
@@ -200,14 +206,14 @@
 							<label class="title">Tax:</label>
 							<span class="pj-form-field-custom pj-form-field-custom-before">
 								<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
-								<input type="text" name="booking_tax" id="booking_tax" class="pj-form-field number w90" >
+								<input type="text" name="booking_tax" id="booking_tax" class="pj-form-field number w90"   value="{{ bookingdetails.booking_tax }}">
 							</span>
 						</p>
 						<p>
 							<label class="title">Total:</label>
 							<span class="pj-form-field-custom pj-form-field-custom-before">
 								<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
-								<input type="text" name="booking_total" id="booking_total" class="pj-form-field number w90" >
+								<input type="text" name="booking_total" id="booking_total" class="pj-form-field number w90"  value="{{ bookingdetails.booking_total }}" >
 							</span>
 						</p>
 
@@ -215,7 +221,7 @@
 					<div class="float_right w350 t15">
 						<p>
 							<label class="title">Notes:</label>
-							<textarea name="c_notes" id="c_notes" class="pj-form-field w334 h120"></textarea>
+							<textarea name="c_notes" id="c_notes" class="pj-form-field w334 h120"  value="{{ bookingdetails.c_notes }}"></textarea>
 						</p>
 					</div>
 				</fieldset>
@@ -230,15 +236,24 @@
 						<p>
 							<label class="title">Country:</label>
 							{% if customer_fields.c_country == "yes" %}
-							<select name="c_country" id="c_country" class="pj-form-field w180 custom-chosen" ng-model="c_country" >
+								<select name="c_country" id="c_country"  >
 							{% elif customer_fields.c_country == "required"  %}
-							<select name="c_country" id="c_country" class="pj-form-field w180 custom-chosen" ng-model="c_country" required>
+								<select name="c_country" id="c_country"  >
 							{% endif %}
 
 								<option value="">-- Choose --</option>
 								{% for country in countries %}
-								    <option value="{{ country.id }}">{{ country.CountryName }}</option>
+								   
+						            {% if bookingdetails.country.id == country.id %}
+						           		
+						                 <option value="{{ country.id }}"  selected >{{ country.CountryName }}</option>
+						            {% else %}
+						               <option value="{{ country.id }}">{{ country.CountryName }}</option>
+
+						            {% endif %}
 								{% endfor %}
+
+
 							</select>
 							<span ng-messages="addbooking.c_country.$error" style="color:maroon" role="alert">
 								  <span ng-message="required">This field is required</span>
@@ -253,10 +268,12 @@
 							<label class="title">State:</label>
 							{% if customer_fields.c_state == "yes" %}
 							<input type="text" name="c_state" id="c_state" class="pj-form-field w180"
-							ng-model="c_state"   ng-pattern="/^\w+$/">
+							ng-model="c_state"   ng-pattern="/^\w+$/" ng-init='c_state="{{bookingdetails.c_state}}"' value="{{ bookingdetails.c_state }}" >
 							{% elif customer_fields.c_state == "required"  %}
-							<input type="text" name="c_state" id="c_state" class="pj-form-field w180"      ng-model="c_state"   ng-pattern="/^\w+$/" required >
+							<input type="text" name="c_state" id="c_state" class="pj-form-field w180"      ng-model="c_state"   ng-pattern="/^\w+$/" 
+							ng-init='c_state="{{bookingdetails.c_state}}"' value="{{ bookingdetails.c_state }}" required >
 							{% endif %}
+
 							<span ng-messages="addbooking.c_state.$error" style="color:maroon" role="alert">
 								  <span ng-message="required">This field is required</span>
 							</span>
@@ -272,11 +289,15 @@
 						<p>
 							<label class="title">City:</label>
 							{% if customer_fields.c_city == "yes" %}
+
 							<input type="text" name="c_city" id="c_city" class="pj-form-field w160"
-							ng-model="c_city"   ng-pattern="/^\w+$/">
+							ng-model="c_city"   ng-pattern="/^\w+$/" ng-init='c_city="{{bookingdetails.c_city}}"' value="{{ bookingdetails.c_city }}">
+
 							{% elif customer_fields.c_city == "required"  %}
+
 							<input type="text" name="c_city" id="c_city" class="pj-form-field w160"
-							 ng-model="c_city"   ng-pattern="/^\w+$/" required>
+							 ng-model="c_city"   ng-pattern="/^\w+$/"  ng-init='c_city="{{bookingdetails.c_city}}"' value="{{ bookingdetails.c_city }}" required>
+
 							{% endif %}
 
 							<span ng-messages="addbooking.c_city.$error" style="color:maroon" role="alert">
@@ -293,11 +314,15 @@
 						<p>
 							<label class="title">Zip:</label>
 							{% if customer_fields.c_zip == "yes" %}
-							<input type="text" name="c_zip" id="c_zip" class="pj-form-field w80">
+
+							<input type="text" name="c_zip" id="c_zip" ng-model="c_zip"  class="pj-form-field w80"  ng-init='c_zip="{{bookingdetails.c_zip}}"' value="{{ bookingdetails.c_zip }}">
+
 							{% elif customer_fields.c_zip == "required"  %}
+
 							<input type="text" name="c_zip" id="c_zip" class="pj-form-field w80"
-							    ng-model="c_zip"   ng-pattern="/^\w+$/" required>
-						{% endif %}
+							    ng-model="c_zip"   ng-pattern="/^\w+$/" ng-init='c_zip="{{bookingdetails.c_zip}}"' value="{{ bookingdetails.c_zip }}"  required>
+
+							{% endif %}
 						<span ng-messages="addbooking.c_zip.$error" style="color:maroon" role="alert">
 						  <span ng-message="required">zip field is required</span>
 						</span>
@@ -312,10 +337,14 @@
 					<p>
 						<label class="title">Name:</label>
 						{% if customer_fields.c_name == "yes" %}
+
 							<input type="text" name="c_name" id="c_name" class="pj-form-field w300 "
-							ng-model="c_name"  ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/" >
+							ng-model="c_name"  ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/"  ng-init='c_name="{{ bookingdetails.c_name}}"'  value="{{ bookingdetails.c_name }}" >
+
 						{% elif customer_fields.c_name == "required"  %}
-							<input type="text" name="c_name" id="c_name" class="pj-form-field w300 required"  ng-model="c_name"  ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/" required>
+
+							<input type="text" name="c_name" id="c_name" class="pj-form-field w300 required"  ng-model="c_name"  ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/"  ng-init='c_name="{{bookingdetails.c_name}}"' value="{{ bookingdetails.c_name }}" required>
+
 						{% endif %}
 							<span ng-messages="addbooking.c_name.$error" style="color:maroon" role="alert">
 								  <span ng-message="required">Customer field is required</span>
@@ -334,9 +363,11 @@
 						<span class="pj-form-field-custom pj-form-field-custom-before">
 							<span class="pj-form-field-before"><abbr class="pj-form-field-icon-email"></abbr></span>
 							{% if customer_fields.c_email == "yes" %}
-								<input type="text" name="c_email" id="c_email" class="pj-form-field email w250"  ng-model="c_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" >
+								<input type="text" name="c_email" id="c_email" class="pj-form-field email w250"  ng-model="c_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"  ng-init='c_email="{{bookingdetails.c_email}}"' 
+								 value="{{ bookingdetails.c_email }}">
 							{% elif customer_fields.c_email == "required"  %}
-								<input type="text" name="c_email" id="c_email" class="pj-form-field email w250" ng-model="c_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"  required>
+								<input type="text" name="c_email" id="c_email" class="pj-form-field email w250" ng-model="c_email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" ng-init='c_email="{{bookingdetails.c_email}}"' value="{{ bookingdetails.c_email }}" required>
+
 							{% endif %}
 						</span>
 
@@ -358,10 +389,13 @@
 						<span class="pj-form-field-custom pj-form-field-custom-before">
 							<span class="pj-form-field-before"><abbr class="pj-form-field-icon-phone"></abbr></span>
 						{% if customer_fields.c_phone == "yes" %}
-								<input name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{10,14}$/"  >
+
+								<input name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"    ng-pattern="/^\+[0-9]{10,14}$/" ng-init='c_phone="{{bookingdetails.c_phone}}"'  value="{{ bookingdetails.c_phone }}"  >
 						{% elif customer_fields.c_phone == "required"  %}
-							<input  name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{3,}$/"  required	 >
+
+							<input  name="c_phone" id="c_phone" class="pj-form-field w250" type="tel"  ng-model="c_phone"   ng-pattern="/^\+[0-9]{3,}$/"  ng-init='c_phone="{{bookingdetails.c_phone}}"' value="{{ bookingdetails.c_phone }}" required	 >
 						{% endif %}
+
 						</span>
 						<span ng-messages="addbooking.c_phone.$error" style="color:maroon" role="alert">
 								  <span ng-message="required">Customer phone field is required</span>
@@ -375,10 +409,15 @@
 				 {% if customer_fields.c_address_1 in  'yes,required' %}
 				<p>
 					<label class="title">Address Line 1:</label>
+
 					{% if customer_fields.c_address_1 == "yes" %}
-						<input type="text" name="c_address_1" id="c_address_1" class="pj-form-field w500"  ng-model="c_address_1"   >
+
+						<input type="text" name="c_address_1" id="c_address_1" class="pj-form-field w500"  ng-model="c_address_1"  ng-init='c_address_1="{{bookingdetails.c_address_1}}"' value="{{ bookingdetails.c_address_1 }}"   >
+
 					{% elif customer_fields.c_address_1 == "required"  %}
-						<input type="text" name="c_address_1" id="c_address_1" class="pj-form-field w500" ng-model="c_address_1" required>
+
+						<input type="text" name="c_address_1" id="c_address_1" class="pj-form-field w500" ng-model="c_address_1"  ng-init='c_address_1="{{bookingdetails.c_address_1}}"' value="{{ bookingdetails.c_address_1 }}" required>
+
 					{% endif %}
 					<span ng-messages="addbooking.c_address_1.$error" style="color:maroon" role="alert">
 								  <span ng-message="required">Customer address1 field is required</span>
@@ -390,11 +429,15 @@
 				<p>
 					<label class="title">Address Line 2:</label>
 					{% if customer_fields.c_address_2 == "yes" %}
-					<input type="text" name="c_address_2" id="c_address_2" class="pj-form-field w500">
+
+					<input type="text" name="c_address_2" id="c_address_2" class="pj-form-field w500" ng-model="c_address_2" ng-init='c_address_2="{{bookingdetails.c_address_2}}"'  value="{{ bookingdetails.c_address_2 }}">
+
 					{% elif customer_fields.c_address_2 == "required"  %}
-					<input type="text" name="c_address_2" id="c_address_2" class="pj-form-field w500"
-					 ng-model="c_address_1" required>
+
+					<input type="text" name="c_address_2" id="c_address_2"  class="pj-form-field w500" ng-model="c_address_2" required  ng-init='c_address_2="{{bookingdetails.c_address_2}}"' value="{{ bookingdetails.c_address_2 }}" >
+
 					{% endif %}
+
 					<span ng-messages="addbooking.c_address_2.$error" style="color:maroon" role="alert">
 			 			 <span ng-message="required">Customer address2 field is required</span>
 					</span>
@@ -625,6 +668,8 @@ function addservices() {
 	    $('#employeeid').val($('#employeeidselected').attr("name"));
 
 	}
+
+
 
 	// alert($('#addservicedata tr').length);
 

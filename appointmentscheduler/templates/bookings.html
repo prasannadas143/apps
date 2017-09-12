@@ -50,22 +50,7 @@ var getfilter = "all";
  
   var rows_selected = [];
   draw_datatable();
-var filterByDate = function(column, status) {
-  // Custom filter syntax requires pushing the new filter to the global filter array
-		$.fn.dataTableExt.afnFiltering.push(
-		   	function( oSettings, aData, iDataIndex ) {
-		   		var gettext = aData[4];
-		   		alert(gettext);
-		   		if (aData[4] == "pending") {
-		   			return true;
-		   		}
-		   		else {
-		   			return false ;
-		   		}
 
-		});
-
-	};
 
 $("#pending").click(function(){
 	
@@ -134,10 +119,6 @@ function draw_datatable() {
         "processing": true,
         "ajax": {
             "url": "/appointmentschduler/getbookings/",
-            "data": function(d) {
-              d.querydata = getfilter
-            },
-
             "type": "GET"
         },        
 
