@@ -493,6 +493,14 @@ services.onchange = function() {
     get_employee_details();
 }
 
+ $('#servicedate_updated').on("change" ,function() {
+
+
+	$('#employeeidselected').val("");
+	$('#asEmployeeInfo').val("");
+
+});
+
 servicedetails.onchange = function() {
 	$('#starttime').val("");
 	$('#endtime').val("");
@@ -645,6 +653,13 @@ function listServices() {
                 // console.log(response);
                 servicelist =eval(response);
                 var serviceName ="";
+                document.getElementById("servicedetails").innerHTML = "";
+				document.getElementById("services").innerHTML = "";
+				$('#starttime').val("");
+				$('#endtime').val("");
+				$('#employeeidselected').val("");
+				$('#servicedate_updated').val("");
+				$('#asEmployeeInfo').val("");
                 var $select = $('#services');
 
                 $select.append('<option value=""  selected>Please select a service...</option>')
