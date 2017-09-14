@@ -93,7 +93,8 @@
 <span class="notice-info">&nbsp;</span>
 <span class="block bold">Add a booking</span>
     <span class="block">Fill in the form below to add a new booking. Under Clients tab you can enter information about the client. </span>
-    <div> "{{ form.errors }}" </div>
+    <div> <p>{{ formerrors|default_if_none:"" }}</p> </div>
+    <div> <p>{{ customerrors|default_if_none:"" }}</p> </div>
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
            action="{% url 'appointmentschduler:addbooking' %}" method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
@@ -163,7 +164,7 @@
 									<div class="asContainer" id="employeedetails">
 									<div>   Start Time: <input type="text" name="starttime" id="starttime"></div>
 									<div id="duration">   End Time: <input type="text" name="endtime" id="endtime"></div>
-									<div>   Employee name: <input type="text" name="employeeid" id="employeeidselected"></div>
+									<div>   Employee name: <input type="text" name="employeeidselected" id="employeeidselected"></div>
 
 										<div class="asEmployeeInfo" id="asEmployeeInfo"> <div class="asEmployeeTimeslots"> </div> </div>
 										<input type="button" id="addemployeeinfo" value="Add">

@@ -61,8 +61,21 @@ class AppschedulerBookings(models.Model):
     def get_duedate(self):
         return self.date
 
-    duedate = property( get_duedate )  
     
+    def get_booking_tax(self):
+        tax_percentage = 10
+        tax = price_db * round(float(tax_percentage/100),2)
+        return tax
+
+    def get_booking_total(self):
+        total = round(float(self.booking_price),2) + round(float(self.booking_tax),2)
+        return total
+
+        duedate = property( get_duedate )  
+        booking_tax = property( get_booking_tax )  
+        booking_total = property( get_booking_total )  
+
+
     class Meta:
         # managed = False
         db_table = 'appscheduler_bookings'
