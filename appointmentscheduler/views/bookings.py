@@ -46,40 +46,154 @@ def show_bookings(request):
 
 @requires_csrf_token
 def editbooking(request, id=None):
-    if request.method == "POST":
-        # pdb.set_trace()
-        pass
+    user_timezone = request.session['visitor_timezone']
+    bookings = AppschedulerBookings.objects.filter(id=id)[0]
+    bookings_old = deepcopy(bookings)
+    errors =""
+    template_name = "editbooking.html"
+
+    customer_fields = {
+    "c_country": "required",
+    "c_state" : "required",
+    "c_city" : "required",
+    "c_zip"  : "required",
+    "c_name"  : "required",
+    "c_email" : "required",
+    "c_phone" : "required",
+    "c_address_1" : "required",
+    "c_address_2" : "required"
+    }
+
+    default_status_if_paid = "confirmed"
+    default_status_if_not_paid = "pending"
+    bookingdetails = dict()
+
+    if request.method == 'POST':
+        formparams= request.POST.dict()
+        request.POST._mutable = True
+        request.POST.clear()
+        request.POST["bookingid"] = bookings.bookingid
+        # verify price from form is same  with DB
+        serviceid = formparams["service_booked_id"]
+        price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
+        booking_price = formparams["booking_price"]  
+ 
+        if round(float(booking_price),2)== round(float(price_db),2):
+            request.POST['booking_price'] = price_db
+        else :
+            return HttpResponse(status=403)
+
+        booking_tax = formparams["booking_tax"]  
+        tax_percentage = 10
+        tax = price_db * round(float(tax_percentage/100),2)
+
+        if round(float(tax),2) == round(float(booking_tax),2):
+            request.POST['booking_tax'] = round(float(tax),2)
+        else :
+            return HttpResponse(status=403)
+
+        total = round(float(price_db),2) + round(float(tax),2)
+        booking_total = round(float( formparams["booking_total"] ) ,2)
+        if round(float(total),2) == round(float(booking_total),2):
+            request.POST['booking_total'] = total
+        else :
+            return HttpResponse(status=403)
+
+        booking_deposit = round(float(formparams['booking_deposit']),2)
+        request.POST['booking_deposit'] = booking_deposit
+        expected_deposit_percentage = 20
+        expected_booking_deposit = round(booking_total * float(expected_deposit_percentage/100),2)
+        if not booking_deposit  >= expected_booking_deposit:
+            errors += "need minimum booking deposit"
+
+        status = formparams['booking_status']
+  
+
+        if round(float(booking_deposit),2) >= round(float(booking_total),2) :
+            request.POST["booking_status"] = default_status_if_paid
+        else :
+            request.POST["booking_status"] = default_status_if_not_paid
+
+     
+        user_timezone = request.session['visitor_timezone']
+        servicedate = formparams['servicedate']
+        request.POST['date'] = getust(servicedate,user_timezone)
+        service_start_time =  servicedate + " " +  formparams['svc_start_time'] 
+        request.POST['service_start_time'] = getust(service_start_time,user_timezone)
 
 
-    else :
-        print("Edit booking")
-        customer_fields = {
-        "c_country": "required",
-        "c_state" : "required",
-        "c_city" : "required",
-        "c_zip"  : "required",
-        "c_name"  : "required",
-        "c_email" : "required",
-        "c_phone" : "required",
-        "c_address_1" : "required",
-        "c_address_2" : "required"
-        }
-        template_name = "editbooking.html"
-        bookingdetails = dict()
-        bookings = AppschedulerBookings.objects.filter(id=id)[0];
-        bookingdetails = { "bookingdetails" : bookings }
-        Countries = AppschedulerCountries.objects.filter(status = 1 )
-        country_info = []
-        for Country in reversed(list(Countries)):
-            data=dict()
-            data['id'] = Country.id
-            data['CountryName'] = Country.CountryName
-            country_info.append(data)
-        todaydate= datetime.now().strftime("%Y-%m-%d")
-        bookingdetails["defaultdate"] = todaydate 
-        bookingdetails["customer_fields"] = customer_fields
-        bookingdetails["countries"] = country_info 
+        service_end_time =  servicedate + " " +  formparams['svc_end_time']
+        request.POST['service_end_time'] = getust(service_end_time,user_timezone)
+
+        employee_id = formparams['employeeid']
+        if customer_fields['c_country'] in ["yes", "required"]:
+            if 'c_country' in formparams and formparams['c_country']:
+                country_id = formparams['c_country']
+                countryobj =  AppschedulerCountries.objects.filter(id = country_id)[0]
+            else :
+                errors += "country field is required"
+        serviceobj =  AppschedulerServices.objects.filter(id = serviceid)[0]
+        employeeobj =  AppschedulerEmployees.objects.filter(id = employee_id)[0]
+
+
+        request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
+        request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
+        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        request.POST['ip'] =  request.session['visitor_ip'] 
+        request.POST['created'] = getust(str(datetime.now()), user_timezone)
+
+        for field,value in customer_fields.items():
+
+            if field in formparams and  formparams[field] is not None:
+                if field != 'c_country':
+                    request.POST[field] = formparams[field]
+                if customer_fields[field]  == "required":
+                    if not customer_fields[field]:
+                        errors += field + " field required"
+
+        form = BookingForm(request.POST or None, instance=bookings )
+        if errors :
+            bookingdetails['formerrors'] = deepcopy( form.errors )
+            bookingdetails['customerrors'] = errors           
+            form.errors["customerror"] = errors
+
+
+
+        # if form.errors:
+        #     return render(request, template_name, {"form" : form })
+
+        if form.is_valid():
+
+            bookingobj = form.save(commit=False)
+            bookingobj.service = serviceobj
+            bookingobj.employee = employeeobj
+            if 'c_country' in  customer_fields and  customer_fields['c_country']:
+                bookingobj.country = countryobj
+            message = "Booking data is saved" 
+            bookingobj.save()
+            return HttpResponseRedirect('/appointmentschduler/bookings/')
+   
+    print("Edit booking")
+
+    bookingdetails['bookingdetails'] = bookings_old 
+    Countries = AppschedulerCountries.objects.filter(status = 1 )
+    country_info = []
+    for Country in reversed(list(Countries)):
+        data=dict()
+        data['id'] = Country.id
+        data['CountryName'] = Country.CountryName
+        country_info.append(data)
+    todaydate= datetime.now().strftime("%Y-%m-%d")
+    bookingdetails["defaultdate"] = todaydate 
+    bookingdetails["customer_fields"] = customer_fields
+    bookingdetails["countries"] = country_info 
+    bookingdetails['svc_start_time'] = bookings_old.service_start_time.astimezone(pytz.timezone(user_timezone[0])).strftime( "%I:%M %p" )
+    bookingdetails['svc_date'] = bookings_old.date.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d")
+    bookingdetails['svc_end_time'] = bookings_old.service_end_time.astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
     return render(request, template_name, bookingdetails)
+
+
  
 
 
@@ -110,6 +224,9 @@ def addbooking(request):
         "c_address_1" : "required",
         "c_address_2" : "required"
     }
+
+    default_status_if_paid = "confirmed"
+    default_status_if_not_paid = "pending"
     if request.method == 'POST':
         formparams= request.POST.dict()
         request.POST._mutable = True
@@ -120,7 +237,7 @@ def addbooking(request):
         price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
         booking_price = formparams["booking_price"]   
         if round(float(booking_price),2)== round(float(price_db),2):
-            request.POST['booking_price'] = booking_price
+            request.POST['booking_price'] = price_db
         else :
             return HttpResponse(status=403)
 
@@ -129,14 +246,14 @@ def addbooking(request):
         tax = price_db * round(float(tax_percentage/100),2)
 
         if round(float(tax),2) == round(float(booking_tax),2):
-            request.POST['booking_tax'] = booking_price
+            request.POST['booking_tax'] = round(float(tax),2)
         else :
             return HttpResponse(status=403)
 
         total = round(float(price_db),2) + round(float(tax),2)
         booking_total = round(float( formparams["booking_total"] ) ,2)
         if round(float(total),2) == round(float(booking_total),2):
-            request.POST['booking_total'] = booking_total
+            request.POST['booking_total'] = total
         else :
             return HttpResponse(status=403)
 
@@ -145,11 +262,10 @@ def addbooking(request):
         expected_deposit_percentage = 20
         expected_booking_deposit = round(booking_total * float(expected_deposit_percentage/100),2)
         if not booking_deposit  >= expected_booking_deposit:
-            error += "need minimum booking deposit"
+            errors += "need minimum booking deposit"
 
         status = formparams['booking_status']
-        default_status_if_paid = "confirmed"
-        default_status_if_not_paid = "pending"
+     
 
         if round(float(booking_deposit),2) >= round(float(booking_total),2) :
             request.POST["booking_status"] = default_status_if_paid
@@ -191,7 +307,6 @@ def addbooking(request):
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
 
         for field,value in customer_fields.items():
-            pdb.set_trace()
 
             if field in formparams and  formparams[field] is not None:
                 if field != 'c_country':
@@ -202,12 +317,10 @@ def addbooking(request):
         form = BookingForm(request.POST or None )
 
         if errors :
+            bookingdetails['formerrors'] = deepcopy( form.errors )
+            bookingdetails['customerrors'] = errors           
             form.errors["customerror"] = errors
 
-        if form.errors:
-            return render(request, template_name, {"form" : form })
-
-        pdb.set_trace()
         if form.is_valid():
 
             bookingobj = form.save(commit=False)
@@ -219,10 +332,11 @@ def addbooking(request):
             bookingobj.save()
         return HttpResponseRedirect('/appointmentschduler/bookings/')
 
-    else :
-        bookingid = "BI" + str(uuid.uuid1().node)
-        todaydate= datetime.now().strftime("%Y-%m-%d")
-        appobjs = AppschedulerBookings.objects.all()
+    bookingid = "BI" + str(uuid.uuid1().node)
+    todaydate= datetime.now().strftime("%Y-%m-%d")
+    appobjs = AppschedulerBookings.objects.all()
+    if  not ("bookingid" in request.POST and request.POST["bookingid"] ):
+
         if len(appobjs) > 0:
             lastbookingid = AppschedulerBookings.objects.latest('bookingid').bookingid
 
@@ -231,18 +345,20 @@ def addbooking(request):
 
         else :
             bookingid = "BI" + str(uuid.uuid1().node)
+    else :
+        bookingid = request.POST['bookingid']
 
-        Countries = AppschedulerCountries.objects.filter(status = 1 )
-        country_info = []
-        for Country in reversed(list(Countries)):
-            data=dict()
-            data['id'] = Country.id
-            data['CountryName'] = Country.CountryName
-            country_info.append(data)
-        bookingdetails["bookingid"] = bookingid
-        bookingdetails["defaultdate"] = todaydate 
-        bookingdetails["customer_fields"] = customer_fields
-        bookingdetails["countries"] = country_info    
+    Countries = AppschedulerCountries.objects.filter(status = 1 )
+    country_info = []
+    for Country in reversed(list(Countries)):
+        data=dict()
+        data['id'] = Country.id
+        data['CountryName'] = Country.CountryName
+        country_info.append(data)
+    bookingdetails["bookingid"] = bookingid
+    bookingdetails["defaultdate"] = todaydate 
+    bookingdetails["customer_fields"] = customer_fields
+    bookingdetails["countries"] = country_info    
     return render(request, template_name, bookingdetails)
 
 @ensure_csrf_cookie
@@ -428,7 +544,6 @@ def employee_in_booking(request):
                 break       
         if not  is_bookings_slot_na:
             return HttpResponse( json.dumps({"error_message" : "slots are not available" }) )
-
     return HttpResponse(json.dumps(employeelist), content_type='application/json')
 
 def get_serviceprice(request):

@@ -93,10 +93,12 @@
 <span class="notice-info">&nbsp;</span>
 <span class="block bold">Add a booking</span>
     <span class="block">Fill in the form below to add a new booking. Under Clients tab you can enter information about the client. </span>
-    <div> "{{ form.errors }}" </div>
+    <div> <p>{{ formerrors|default_if_none:"" }}</p> </div>
+    <div> <p>{{ customerrors|default_if_none:"" }}</p> </div>
+
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
-           action='/appointmentschduler/editbooking/' + bookingdetails.id + "/"  method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
+           action="{% url 'appointmentschduler:editbooking' bookingdetails.id %}"  method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
             <fieldset class="fieldset white">
 					<legend>Booking details</legend>
 					<div class="float_left w450">
@@ -110,10 +112,10 @@
 							<input type="hidden" name="default_status_if_paid" id="default_status_if_paid" value="">
 							<input type="hidden" name="default_status_if_not_paid" id="default_status_if_not_paid" value="">
 							<input type="hidden" id="service_booked_id" name="service_booked_id" value="{{ bookingdetails.service.id }}"  >
-							<input type="hidden" id="svcdate" name="svcdate" value="{{ bookingdetails.date }}"  >
+							<input type="hidden" id="svcdate" name="svcdate" value="{{ svc_date }}" >
 							<input type="hidden" id="svc_start_time" name="svc_start_time" 
-							value="{{ bookingdetails.service_start_time }}"  >
-							<input type="hidden" id="svc_end_time" name="svc_end_time" value="{{ bookingdetails.service_end_time }}" >
+							value="{{ svc_start_time }}"  >
+							<input type="hidden" id="svc_end_time" name="svc_end_time" value="{{ svc_end_time }}" >
 							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value="{{ bookingdetails.service.emp_name }}" >
 							<input type="hidden" id="employeeid" name="employeeid"   value="{{ bookingdetails.employee.id }}" >
 														
@@ -127,7 +129,7 @@
 						<input type="button" value="+ Add service" class="pj-button item-add" id="myBtn">
 						<div id="addservices"> <table id="addservicedata" class="table table-striped table-bordered table-hover"    cellspacing="0" width="100%" >	<tr><th>Service/Employee</th><th>Date/Time</th><th>Price</th><th> Action </th></tr>
 								<tr id= "{{ bookingdetails.service.id }}" ><td> {{ bookingdetails.service.service_name }}  {{ bookingdetails.employee.emp_name }} </td><td>
-								{{ bookingdetails.date }} {{ bookingdetails.service_start_time }}</td><td> {{ bookingdetails.booking_price }} </td>  <td> <input type="button" class="deleteDep" 
+								{{ svc_date }} {{ svc_start_time }}</td><td> {{ bookingdetails.booking_price }} </td>  <td> <input type="button" class="deleteDep" 
 								value="Delete"/></td></tr>
 							</table>
 						</div>
@@ -169,7 +171,7 @@
 									<div class="asContainer" id="employeedetails">
 									<div>   Start Time: <input type="text" name="starttime" id="starttime"></div>
 									<div id="duration">   End Time: <input type="text" name="endtime" id="endtime"></div>
-									<div>   Employee name: <input type="text" name="employeeid" id="employeeidselected"></div>
+									<div>   Employee name: <input type="text" name="employeeidselected" id="employeeidselected"></div>
 
 										<div class="asEmployeeInfo" id="asEmployeeInfo"> <div class="asEmployeeTimeslots"> </div> </div>
 										<input type="button" id="addemployeeinfo" value="Add">
@@ -236,11 +238,10 @@
 						<p>
 							<label class="title">Country:</label>
 							{% if customer_fields.c_country == "yes" %}
-								<select name="c_country" id="c_country"  >
+								<select name="c_country" id="c_country" ng-model="c_country"  ng-init='c_country="{{bookingdetails.country.id }}"' >
 							{% elif customer_fields.c_country == "required"  %}
-								<select name="c_country" id="c_country"  >
+								<select name="c_country" id="c_country" ng-model="c_country"  ng-init='c_country="{{bookingdetails.country.id }}"'   >
 							{% endif %}
-
 								<option value="">-- Choose --</option>
 								{% for country in countries %}
 								   
@@ -446,23 +447,23 @@
 	 			<p>
 				
  				<span>
- 				<label><input name="reminder_email" id="reminder_email"  type="checkbox" > Send reminder email  when new booking is made</label>
+ 				<label><input name="reminder_email" id="reminder_email"  type="checkbox" {% if bookingdetails.reminder_email == 1 %} checked {% endif %}> Send reminder email  when new booking is made</label>
  				<input name="reminder_email_value" id="reminder_email_value"  type="hidden" >
 				</span>
 				<span >
-				<label><input name="reminder_sms" id="reminder_sms"  type="checkbox"  > Send SMS reminder sms new booking is made</label>
+				<label><input name="reminder_sms" id="reminder_sms"  type="checkbox" {% if bookingdetails.reminder_sms == 1 %} checked {% endif %} > Send SMS reminder sms new booking is made</label>
 				<input name="reminder_sms_value" id="reminder_sms_value"  type="hidden" >
 
 
 				</span>
 
 				<span>
-				<label><input name="subscribed_email" id="subscribed_email"  type="checkbox"  checked> Send SMS when new booking is made</label>
+				<label><input name="subscribed_email" id="subscribed_email"  type="checkbox"  {% if bookingdetails.subscribed_email == 1 %} checked {% endif %} > Send SMS when new booking is made</label>
 				 <input name="subscribed_email_value" id="subscribed_email_value"  type="hidden" >
 
 				</span>
 				<span>
-				<label><input name="subscribed_sms" id="subscribed_sms"  type="checkbox" checked > Send Email when new booking is made</label>
+				<label><input name="subscribed_sms" id="subscribed_sms"  type="checkbox" {% if bookingdetails.subscribed_sms == 1 %} checked {% endif %} > Send Email when new booking is made </label>
 				 <input name="subscribed_sms_value" id="subscribed_sms_value"  type="hidden" >
 
 				</span>
@@ -512,6 +513,11 @@ span.onclick = function() {
 
 $('body').on('click', 'input.deleteDep', function() {
    $('#addservices').empty();  
+   $('#booking_price').val("");
+   $('#booking_tax').val("");
+   $('#booking_total').val("");
+   $('#booking_status').val("");
+
    btn.disabled = false;
 });
 
