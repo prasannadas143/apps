@@ -81,7 +81,22 @@ class AppschedulerBookings(models.Model):
         db_table = 'appscheduler_bookings'
 
 
+class AppschedulerBookingsServices(models.Model):
+    tmp_hash = models.CharField(max_length=32, blank=True, null=True)
+    booking_id = models.IntegerField(blank=True, null=True)
+    service_id = models.IntegerField(blank=True, null=True)
+    employee_id = models.IntegerField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    start = models.TimeField(blank=True, null=True)
+    start_ts = models.IntegerField(blank=True, null=True)
+    total = models.SmallIntegerField(blank=True, null=True)
+    price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
+    reminder_email = models.IntegerField(blank=True, null=True)
+    reminder_sms = models.IntegerField(blank=True, null=True)
 
+    class Meta:
+        # managed = False
+        db_table = 'appscheduler_bookings_services'
 
 class AppschedulerCalendars(models.Model):
     user_id = models.IntegerField(blank=True, null=True)
@@ -304,6 +319,25 @@ class AppschedulerCountries(models.Model):
         # managed = False
         db_table = 'appscheduler_countries'
         unique_together = (('CountryName'),)
+
+
+class AppschedulerTemplates(models.Model):
+    TemplateName = models.CharField(max_length=200, blank=False, null=False,unique=True)
+    status = models.BooleanField(default=True)
+    class Meta:
+        # managed = False
+        db_table = 'appscheduler_templates'
+        unique_together = (('TemplateName'),)
+
+class AppschedulerTemplatesDetails(models.Model):
+    TemplateID = models.CharField(max_length=200, blank=False, null=False,unique=True)
+    subject = models.CharField(max_length=200, blank=False, null=False)
+    DesignedTemplate = models.TextField(blank=False, null=False)
+    status = models.BooleanField(default=True)
+    class Meta:
+        # managed = False
+        db_table = 'appscheduler_TemplatesDetails'
+        unique_together = (('TemplateID'),)           
 
 # class DjangoMigrations(models.Model):
     # app = models.CharField(max_length=255)
