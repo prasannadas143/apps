@@ -7,8 +7,8 @@ from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf
 from django.core import serializers
 from PIL import Image
 import io
-from io import BytesIO
 from django.core.files.base import ContentFile
+from io import BytesIO
 from django.core.files import File
 from base64 import decodestring
 from django.http import JsonResponse

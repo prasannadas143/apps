@@ -74,4 +74,15 @@ urlpatterns = [
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
     url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate"),
 
+    url(r'^Template/$', ckEditor.Template, name="Template"),
+    url(r'^AddTemplate/$', ckEditor.AddTemplate, name="AddTemplate"),
+    url(r'^CheckDuplicateTemplate/$', ckEditor.CheckDuplicateTemplate, name="CheckDuplicateTemplate"),
+    url(r'^Templates/$', ckEditor.Templates, name="Templates"),
+    url(r'^TemplateList/$', ckEditor.TemplateList, name="TemplateList"),
+    url(r'^deleteTemplate/$', ckEditor.deleteTemplate, name="deleteTemplate"),
+    url(r'^editTemplate/(?P<id>\d+)/$', ckEditor.editTemplate, name="editTemplate"),
+    url(r'^GetTemplateDetails/$', ckEditor.GetTemplateDetails, name="GetTemplateDetails"),
+    url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
+    url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
+    url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate")
 ]
