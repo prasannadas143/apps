@@ -65,12 +65,15 @@ urlpatterns = [
     url(r'^editbooking/(?P<id>\d+)/$', bookings.editbooking, name="editbooking"),
     url(r'^deletebooking/(?P<id>\d+)/$', bookings.deletebooking, name="deletebooking"),
     url(r'^deletebookings/$', bookings.deletebookings, name="delete_bookings"),
+    url(r'^is_booking_exist/$', bookings.is_booking_exist, name="is_booking_exist"),
+
      
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
     url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate"),
+
     url(r'^Template/$', ckEditor.Template, name="Template"),
     url(r'^AddTemplate/$', ckEditor.AddTemplate, name="AddTemplate"),
     url(r'^CheckDuplicateTemplate/$', ckEditor.CheckDuplicateTemplate, name="CheckDuplicateTemplate"),
