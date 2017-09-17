@@ -142,7 +142,25 @@ def editbooking(request, id=None):
         request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
+        svc_start_time = request.POST['service_start_time']
+        svc_end_time = request.POST['service_end_time']
+        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+        svc_datetime = servicedate.split('-')
+        year = int(svc_datetime[0].lstrip('0') )
+        month = int(svc_datetime[1].lstrip('0') )
+        day = int( svc_datetime[2].lstrip('0') )
 
+        for bkdn in bookings_done:
+            bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
+
+            if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
+                start_time_db = bkdn.service_start_time
+                end_time_db =  bkdn.service_end_time   
+                if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
+                (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
+                    
+                    errors+=" change booking time slotsb: booking already existed"
+                    break
         for field,value in customer_fields.items():
 
             if field in formparams and  formparams[field] is not None:
@@ -162,7 +180,6 @@ def editbooking(request, id=None):
 
         # if form.errors:
         #     return render(request, template_name, {"form" : form })
-
         if form.is_valid():
 
             bookingobj = form.save(commit=False)
@@ -256,7 +273,8 @@ def addbooking(request):
             request.POST['booking_total'] = total
         else :
             return HttpResponse(status=403)
-
+        if not formparams['booking_deposit'] :
+            formparams['booking_deposit'] = 0 
         booking_deposit = round(float(formparams['booking_deposit']),2)
         request.POST['booking_deposit'] = booking_deposit
         expected_deposit_percentage = 20
@@ -283,11 +301,11 @@ def addbooking(request):
         request.POST['date'] = getust(servicedate,user_timezone)
         service_start_time =  servicedate + " " +  formparams['svc_start_time'] 
         request.POST['service_start_time'] = getust(service_start_time,user_timezone)
-
+        svc_start_time = request.POST['service_start_time']
 
         service_end_time =  servicedate + " " +  formparams['svc_end_time']
         request.POST['service_end_time'] = getust(service_end_time,user_timezone)
-
+        svc_end_time = request.POST['service_end_time'] 
         employee_id = formparams['employeeid']
         if customer_fields['c_country'] in ["yes", "required"]:
             if 'c_country' in formparams and formparams['c_country']:
@@ -305,7 +323,25 @@ def addbooking(request):
         request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
+        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+        svc_datetime = servicedate.split('-')
+        year = int(svc_datetime[0].lstrip('0') )
+        month = int(svc_datetime[1].lstrip('0') )
+        day = int( svc_datetime[2].lstrip('0') )
+        
+        # Throws error if booked time is already allotted
+        if not formparams['book_exist']:
+            for bkdn in bookings_done:
+                bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
 
+                if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
+                    start_time_db = bkdn.service_start_time
+                    end_time_db =  bkdn.service_end_time   
+                    if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
+                    (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
+                        
+                        errors+=" change booking time slotsb: booking already existed"
+                        break
         for field,value in customer_fields.items():
 
             if field in formparams and  formparams[field] is not None:
@@ -330,7 +366,7 @@ def addbooking(request):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
-        return HttpResponseRedirect('/appointmentschduler/bookings/')
+            return HttpResponseRedirect('/appointmentschduler/bookings/')
 
     bookingid = "BI" + str(uuid.uuid1().node)
     todaydate= datetime.now().strftime("%Y-%m-%d")
@@ -361,6 +397,36 @@ def addbooking(request):
     bookingdetails["countries"] = country_info    
     return render(request, template_name, bookingdetails)
 
+@csrf_exempt
+def is_booking_exist(request):
+    print("check existing booking")
+    user_timezone = request.session['visitor_timezone']
+    servicedate = request.GET['servicedate']
+    svc_datetime = servicedate.split('-')
+    year = int(svc_datetime[0].lstrip('0') )
+    month = int(svc_datetime[1].lstrip('0') )
+    day = int( svc_datetime[2].lstrip('0') )
+    service_start_time =  servicedate + " " +  request.GET['svc_start_time'] 
+    svc_start_time = getust(service_start_time,user_timezone)
+    errors=""
+
+    service_end_time =  servicedate + " " +  request.GET['svc_end_time']
+    svc_end_time = getust(service_end_time,user_timezone)
+    employee_id = request.GET['employeeid']
+    bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+    for bkdn in bookings_done:
+            bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
+
+            if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
+                start_time_db = bkdn.service_start_time
+                end_time_db =  bkdn.service_end_time   
+                if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
+                (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
+                    
+                    errors+=" change booking time slotsb: booking already existed"
+                    break
+    print(errors)                
+    return HttpResponse(errors)
 @ensure_csrf_cookie
 def employee_in_booking(request):
     serviceid = request.GET['serviceid']

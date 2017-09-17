@@ -116,6 +116,8 @@
 							<input type="hidden" id="svc_end_time" name="svc_end_time" value=""  >
 							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value=""  >
 							<input type="hidden" id="employeeid" name="employeeid"  value="" >
+							<input type="hidden" id="book_exist" name="book_exist"  value="" >
+
 														
 						</p>
 
@@ -537,6 +539,34 @@ function validatebookingform() {
 
 	var reminder_sms = document.getElementById("reminder_sms");
 	$('#reminder_sms_value').val(Number(reminder_sms.checked)) ;
+	alert($('#servicedate').val());
+	alert($('#svc_start_time').val());
+	alert($('#svc_end_time').val());
+	alert( $('#employeeid').val());
+	$.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:is_booking_exist'  %}",
+            async: false,
+			data: {
+				"employeeid" : $('#employeeid').val(),
+				"servicedate" : $('#servicedate').val(),
+				"svc_start_time" : $('#svc_start_time').val(),
+				"svc_end_time"	: $('#svc_end_time').val()
+			},
+
+            success:function(data){
+                alert(data);
+                if(data) {
+                	$('#book_exist').val("no");
+
+                	return false;
+
+                }
+                else {
+                	$('#book_exist').val("yes");
+                }
+            }
+    });
 
 
 	if ($('#addservicedata tr').length < 2 ) {

@@ -98,7 +98,7 @@
 
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
-           action="{% url 'appointmentschduler:editbooking' bookingdetails.id %}"  method="post"  onsubmit="return validatebookingform()"  > {% csrf_token %}
+           action="{% url 'appointmentschduler:editbooking' bookingdetails.id %}"  method="post"  onsubmit="return validatebookingform();"  > {% csrf_token %}
             <fieldset class="fieldset white">
 					<legend>Booking details</legend>
 					<div class="float_left w450">
@@ -497,6 +497,11 @@ var btn = document.getElementById("myBtn");
 var span = document.getElementsByClassName("close")[0];
 var addservice = document.getElementById("addemployeeinfo");
 var servicedetails = document.getElementById("servicedetails");
+ 
+if(! $('#addservicedata tr').length < 2) {
+	btn.disabled = true;
+}
+
 
 // When the user clicks the button, open the modal
 btn.onclick = function() {
@@ -592,6 +597,8 @@ function validatebookingform() {
 			document.getElementById("serviceerror").innerHTML = "<b>Please Add service details</b>";
 			return false ;
 	}
+
+	  
 
 	return true;
 }
