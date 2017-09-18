@@ -555,10 +555,9 @@ function validatebookingform() {
 			},
 
             success:function(data){
-                alert(data);
                 if(data) {
                 	$('#book_exist').val("no");
-
+                	alert(data);
                 	return false;
 
                 }
