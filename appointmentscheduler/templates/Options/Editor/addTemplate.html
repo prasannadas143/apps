@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% load get_item %}
+
+{% block title %}
+{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+<div id="AddTemplate">
+<h2 align="center">Add Template</h2>
+
+   <form class="form-horizontal" role="form">
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="TemplateName">Template Name</label>
+    <div class="col-sm-6">
+       <input id="TemplateName" class="TemplateName" maxlength="200" name="TemplateName" type="text" value=""   />
+       <div class="TemplateName-msg red"></div>
+    </div>
+</div>
+
+  <div class="form-group">
+  <label class="col-sm-6 control-label " for="Status">Status</label>
+  <div class="col-sm-6">
+  <input type="checkbox" name="Status" class="Status" checked>
+  <div class="Status-msg red"></div>
+  </div>
+  </div>
+
+
+    <div class="form-group">
+    <div class="col-sm-12" align="center">
+	<input type="button" name="Save" onclick="ValidateForm();" value="Save">
+	<input type="button" name="Templatelist" onclick="ShowTemplateLsit();" value="Back to Template list">
+    </div>
+    </div>
+
+</form>
+
+
+<div class="modal fade" id="messageStatus" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="Ok">Ok</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+
+<script type="text/javascript">
+
+function ValidateForm()
+{
+  var status=1
+if ($('.Status').is(":checked"))
+{
+  // it is checked
+  status=1;
+}
+else{
+  status=0;
+}
+
+
+ $('.TemplateName-msg').html('');
+ var isValidForm=true;
+
+if($('.TemplateName').val().trim()=="")
+{
+	isValidForm=false;
+	$('.TemplateName-msg').html("Please enter Template Name")
+}
+else
+{
+ 
+  //Ajax call to check values into the DB
+$.ajax({
+  url: "{% url 'appointmentschduler:CheckDuplicateTemplate' %}",
+  method: 'GET',
+  data : {
+          "TemplateName":$('.TemplateName').val().trim()
+         },
+  }).success(function (data, jqXHR) 
+  {
+        if(data) {
+          isValidForm=false;
+          $('.TemplateName-msg').html("Template name is already exist in database, Please choose another one.")
+        }
+        else
+        {
+             $.ajax({
+              url: "{% url 'appointmentschduler:AddTemplate' %}",
+              method: 'POST',
+              data : {
+                      "TemplateName":$('.TemplateName').val().trim(),
+                      "Status": status
+                     },
+              }).success(function (data, jqXHR) 
+              {
+                    $('.modal-title').text('Template saved successfully');
+                    $("#messageStatus").modal();
+              }).error(function (jqXHR, errorThrown) {
+                 $('.modal-title').text('Template is not saved');
+                    $("#messageStatus").modal();
+                });
+        }
+  })
+
+  }
+
+}
+
+
+function ShowTemplateLsit(){
+window.location.href="/appointmentschduler/Templates";
+}
+
+</script>
+
+<style type="text/css">
+	.red{
+		color: Red;
+	}
+
+</style>
+
+
+
+ {% endblock %}

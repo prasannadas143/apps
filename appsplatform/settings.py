@@ -160,3 +160,4 @@ STATICFILES_FINDERS = (
 )
 
 STATIC_URL = '/static/'
+JSONFILES = os.path.join(BASE_DIR, 'appointmentscheduler','views', 'Options','Json')

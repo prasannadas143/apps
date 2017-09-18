@@ -9,37 +9,30 @@
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
-   <input type="button" value="Active"   id="active"  />
-   <input type="button" value="Inactive"   id="inactive"  />
-   <input type="button" value="All"   id="all"  />
+<input type="button" value="Active"   id="active"  />
+<input type="button" value="Inactive"   id="inactive"  />
+<input type="button" value="All"   id="all"  />
 
-
-   <input type="button" onclick="location.href='{% url 'appointmentschduler:addservice' %}'"  value="Add Service" />{% csrf_token %}
+<input type="button" onclick="location.href='{% url 'appointmentschduler:Template' %}'"  value="Add Template" />{% csrf_token %}
 
 <table id="datatables" class="table table-hover">
         <thead>
         <tr>
          <th><input name="select_all" value="1" id="select-all-records" type="checkbox" /></th> 
-            <th>Service Name</th>
-            <th>Employees</th>
-            <th>Price</th>
-            <th>Length</th>
-            <th>Total</th>
-            <th>is active</th>
+            <th>Template Name</th>
+            <th>Status</th>
             <th> action</th>
         </tr>
         </thead>
-      
-    </table>
-
+</table>
   
 <button type="button" id="multicheckbox"  >Delete </button>
 <div class="modal fade" id="confirm" role="dialog">
     <div class="modal-dialog">
-        <!-- Moda00l content-->
+        <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Are you sure?</h4>
+                <h4 class="modal-title">Are you sure want to delete this country?</h4>
             </div>
             <div class="modal-body">
                 <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
@@ -66,6 +59,7 @@ $("#inactive").click(function(){
    getfilter = "inactive";
    draw_datatable();
 });
+
 $("#all").click(function(){
    getfilter = "all";
    draw_datatable();
@@ -92,6 +86,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
+
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -107,20 +102,17 @@ $.ajaxSetup({
 
 var table ;
 function draw_datatable() {
-
   if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
      table.destroy();
   }
 
    table = $('#datatables').DataTable({
-       
         "processing": true,
         "ajax": {
-            "url": "/appointmentschduler/listservices/",
+            "url": "/appointmentschduler/TemplateList/",
             "data": function(d) {
               d.querydata = getfilter
             },
-
             "type": "GET"
         },        
 
@@ -143,33 +135,15 @@ function draw_datatable() {
             },
             {
              'targets':1,
-              "data": "service_name"
+              "data": "TemplateName"
             },
             {
-             'targets':2,
-              "data": "cnt_employees"
-            },
-            {
-             'targets':3,
-              "data": "price"
-            },
-            {
-             'targets':4,
-              "data": "length"
-            },
-            {
-             'targets':5,
-              "data": "total"
-            },
-
-            {
-              'targets':6,
-              "data": "is_active",
+              'targets':2,
+              "data": null,
               render: function ( d, t, r ) {
 
-
                     var $select = $("<select></select>", {
-                      "id": "is_active",
+                      "id": "status",
                         "value": d
                     });
                       var $option = $("<option></option>", {
@@ -186,27 +160,23 @@ function draw_datatable() {
                           "text": "inactive",
                             "value": "False"
                         });
-                        if(d == "False"){
+                        if(d == "False" ){
                           hiddenvalue = true
                           $option.attr("selected", "selected")
                         }
 
                       $select.append($option);
-                      var $hiddenInput = $('<input/>',{type:'hidden',value:hiddenvalue});
                        var $selecthtml = $select.prop("outerHTML");
-                       var $updated = $selecthtml + $hiddenInput.html();
                     return $selecthtml;
                 }
               },
             
             {
-              'targets':7,
+              'targets':3,
               "data": null,
               "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
               '<button type="button" class="btn btn-danger">Delete</button>'
             }
-            
-        
         ],
             'rowCallback': function(row, data, dataIndex){
              // Get row ID
@@ -228,7 +198,6 @@ function draw_datatable() {
       var rows = table.rows({ 'search': 'applied' }).nodes();
       $('input[type="checkbox"]', rows).prop('checked', this.checked);
    });
-
 
 
 function updateDataTableSelectAllCtrl(table){
@@ -329,7 +298,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
           alert("no rows selected");
      }
        $.ajax({
-                url: "{% url 'appointmentschduler:delete_services' %}",
+                url: "{% url 'appointmentschduler:deleteTemplate' %}",
                 method: 'POST',
                 data : {
                         "rowids":rowids,
@@ -360,8 +329,7 @@ $('#datatables tbody').on('click', 'button', function () {
     let class_name = $(this).attr('class');
     if (class_name == 'btn btn-info') {
        
-          location.href = "/appointmentschduler/editservice/" + data['id'];
-
+          location.href = "/appointmentschduler/editTemplate/" + data['id'];
 
     } else if( class_name == 'btn btn-danger') {
         // DELETE button
@@ -376,11 +344,9 @@ $('#datatables tbody').on('click', 'button', function () {
     $('#confirm').on('click', '#delete', function (e) {
 
         $.ajax({
-              url: "/appointmentschduler/deleteservice/" + id + "/",
+              url: "/appointmentschduler/deleteTemplate/" + id + "/",
               method: 'POST'
           }).success(function (data, textStatus, jqXHR) {
-              // location.reload();
-
                table
         .row( '#' + id )
         .remove()
@@ -390,16 +356,7 @@ $('#datatables tbody').on('click', 'button', function () {
           });         
   });
 
-   
-
-
-
-
-
-
-
 </script>
-  
 
 {% endblock %}
 
