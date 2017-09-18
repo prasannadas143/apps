@@ -144,23 +144,24 @@ def editbooking(request, id=None):
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
         svc_start_time = request.POST['service_start_time']
         svc_end_time = request.POST['service_end_time']
-        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id).exclude(id=id)
         svc_datetime = servicedate.split('-')
         year = int(svc_datetime[0].lstrip('0') )
         month = int(svc_datetime[1].lstrip('0') )
         day = int( svc_datetime[2].lstrip('0') )
 
-        for bkdn in bookings_done:
-            bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
+        if not formparams['book_exist']:
+            for bkdn in bookings_done:
+                bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
 
-            if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
-                start_time_db = bkdn.service_start_time
-                end_time_db =  bkdn.service_end_time   
-                if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
-                (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
-                    
-                    errors+=" change booking time slotsb: booking already existed"
-                    break
+                if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
+                    start_time_db = bkdn.service_start_time
+                    end_time_db =  bkdn.service_end_time   
+                    if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
+                    (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
+                        
+                        errors+=" change booking time slotsb: booking already existed"
+                        break
         for field,value in customer_fields.items():
 
             if field in formparams and  formparams[field] is not None:
@@ -328,7 +329,6 @@ def addbooking(request):
         year = int(svc_datetime[0].lstrip('0') )
         month = int(svc_datetime[1].lstrip('0') )
         day = int( svc_datetime[2].lstrip('0') )
-        
         # Throws error if booked time is already allotted
         if not formparams['book_exist']:
             for bkdn in bookings_done:
@@ -409,23 +409,26 @@ def is_booking_exist(request):
     service_start_time =  servicedate + " " +  request.GET['svc_start_time'] 
     svc_start_time = getust(service_start_time,user_timezone)
     errors=""
-
     service_end_time =  servicedate + " " +  request.GET['svc_end_time']
     svc_end_time = getust(service_end_time,user_timezone)
     employee_id = request.GET['employeeid']
-    bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+    if 'editflag' in request.GET and request.GET['editflag']:
+        id = request.GET['id']
+        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id).exclude(id=id)
+    else :
+        bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
+
     for bkdn in bookings_done:
             bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
 
             if bookingtime_done.day == day and bookingtime_done.month == month and bookingtime_done.year == year:
                 start_time_db = bkdn.service_start_time
                 end_time_db =  bkdn.service_end_time   
-                if (svc_start_time >= start_time_db   and svc_start_time <= end_time_db)  or \
-                (svc_end_time >= start_time_db   and svc_end_time <= end_time_db):
+                if (svc_start_time >= start_time_db   and svc_start_time < end_time_db)  or \
+                (svc_end_time > start_time_db   and svc_end_time <= end_time_db):
                     
                     errors+=" change booking time slotsb: booking already existed"
                     break
-    print(errors)                
     return HttpResponse(errors)
 @ensure_csrf_cookie
 def employee_in_booking(request):

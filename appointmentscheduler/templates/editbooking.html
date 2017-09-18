@@ -118,6 +118,9 @@
 							<input type="hidden" id="svc_end_time" name="svc_end_time" value="{{ svc_end_time }}" >
 							<input type="hidden" id="servicedetails_name" name="servicedetails_name" value="{{ bookingdetails.service.emp_name }}" >
 							<input type="hidden" id="employeeid" name="employeeid"   value="{{ bookingdetails.employee.id }}" >
+							<input type="hidden" id="booked_id" name="booked_id" value="{{ bookingdetails.id }}"  >
+							<input type="hidden" id="book_exist" name="book_exist"  value="" >
+
 														
 						</p>
 
@@ -597,10 +600,39 @@ function validatebookingform() {
 			document.getElementById("serviceerror").innerHTML = "<b>Please Add service details</b>";
 			return false ;
 	}
+	error = 0
+	$.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:is_booking_exist'  %}",
+            async: false,
+			data: {
+				"employeeid" : $('#employeeid').val(),
+				"servicedate" : $('#servicedate').val(),
+				"svc_start_time" : $('#svc_start_time').val(),
+				"svc_end_time"	: $('#svc_end_time').val(),
+				"editflag"	: 1,
+				"id" : $('#booked_id').val()
+			},
 
-	  
+            success:function(data){
+                if(data) {
+                	$('#book_exist').val("no");
+                	alert(data);
+                	error = 1
+                }
+                else {
+                	$('#book_exist').val("yes");
+                }
+            }
+    });
 
-	return true;
+	if(error) {
+	 	return false ;
+	 }
+
+	else {
+		return true;
+	}
 }
 
 function addservices() {
@@ -734,7 +766,7 @@ function listServices() {
       });
   }
 
- function selectedservice() {
+function selectedservice() {
  	
     $.ajax({
             method:'get',
