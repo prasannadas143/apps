@@ -58,22 +58,23 @@ class AppschedulerBookings(models.Model):
         related_name="service", blank=True,null=True
         
     ) 
+    
     def get_duedate(self):
         return self.date
 
     
     def get_booking_tax(self):
         tax_percentage = 10
-        tax = price_db * round(float(tax_percentage/100),2)
-        return tax
+        tax = float(self.booking_price) * float(tax_percentage/100)
+        return round(float(tax),2)
 
     def get_booking_total(self):
-        total = round(float(self.booking_price),2) + round(float(self.booking_tax),2)
-        return total
+        total = float(self.booking_price) + float(self.booking_tax)
+        return round(float(total),2)
 
-        duedate = property( get_duedate )  
-        booking_tax = property( get_booking_tax )  
-        booking_total = property( get_booking_total )  
+    duedate = property( get_duedate )  
+    booking_tax = property( get_booking_tax )  
+    booking_total = property( get_booking_total )
 
 
     class Meta:
@@ -81,22 +82,7 @@ class AppschedulerBookings(models.Model):
         db_table = 'appscheduler_bookings'
 
 
-class AppschedulerBookingsServices(models.Model):
-    tmp_hash = models.CharField(max_length=32, blank=True, null=True)
-    booking_id = models.IntegerField(blank=True, null=True)
-    service_id = models.IntegerField(blank=True, null=True)
-    employee_id = models.IntegerField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
-    start = models.TimeField(blank=True, null=True)
-    start_ts = models.IntegerField(blank=True, null=True)
-    total = models.SmallIntegerField(blank=True, null=True)
-    price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    reminder_email = models.IntegerField(blank=True, null=True)
-    reminder_sms = models.IntegerField(blank=True, null=True)
 
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_bookings_services'
 
 class AppschedulerCalendars(models.Model):
     user_id = models.IntegerField(blank=True, null=True)
@@ -148,6 +134,18 @@ class AppschedulerEmployees(models.Model):
 
     service_count = property( service_count_in_employee )
 
+class AppschedulerInvoice(models.Model):
+    booking = models.ForeignKey(
+        'AppschedulerBookings',
+        on_delete=models.CASCADE,
+        related_name="invoice", blank=True,null=True
+    
+    )    
+    invoiceid =  models.CharField(max_length=100)
+
+    class Meta:
+        # managed = False
+        db_table = 'appscheduler_invoices'
   
 
 class AppschedulerEmployeesServices(models.Model):
@@ -320,6 +318,15 @@ class AppschedulerCountries(models.Model):
         db_table = 'appscheduler_countries'
         unique_together = (('CountryName'),)
 
+# class DjangoMigrations(models.Model):
+    # app = models.CharField(max_length=255)
+    # name = models.CharField(max_length=255)
+    # applied = models.DateTimeField()
+
+    # class Meta:
+        # # managed = False
+        # db_table = 'django_migrations'
+
 
 class AppschedulerTemplates(models.Model):
     TemplateName = models.CharField(max_length=200, blank=False, null=False,unique=True)
@@ -337,13 +344,4 @@ class AppschedulerTemplatesDetails(models.Model):
     class Meta:
         # managed = False
         db_table = 'appscheduler_TemplatesDetails'
-        unique_together = (('TemplateID'),)           
-
-# class DjangoMigrations(models.Model):
-    # app = models.CharField(max_length=255)
-    # name = models.CharField(max_length=255)
-    # applied = models.DateTimeField()
-
-    # class Meta:
-        # # managed = False
-        # db_table = 'django_migrations'
+        unique_together = (('TemplateID'),)      

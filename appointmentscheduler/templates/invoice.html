@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}            
+
+<fieldset class="fieldset white">
+		<legend>Booking details</legend>
+		<div class="float_left w450">
+		
+			<p>
+				<label class="title">Status:</label>
+				<input type="text" name="booking_status" id="booking_status" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ status }}" >
+			</p>
+			
+			<p>
+				<label class="title">created date :</label>
+				<input type="text" name="created" id="created" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ created }}" >
+					
+			</p>
+			<p>
+				<label class="title">issued date :</label>
+				<input type="text" name="issued" id="issued" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ issued }}" >
+					
+			</p>
+			<p>
+				<label class="title">Due date :</label>
+				<input type="text" name="duedate" id="duedate" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ duedate }}" >
+					
+			</p>
+
+		</div>
+
+		<div id="serviceerror"></div>
+		<p>
+			<label class="title">&nbsp;</label>
+			<div id="addservices"> <table id="addservicedata" class="table table-striped table-bordered table-hover"    cellspacing="0" width="100%" >	<tr><th>Service</th><th>Price</th><th> Total </th></tr>
+					<tr ><td> {{ servicename }}  </td><td>{{ price }}</td><td> {{ total }} </td>  
+					</tr>
+				</table>
+			</div>
+			
+		</p>
+		<div class="float_left w350 t15">
+			
+			<p>
+				<label class="title">Subtotal:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="Subtotal" id="Subtotal" class="pj-form-field number w90 required" value="{{ price }}" aria-required="true">
+				</span>
+			</p>
+
+			<p>
+				<label class="title">Discount:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="tax" id="tax" class="pj-form-field number w90"   value="{{ discount }}">
+				</span>
+			</p>
+			
+			<p>
+				<label class="title">Tax:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="tax" id="tax" class="pj-form-field number w90"   value="{{ tax }}">
+				</span>
+			</p>
+			<p>
+				<label class="title">Total:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="total" id="total" class="pj-form-field number w90"  value="{{ total }}" >
+				</span>
+			</p>
+
+			<p>
+				<label class="title">Deposit:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="deposit" id="deposit" class="pj-form-field number w90"  value="{{ deposit }}" >
+				</span>
+			</p>
+			<p>
+				<label class="title">Amount Due:</label>
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+					<input type="text" name="amount_due" id="amount_due" class="pj-form-field number w90"  value="{{ amount_due }}" >
+				</span>
+			</p>
+
+		</div>
+		<div class="float_right w350 t15">
+			<p>
+				<label class="title">Notes:</label>
+				<textarea name="c_notes" id="c_notes" class="pj-form-field w334 h120"  value="{{ c_notes }}"></textarea>
+			</p>
+		</div>
+
+	</fieldset>
+{% endblock %}

@@ -356,7 +356,6 @@ def addbooking(request):
             bookingdetails['formerrors'] = deepcopy( form.errors )
             bookingdetails['customerrors'] = errors           
             form.errors["customerror"] = errors
-
         if form.is_valid():
 
             bookingobj = form.save(commit=False)
