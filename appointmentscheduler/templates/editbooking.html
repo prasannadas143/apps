@@ -95,7 +95,8 @@
     <span class="block">Fill in the form below to add a new booking. Under Clients tab you can enter information about the client. </span>
     <div> <p>{{ formerrors|default_if_none:"" }}</p> </div>
     <div> <p>{{ customerrors|default_if_none:"" }}</p> </div>
-
+	<button onclick="location.href='/appointmentschduler/getinvoice/{{bookingdetails.id}}'" type="button">
+    Get Invoice </button>
     <a href="#" class="notice-close"></a>		</div>
      <form class="form pj-form"   name="addbooking" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate"  ng-app="ServiceMod"
            action="{% url 'appointmentschduler:editbooking' bookingdetails.id %}"  method="post"  onsubmit="return validatebookingform();"  > {% csrf_token %}
@@ -120,7 +121,7 @@
 							<input type="hidden" id="employeeid" name="employeeid"   value="{{ bookingdetails.employee.id }}" >
 							<input type="hidden" id="booked_id" name="booked_id" value="{{ bookingdetails.id }}"  >
 							<input type="hidden" id="book_exist" name="book_exist"  value="" >
-
+							<input type="text" name="visitor_address" id="visitor_address" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ bookingdetails.ip }}" >
 														
 						</p>
 

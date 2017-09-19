@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, HttpResponseRedirect, get_object_or_404
-from appointmentscheduler.models import  AppschedulerWorkingTimes
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
 from django.http import JsonResponse
 import pdb,os,json,re
