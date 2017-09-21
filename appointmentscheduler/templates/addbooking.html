@@ -396,7 +396,7 @@
 					<input type="text" name="c_address_2" id="c_address_2" class="pj-form-field w500">
 					{% elif customer_fields.c_address_2 == "required"  %}
 					<input type="text" name="c_address_2" id="c_address_2" class="pj-form-field w500"
-					 ng-model="c_address_1" required>
+					 ng-model="c_address_2" required>
 					{% endif %}
 					<span ng-messages="addbooking.c_address_2.$error" style="color:maroon" role="alert">
 			 			 <span ng-message="required">Customer address2 field is required</span>
@@ -539,10 +539,10 @@ function validatebookingform() {
 
 	var reminder_sms = document.getElementById("reminder_sms");
 	$('#reminder_sms_value').val(Number(reminder_sms.checked)) ;
-	alert($('#servicedate').val());
-	alert($('#svc_start_time').val());
-	alert($('#svc_end_time').val());
-	alert( $('#employeeid').val());
+	// alert($('#servicedate').val());
+	// alert($('#svc_start_time').val());
+	// alert($('#svc_end_time').val());
+	// alert( $('#employeeid').val());
 	$.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:is_booking_exist'  %}",

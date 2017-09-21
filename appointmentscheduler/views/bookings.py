@@ -53,15 +53,15 @@ def editbooking(request, id=None):
     template_name = "editbooking.html"
 
     customer_fields = {
-    "c_country": "required",
-    "c_state" : "required",
-    "c_city" : "required",
-    "c_zip"  : "required",
+    "c_country": "no",
+    "c_state" : "no",
+    "c_city" : "no",
+    "c_zip"  : "no",
     "c_name"  : "required",
     "c_email" : "required",
     "c_phone" : "required",
-    "c_address_1" : "required",
-    "c_address_2" : "required"
+    "c_address_1" : "no",
+    "c_address_2" : "no"
     }
 
     default_status_if_paid = "confirmed"
@@ -186,13 +186,12 @@ def editbooking(request, id=None):
             bookingobj = form.save(commit=False)
             bookingobj.service = serviceobj
             bookingobj.employee = employeeobj
-            if 'c_country' in  customer_fields and  customer_fields['c_country']:
+            if 'c_country' in  customer_fields and  customer_fields['c_country'] in ['yes','required']:
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
             return HttpResponseRedirect('/appointmentschduler/bookings/')
    
-    print("Edit booking")
 
     bookingdetails['bookingdetails'] = bookings_old 
     Countries = AppschedulerCountries.objects.filter(status = 1 )
@@ -232,15 +231,15 @@ def addbooking(request):
     bookingdetails = dict()
     errors =""
     customer_fields = {
-        "c_country": "required",
-        "c_state" : "required",
-        "c_city" : "required",
-        "c_zip"  : "required",
+        "c_country": "no",
+        "c_state" : "no",
+        "c_city" : "no",
+        "c_zip"  : "no",
         "c_name"  : "required",
         "c_email" : "required",
         "c_phone" : "required",
-        "c_address_1" : "required",
-        "c_address_2" : "required"
+        "c_address_1" : "no",
+        "c_address_2" : "no"
     }
 
     default_status_if_paid = "confirmed"
@@ -267,7 +266,6 @@ def addbooking(request):
             request.POST['booking_tax'] = round(float(tax),2)
         else :
             return HttpResponse(status=403)
-
         total = round(float(price_db),2) + round(float(tax),2)
         booking_total = round(float( formparams["booking_total"] ) ,2)
         if round(float(total),2) == round(float(booking_total),2):
@@ -361,7 +359,7 @@ def addbooking(request):
             bookingobj = form.save(commit=False)
             bookingobj.service = serviceobj
             bookingobj.employee = employeeobj
-            if 'c_country' in  customer_fields and  customer_fields['c_country']:
+            if 'c_country' in  customer_fields and  customer_fields['c_country'] in ['yes','required']:
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
@@ -442,7 +440,7 @@ def employee_in_booking(request):
 
     # Prepare  timestamps from start_time to end_time with 30 min gap
     #Get the working hours for the given date
-    adates = AppschedulerDates.objects.filter(date__year=year)
+    adates = AppschedulerDates.objects.filter(date__year=year, visitor_timezone=user_timezone[0])
     booktime=None
     for dt in adates:
         getvisitortime = dt.date.astimezone(pytz.timezone(user_timezone[0]))
