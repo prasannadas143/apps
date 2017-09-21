@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
+<div class="float_left w350 t15">
+	<p>
+	 <input type="button" value="today"   id="today" name="today" />
+   <input type="button" value="tomorrow"   id="tomorrow" name="tomorrow" />
+
+	<label class="title">Date:</label>
+	<span class="pj-form-field-custom pj-form-field-custom-before">
+		<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
+		<input type="text" name="selectdate" id="selectdate" class="pj-form-field number w90"
+		 onblur="dasboard_details(this.value)">{% csrf_token %}
+
+	</span>
+
+</p>
+<div id="dashboard"> </div>
+</div>
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+
+
+$("#today").click(function(){
+	
+	dasboard_details( "today" );
+
+});
+
+$("#tomorrow").click(function(){
+	
+	dasboard_details( "tomorrow" );
+
+});
+
+function dasboard_details(selecteddate) {
+    $.ajax({
+            method:'get',
+            url:"{% url 'appointmentschduler:getdashboarddetails'  %}",
+            data: {
+            	"selecteddate": selecteddate,
+            },
+
+            success:function(response){
+                // console.log(response);
+                // dasboard_info =eval(response);
+                console.log(response);
+                var jsonData = response.bookeddetails;
+                var tablecontents = "";
+   				tablecontents = "<table><tr><th>working time</th><th>booking details</th></tr>";
+				for (var i = 0; i < jsonData.length; i++) {
+				    var data = jsonData[i];
+				    tablecontents += "<tr><td>" + data.hhmm + "</td>";
+
+				    // alert(data.hhmm);
+				    // alert(data.bookingdetail.length);
+				    tablecontents += "<td>" ;
+				    for (var j = 0; j < data.bookingdetail.length; j++) {
+
+				    	tablecontents += "</p>" ;
+				    	tablecontents += data.bookingdetail[j].employee + data.bookingdetail[j].servicename +  '<a href=' + "/appointmentschduler/editbooking/" + data.bookingdetail[j].id + ">" + data.bookingdetail[j].customername  + "</a>";
+ 
+				    	tablecontents += "</p>" ;
+
+				    }	
+				    tablecontents += "</td></tr>";
+
+				}
+			    tablecontents += "</table>";
+			    $('#dashboard').html(tablecontents);
+
+        	}     
+      });
+  }
+dasboard_details("today");
+
+</script>
+{% endblock %}

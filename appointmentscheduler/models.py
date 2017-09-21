@@ -63,18 +63,18 @@ class AppschedulerBookings(models.Model):
         return self.date
 
     
-    def get_booking_tax(self):
-        tax_percentage = 10
-        tax = float(self.booking_price) * float(tax_percentage/100)
-        return round(float(tax),2)
+    # def get_booking_tax(self):
+    #     tax_percentage = 10
+    #     tax = float(self.booking_price) * float(tax_percentage/100)
+    #     return round(float(tax),2)
 
-    def get_booking_total(self):
-        total = float(self.booking_price) + float(self.booking_tax)
-        return round(float(total),2)
+    # def get_booking_total(self):
+    #     total = float(self.booking_price) + float(self.booking_tax)
+    #     return round(float(total),2)
 
     duedate = property( get_duedate )  
-    booking_tax = property( get_booking_tax )  
-    booking_total = property( get_booking_total )
+    # booking_tax = property( get_booking_tax )  
+    # booking_total = property( get_booking_total )
 
 
     class Meta:

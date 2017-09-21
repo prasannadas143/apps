@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import service,employees,bookings
+from .views import service,employees,bookings,dashboard
 
 from .views import service,employees,invoice
 from .views.Options import General
@@ -84,5 +84,12 @@ urlpatterns = [
     url(r'^GetTemplateDetails/$', ckEditor.GetTemplateDetails, name="GetTemplateDetails"),
     url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
-    url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate")
+    url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate"),
+
+    url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
+    url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
+
+    
+
+
 ]
