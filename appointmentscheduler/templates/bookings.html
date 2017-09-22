@@ -44,6 +44,23 @@
     </div>
 </div>
 
+<div class="modal fade" id="cancelmodal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="cnbooking">cancel booking</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <script type="text/javascript">
 
 var getfilter = "all";
@@ -66,7 +83,7 @@ $("#confirmed").click(function(){
 
 $("#cancelled").click(function(){
 	
-	table.columns(4).search("cacelled", true).draw();
+	table.columns(4).search("cancelled", true).draw();
 
 });
 
@@ -187,8 +204,8 @@ function draw_datatable() {
             {
               'targets':5,
               "data": null,
-              "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
-              '<button type="button" class="btn btn-danger">Delete</button>'
+              "defaultContent": '<button type="button" class="btn btn-info" id="edit">Edit</a></button>' + '&nbsp;&nbsp' +
+              '<button type="button" class="btn btn-danger" id="delete">Delete</button> <button type="button" class="btn btn-danger" id="cancel">Cancel</button>'
             }
             
         
@@ -343,16 +360,25 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
 $('#datatables tbody').on('click', 'button', function () {
     let data = table.row($(this).parents('tr')).data();
     let class_name = $(this).attr('class');
-    if (class_name == 'btn btn-info') {
+    let op_id = $(this).attr('id');
+
+    if (op_id == 'edit') {
        
           location.href = '/appointmentschduler/editbooking/' + data.bookingid;
 
 
-    } else if( class_name == 'btn btn-danger') {
+    } else if( op_id == 'delete') {
         // DELETE button
         $('#modal_title').text('DELETE');
         $("#confirm").modal();
     }
+
+    else if( op_id == 'cancel') {
+        // DELETE button
+        $('#modal_title').text('CANCEL BOOKING');
+        $("#cancelmodal").modal();
+    }
+
 
     id = data['bookingid'];
 
@@ -372,6 +398,24 @@ $('#datatables tbody').on('click', 'button', function () {
           });         
   });
 
+
+
+$('#cancelmodal').on('click', '#cnbooking', function (e) {
+
+    $.ajax({
+          url: "/appointmentschduler/cancelbooking/" + id + "/",
+          method: 'POST'
+      }).success(function (data, textStatus, jqXHR) {
+          // cellv= table.cell(2,5).data();
+          // alert(    table.cell(1,3));
+          // alert(    table.cell(2,5).data());
+           // table.cell(1,3).data("cancelled");
+           location.reload()
+
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+      });         
+  });
 </script>
 
 

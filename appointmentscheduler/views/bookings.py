@@ -224,6 +224,17 @@ def deletebookings(request):
     print("Delete bookings")
     return  HttpResponse(json.dumps({"data" :"delete all bookings" }), content_type='application/json')   
 
+@requires_csrf_token
+def cancelbooking(request, id):
+    print("cancel bookings")
+    booking = AppschedulerBookings.objects.filter(id=id)[0]
+    booking.booking_status = "cancelled"
+    booking.save()
+    
+    return  HttpResponse(status=204)   
+
+
+
 
 @requires_csrf_token
 def addbooking(request):
