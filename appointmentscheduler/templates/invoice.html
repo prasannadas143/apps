@@ -10,6 +10,17 @@
 <fieldset class="fieldset white">
 		<legend>Booking details</legend>
 		<div class="float_left w450">
+		<a href="{% url 'appointmentschduler:getinvoicepdf' id  %}" class="button">Print</a>
+
+			<p>
+				<label class="title">Invoiceid:</label>
+				<input type="text" name="invoiceid" id="invoiceid" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ invoiceid }}" >
+			</p>
+		
+			<p>
+				<label class="title">Invoiceno:</label>
+				<input type="text" name="invoiceno" id="invoiceno" class="pj-form-field required valid" aria-required="true" aria-invalid="false" value="{{ invoiceno }}" >
+			</p>
 		
 			<p>
 				<label class="title">Status:</label>
