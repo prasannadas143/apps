@@ -217,6 +217,7 @@ def editbooking(request, id=None):
 @requires_csrf_token
 def deletebooking(request,id=None):
     print("Delete booking")
+    SendMail();
     return  HttpResponse(status=204)   
 
 @requires_csrf_token

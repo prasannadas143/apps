@@ -43,7 +43,6 @@ def GetTemplateDetails(request):
     if request.method == "GET":
         Templates = AppschedulerTemplatesDetails.objects.filter(TemplateID=request.GET['TemplateID'])
         data=dict()
-
         if Templates.count()>0 :
             Template =Templates[0]
             data['id'] = Template.id
@@ -125,16 +124,15 @@ def deleteTemplate(request,id=None):
     aCountry=AppschedulerCountries.objects.get(id=id)
     aCountry.delete()
     return HttpResponse(status=204)        
-
+1
 @csrf_exempt
 def editTemplate(request,id):
     template_name="EditTemplate.html"
-    appscheduleobj =     AppschedulerTemplates.objects.get(id=id)
-    if request.method == "POST":
-        appscheduleTemplate = addTemplate(request.POST or None ,instance=appscheduleobj)
-        if appscheduleTemplate.is_valid():
-            post = appscheduleTemplate.save()
-            return HttpResponseRedirect('/appointmentschduler/Templates/')
+    appscheduleobj =AppschedulerTemplates.objects.get(id=id)
+    appscheduleTemplate = addTemplate(request.POST or None ,instance=appscheduleobj)
+    if appscheduleTemplate.is_valid():
+        post = appscheduleTemplate.save()
+        return HttpResponseRedirect('/appointmentschduler/Templates/')
     templatename=  os.path.join('Options','Editor',template_name)
     Templateinfo = model_to_dict(appscheduleobj)
     Templateinfo['status'] = int(Templateinfo['status'])
@@ -158,7 +156,6 @@ def TemplateList(request):
         data=dict()
         data['id'] = Templ.id
         data['TemplateName'] = Templ.TemplateName
-        print(Templ.TemplateName);
         data['status'] = str(Templ.status)
         Template_info.append(data)
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')   
@@ -176,7 +173,6 @@ def TemplateDetailsList(request):
 @csrf_exempt
 def TemplateDetailsData(request):
     Template_info=[]
-    pdb.set_trace();
     if 'querydata' in request.GET:
         querydata = request.GET['querydata']
         if querydata == "all":
