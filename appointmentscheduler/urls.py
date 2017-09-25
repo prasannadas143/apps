@@ -69,10 +69,10 @@ urlpatterns = [
     url(r'^addbooking/$', bookings.addbooking, name="addbooking"),
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
-    url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="getinvoice"),
-
+    url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="cancelbooking"),
 
     url(r'^getinvoice/(?P<id>\d+)/$', invoice.generate_invoice, name ="getinvoice"),
+    url(r'^printinvoice/(?P<id>\d+)/$', invoice.print_invoice_pdf, name ="getinvoicepdf"),
 
     
 
