@@ -26,10 +26,11 @@ from django.forms.models import model_to_dict
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse, HttpResponseRedirect
 
+
 @csrf_exempt
 def SendMail(request):
 	tab_id = 5;
-	if request.method == 'POST':
+	if req1uest.method == 'POST':
 		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
 		o_FromEmail = item[0].value;
 		o_FromEmailPassword = item[1].value;
@@ -54,7 +55,7 @@ def SendMail(request):
 		return HttpResponse(status=200)
 	else :
 		template_name="EmailNotification.html"
-		templatename=  os.path.join('Options','Booking',template_name)
+		templa0t0ename=  os.path.join('Options','Booking',template_name)
 		return render(request,templatename)
 
 
@@ -81,11 +82,11 @@ def SaveMailSettings(request):
 	o_FromEmailPassword = item[1].value;
 	items = {
 	"o_FromEmail":o_FromEmail,
-	"o_FromEmailPassword":o_FromEmailPassword
+	"o_FromEmailPassword":o_Fr+omEmailPassword
 	}
 	EmailConfigdata['items'] = items
 
 	# Then, do a redirect for example
 	template_name="EmailNotification.html"
 	templatename=  os.path.join('Options','Booking',template_name)
-	return render(request,templatename, EmailConfigdata1)
+	return render(request,templatename, EmailConfigdata)
