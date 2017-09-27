@@ -7,6 +7,8 @@
 {% endblock %}
 {% block content %} 
 <div class="float_left w350 t15">
+    
+    <a href="/appointmentschduler/printdashboard?selecteddate=" id="printdate" class="button">Print</a>
 	<p>
 	 <input type="button" value="today"   id="today" name="today" />
    <input type="button" value="tomorrow"   id="tomorrow" name="tomorrow" />
@@ -16,6 +18,7 @@
 		<span class="pj-form-field-before"><abbr class="pj-form-field-icon-text">€</abbr></span>
 		<input type="text" name="selectdate" id="selectdate" class="pj-form-field number w90"
 		 onblur="dasboard_details(this.value)">{% csrf_token %}
+        <input type="hidden" name="useddate" id="useddate" val="">
 
 	</span>
 
@@ -57,20 +60,23 @@ $.ajaxSetup({
     }
 });
 
-
+var useddate;
 $("#today").click(function(){
-	
-	dasboard_details( "today" );
+	useddate ="today"
+	dasboard_details( useddate );
 
 });
 
 $("#tomorrow").click(function(){
-	
-	dasboard_details( "tomorrow" );
+	useddate ="tomorrow"
+	dasboard_details( useddate );
 
 });
 
 function dasboard_details(selecteddate) {
+    $('#useddate').val(selecteddate);
+    var link = $('#printdate');
+    link.attr('href', "/appointmentschduler/printdashboard?selecteddate=" + $('#useddate').val());   
     $.ajax({
             method:'get',
             url:"{% url 'appointmentschduler:getdashboarddetails'  %}",

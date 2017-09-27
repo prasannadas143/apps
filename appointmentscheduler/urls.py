@@ -70,6 +70,11 @@ urlpatterns = [
     url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="cancelbooking"),
     url(r'^getinvoice/(?P<id>\d+)/$', invoice.generate_invoice, name ="getinvoice"),
     url(r'^printinvoice/(?P<id>\d+)/$', invoice.print_invoice_pdf, name ="getinvoicepdf"),
+
+    url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
+    url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
+    url(r'^printdashboard/$', dashboard.printdashboard),
+
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
     url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate"),
     url(r'^Template/$', ckEditor.Template, name="Template"),
@@ -83,8 +88,9 @@ urlpatterns = [
     url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
     url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate"),
-    url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
-    url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
+
+   
+    
     url(r'^SMSConfig/$', SMS.SMSConfig, name="SMSConfig"),
     url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
     url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
