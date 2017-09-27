@@ -30,7 +30,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 @csrf_exempt
 def SendMail(request):
 	tab_id = 5;
-	if req1uest.method == 'POST':
+	if request.method == 'POST':
 		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
 		o_FromEmail = item[0].value;
 		o_FromEmailPassword = item[1].value;
@@ -55,7 +55,7 @@ def SendMail(request):
 		return HttpResponse(status=200)
 	else :
 		template_name="EmailNotification.html"
-		templa0t0ename=  os.path.join('Options','Booking',template_name)
+		templatename=  os.path.join('Options','Booking',template_name)
 		return render(request,templatename)
 
 
@@ -84,9 +84,41 @@ def SaveMailSettings(request):
 	"o_FromEmail":o_FromEmail,
 	"o_FromEmailPassword":o_Fr+omEmailPassword
 	}
-	EmailConfigdata['items'] = items
+	EmailConfigdata['items'] = i1tems
 
 	# Then, do a redirect for example
 	template_name="EmailNotification.html"
 	templatename=  os.path.join('Options','Booking',template_name)
 	return render(request,templatename, EmailConfigdata)
+
+
+def SendMailFromBooking(EmailAddress,Subject,Body):
+	tab_id = 5;
+	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+	o_FromEmail = item[0].value;
+	o_FromEmailPassword = item[1].value;
+	fromaddr = o_FromEmail
+	toaddr = EmailAddress
+	msg = MIMEMultipart()
+	msg['From'] = fromaddr
+	msg['To'] = toaddr
+	msg['Subject']  = Subject
+	body =  Body
+	# msg['EMAIL_USE_TLS'] = True
+	print(o_FromEmail);
+	print(o_FromEmailPassword);
+	print(Subject);
+	print(Body);
+	print(EmailAddress);
+	msg.attach(MIMEText(body, "html"))
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.ehlo()
+	server.starttls()
+	server.ehlo()
+	server.login(fromaddr, o_FromEmailPassword)
+	text = msg.as_string()
+	print(fromaddr);
+	print(toaddr);
+	server.sendmail(fromaddr, toaddr, text)
+	server.quit()						
+	return 

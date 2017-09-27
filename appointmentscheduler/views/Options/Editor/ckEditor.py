@@ -195,3 +195,19 @@ def TemplateDetailsData(request):
         data['status'] = str(Templ.status)
         Template_info.append(data)
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
+
+
+
+@csrf_exempt
+def GetTemplateDetailByTemplateID(TemplateID):
+    Template = AppschedulerTemplatesDetails.objects.filter(TemplateID=TemplateID)[0]
+    return Template.DesignedTemplate
+
+@csrf_exempt
+def GetSMSTemplateDetailByTemplateID(TemplateID):
+    Template = "Hi {Name}, "
+    Template+= " Your booking is {bookingID}  confirmed with us at {date} on {Day}. Please go ahead for enjoy the services at Herolocity."
+    Template+= "Thanks "
+    Template+= "Herolocity"
+    pdb.set_trace();
+    return Template

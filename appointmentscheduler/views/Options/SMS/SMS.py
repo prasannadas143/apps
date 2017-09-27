@@ -26,6 +26,30 @@ def update_value(field_id, tab_id, newstep):
    print(newstep);
    item.save()
 
+
+
+@csrf_exempt
+def SendSMSDyncamic(MobileNumber,Message):
+	pdb.set_trace();
+	toNumber = MobileNumber
+	print(toNumber);
+	Message = Message
+	print(Message);
+	tab_id = 101;
+	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+	TWILIO_ACCOUNT_SID = item[0].value;
+	print(TWILIO_ACCOUNT_SID);
+	TWILIO_AUTH_TOKEN = item[1].value;
+	print(TWILIO_AUTH_TOKEN);
+	TWILIO_FROM_NUMBER = item[2].value;
+	print(TWILIO_FROM_NUMBER);
+	pdb.set_trace();
+	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
+	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
+	print(result);
+	pdb.set_trace();
+	return HttpResponse(status=200)   
+
 @csrf_exempt
 def SendSMS(request):
 	toNumber = request.POST['MobileNumber']

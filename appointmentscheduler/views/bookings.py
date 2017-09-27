@@ -19,6 +19,9 @@ from datetime import datetime, timedelta
 import dateutil.parser as dparser
 from copy import deepcopy
 from appointmentscheduler.form.bookingform import BookingForm
+from appointmentscheduler.views.Options.SMS import SMS
+from appointmentscheduler.views.Options.Editor import ckEditor
+from appointmentscheduler.views.Options.Booking import EmailNotification
 
 @requires_csrf_token
 def show_bookings(request):
@@ -41,7 +44,6 @@ def show_bookings(request):
         format = '%Y-%m-%d %H:%M %p'
         bookingdetails["booking_time"] = getvisitortime.strftime(format)
         bookingsdetails.append( bookingdetails )
-
     return  HttpResponse(json.dumps({"data" :bookingsdetails }), content_type='application/json')   
 
 @requires_csrf_token
@@ -63,6 +65,14 @@ def editbooking(request, id=None):
     "c_address_1" : "no",
     "c_address_2" : "no"
     }
+   
+    emailres=ckEditor.GetTemplateDetailByTemplateID(2)
+    SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
+    # res=res.replace("{name}","Anupam Singh").replace("{date}","9:30").replace("{Day}","Monday")
+    SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    #SMS.SendSMSDyncamic("727-723-4147 ",res1)
+    #EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
 
     default_status_if_paid = "confirmed"
     default_status_if_not_paid = "pending"
@@ -211,9 +221,6 @@ def editbooking(request, id=None):
     return render(request, template_name, bookingdetails)
 
 
- 
-
-
 @requires_csrf_token
 def deletebooking(request,id=None):
     print("Delete booking")
@@ -227,15 +234,10 @@ def deletebookings(request):
 
 @requires_csrf_token
 def cancelbooking(request, id):
-    print("cancel bookings")
     booking = AppschedulerBookings.objects.filter(id=id)[0]
     booking.booking_status = "cancelled"
     booking.save()
-    
     return  HttpResponse(status=204)   
-
-
-
 
 @requires_csrf_token
 def addbooking(request):
