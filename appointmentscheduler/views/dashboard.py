@@ -20,6 +20,13 @@ import datetime as dtm
 import dateutil.parser as dparser
 from copy import deepcopy
 from collections import OrderedDict
+from reportlab.platypus.paragraph import Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4, inch, landscape
+from io import BytesIO
+from reportlab.lib import colors
+from reportlab.rl_config import defaultPageSize
 
 @requires_csrf_token
 def dashboard(request):
@@ -31,6 +38,64 @@ def getdashboarddetails(request):
 	template = "dashboard.html"
 	user_timezone = request.session['visitor_timezone']
 	selecteddate = request.GET['selecteddate']
+	bkddetails = getbookingdetails(user_timezone, selecteddate )
+	bookeddetails = {"bookeddetails": bkddetails}
+	return JsonResponse(bookeddetails)
+
+@requires_csrf_token
+def printdashboard(request):
+	user_timezone = request.session['visitor_timezone']
+	selecteddate = request.GET['selecteddate']
+
+
+	boookingdetails = getbookingdetails(user_timezone, selecteddate )
+	file = "dashboard.pdf"
+	response = HttpResponse(content_type='application/pdf')
+	response['Content-Disposition'] = 'inline; filename="{}"'.format(file)
+	
+	buffer = BytesIO()
+
+	doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30,leftMargin=30, topMargin=30,bottomMargin=18)
+	doc.pagesize = landscape(A4)
+
+	Catalog = []
+	styles = getSampleStyleSheet()
+
+	styles.wordWrap = 'CJK'
+	header = Paragraph("Product Inventory" , styles['Normal'])
+	Catalog.append(header)
+	style = styles['Normal']
+
+	pdfdetails  = []
+	for bkditem in boookingdetails:
+		head = []
+		pdfrow=[]
+		pdfrow.append( bkditem['hhmm'] )
+		for bkd in bkditem['bookingdetail']:
+			header1 = Paragraph( bkd["employee"] , styles['Normal'])
+			header2 = Paragraph( bkd["servicename"] , styles['Normal'])
+			header3 = Paragraph( bkd["customername"] , styles['Normal'])
+			head.extend([header1, header2, header3, Spacer(1,0.2*inch)])
+		pdfrow.append( head )
+
+		pdfdetails.append( pdfrow )
+		
+	headings = ('Working Time', 'Booking Details')
+	t = Table([headings] + pdfdetails)
+	t.setStyle(TableStyle(
+	                [('GRID', (0,0), (1,-1), 2, colors.black),
+	                 ('LINEBELOW', (0,0), (-1,0), 2, colors.red),
+	                 ('BACKGROUND', (0, 0), (-1, 0), colors.pink)]))
+	Catalog.append(t) 
+	doc.build(Catalog)
+	pdf = buffer.getvalue()
+	buffer.close()
+	response.write(pdf)
+	return response
+
+
+
+def getbookingdetails(user_timezone, selecteddate ):
 	if selecteddate == "today":
 		visitor_tz = pytz.timezone(str(user_timezone[0]))
 		datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
@@ -41,7 +106,7 @@ def getdashboarddetails(request):
 		tomorrowdate = visitor_tz.localize(datetime_without_tz, is_dst=None) + + dtm.timedelta(days=1)
 		servicedate = tomorrowdate.strftime("%Y-%m-%d")
 	else:
-		servicedate = request.GET['selecteddate']
+		servicedate = selecteddate
 		
 	# get. records for the specific date.
 
@@ -104,8 +169,13 @@ def getdashboarddetails(request):
 	for key,value in bookeddetails.items():
 		timerow = dict()
 		timerow["hhmm"] = key
+		if not len(value):
+			hhmmrecord = dict()
+			hhmmrecord["employee"] = "--"
+			hhmmrecord["servicename"] = "--"
+			hhmmrecord["customername"] = "--"
+			value = [hhmmrecord]
 		timerow["bookingdetail"] = value
-
 		bkddetails.append(timerow)
-	bookeddetails = {"bookeddetails": bkddetails}
-	return JsonResponse(bookeddetails)
+	return bkddetails
+
