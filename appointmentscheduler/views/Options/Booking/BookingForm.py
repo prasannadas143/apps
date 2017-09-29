@@ -50,7 +50,6 @@ def BookingFormOptions(request):
    o_bf_zip_id = item[11].id
 
    labels = item[11].label.split('::')[0].split('|')
-
    o_bf_termsList = item[10].value.split('::')
    o_bf_terms = o_bf_termsList[0].split('|')
    o_bf_terms_selected = o_bf_termsList[-1]
