@@ -9,7 +9,8 @@ from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
 from .views.Options.Editor import ckEditor
 from django.views.generic import TemplateView
-
+from .views.Options.SMS import SMS
+from .views.Options.Booking import Options,Payments,BookingForm,EmailNotification
 
 
 urlpatterns = [
@@ -95,8 +96,11 @@ urlpatterns = [
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
     url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate"),
 
-
-   
+    url(r'^SMSConfig/$', SMS.SMSConfig, name="SMSConfig"),
+    url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
+    url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
+    url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
+    url(r'^sendemail/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
     
 
 
