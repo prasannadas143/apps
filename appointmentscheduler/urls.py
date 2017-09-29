@@ -1,15 +1,15 @@
 from django.conf.urls import url
 from .views import service,employees,bookings,dashboard
 
-from .views import service,employees,invoice
+from .views import service,employees,invoice,exportbookings
 from .views.Options import General
-from .views.Options.Booking import Options,Payments,BookingForm,EmailNotification
+from .views.Options.Booking import Options,Payments,BookingForm
 from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
 from .views.Options.Editor import ckEditor
 from django.views.generic import TemplateView
-from .views.Options.SMS import SMS
+
 
 
 urlpatterns = [
@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^listServicesName/$', employees.services_names, name="listServicesName"),
     url(r'^deleteimage/(?P<id>\d+)/$', service.deleteimage, name="delete_service_image"),
     url(r'associated_employee_names/(?P<id>\d+)/$', service.associated_employee_names, name="assiosiated_employees"),
+
+ 
     url(r'^addemployee/$', employees.add_Employee, name="addemployee"),
     url(r'^deleteemployeeimage/(?P<id>\d+)/$', employees.deleteemployeeimage, name="deleteemployeeimage"),
     url(r'^employeelist/$', employees.employee_List, name="employeelist"),
@@ -68,12 +70,16 @@ urlpatterns = [
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
     url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="cancelbooking"),
+
     url(r'^getinvoice/(?P<id>\d+)/$', invoice.generate_invoice, name ="getinvoice"),
     url(r'^printinvoice/(?P<id>\d+)/$', invoice.print_invoice_pdf, name ="getinvoicepdf"),
 
     url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
     url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
     url(r'^printdashboard/$', dashboard.printdashboard),
+
+    url(r'^exportbookings/$', exportbookings.exportbookings, name="exportbookings"),
+
 
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
     url(r'^SaveTemplate/$', ckEditor.SaveTemplate, name="SaveTemplate"),
@@ -89,13 +95,9 @@ urlpatterns = [
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
     url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate"),
 
+
    
     
-    url(r'^SMSConfig/$', SMS.SMSConfig, name="SMSConfig"),
-    url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
-    url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
-    url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
-    url(r'^sendemail/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
 
 
 ]
