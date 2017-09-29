@@ -28,7 +28,7 @@ class AppschedulerBookings(models.Model):
     country = models.ForeignKey(
         'AppschedulerCountries',
         on_delete=models.CASCADE,
-        related_name="countries", blank=True,null=True
+        related_name="country", blank=True,null=True
         
     ) 
     c_city = models.CharField(max_length=255, blank=True, null=True)
@@ -344,4 +344,13 @@ class AppschedulerTemplatesDetails(models.Model):
     class Meta:
         # managed = False
         db_table = 'appscheduler_TemplatesDetails'
-        unique_together = (('TemplateID'),)      
+        unique_together = (('TemplateID'),)  
+
+class DjangoMigrations(models.Model):
+    app = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    applied = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_migrations'

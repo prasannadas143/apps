@@ -24,8 +24,9 @@ from appointmentscheduler.form.bookingform import BookingForm
 def show_bookings(request):
     template_name = "bookings.html"
     bookingdata = dict()
-    bookings = AppschedulerBookings.objects.all()
     user_timezone = request.session['visitor_timezone']
+    bookings = AppschedulerBookings.objects.all()
+
     bookingsdetails = []
     for booking in  reversed(list(bookings)):
         bookingdetails = dict()

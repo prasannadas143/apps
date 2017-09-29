@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from .views import service,employees,bookings,dashboard
 
-from .views import service,employees,invoice
+from .views import service,employees,invoice,exportbookings
 from .views.Options import General
 from .views.Options.Booking import Options,Payments,BookingForm
 from .views.Options.WorkingTime import Default, DefaultTime
@@ -78,6 +78,7 @@ urlpatterns = [
     url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
     url(r'^printdashboard/$', dashboard.printdashboard),
 
+    url(r'^exportbookings/$', exportbookings.exportbookings, name="exportbookings"),
 
 
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),
@@ -93,6 +94,7 @@ urlpatterns = [
     url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
     url(r'^UpdateTemplate/(?P<id>\d+)/$', ckEditor.UpdateTemplate, name="UpdateTemplate"),
+
 
    
     

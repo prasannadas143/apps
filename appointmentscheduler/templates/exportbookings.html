@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
+<div>{{ error_message|default:"" }}</div>
+
+<form action="/appointmentschduler/exportbookings/" method="post" id="frmExportBookings" class="form pj-form">{% csrf_token %}
+		<input type="hidden" name="bookings_export" value="1">
+		<p>
+			<label class="title">Format</label>
+			<span class="inline_block">
+				<select name="format" id="format" class="pj-form-field w100">
+					<option value="csv" selected="selected">CSV</option><option value="pdf">PDF</option><option value="xml">XML</option>				</select>
+			</span>
+		</p>
+		<p>
+			<label class="title">Type</label>
+			<span class="inline_block t5">
+				<span class="block float_left r10">
+					<input type="radio" name="type" id="file" value="file" class="float_left r3">
+					<span class="inline_block">
+						<label for="file">File</label>
+					</span>
+				</span>
+				<span class="block float_left">
+					<input type="radio" name="type" id="feed" value="feed" checked="checked" class="float_left r3">
+					<span class="inline_block">
+						<label for="feed">Feed</label>
+					</span>
+				</span>
+			</span>
+		</p>
+		<p class="tsPassowrdContainer" style="display: block">
+			<label class="title">Enter password</label>
+			<span class="pj-form-field-custom pj-form-field-custom-before">
+				<span class="pj-form-field-before"><abbr class="pj-form-field-icon-password"></abbr></span>
+				<input type="text" id="feed_password" name="password" class="pj-form-field w200" value="" autocomplete="off" >
+			</span>
+		</p>
+		<p>
+			<label class="title">Bookings</label>
+			<span class="inline_block">
+				
+				<span id="next_label" class="block float_left overflow r20" style="display: block;">
+					<select name="coming_period" id="coming_period" class="pj-form-field w150">
+						<option value="today" selected="selected">Today</option><option value="tomorrow">Tomorrow</option><option value="thisweek">This week</option><option value="nextweek">Next week</option><option value="thismonth">This month</option><option value="nextmonth">Next month</option><option value="coming">Coming</option>			</select>
+				</span>
+			
+			</span>
+			<p>
+			<label class="title">&nbsp;</label>
+			<input type="submit" id="tsSubmitButton" value="Export" class="pj-button" />
+		</p>
+
+		</p>
+		
+		<p>
+			<label class="title">&nbsp;</label>
+			<input type="submit" id="tsSubmitButton" value="Get Feed URL" class="pj-button">
+		</p>
+					<div class="tsFeedContainer">
+				<br>
+						<div class="notice-box">
+			<span class="notice-info">&nbsp;</span>
+			<span class="block bold">Bookings Feed URL</span><span class="block">Use the URL below to have access to all bookings. Please, note that if you change the password the URL will change too as password is used in the URL itself so no one else can open it.</span><a href="#" class="notice-close"></a>		</div>
+						<span class="inline_block">
+					<textarea id="bookings_feed" name="bookings_feed" class="pj-form-field h80" style="width: 726px;"></textarea>
+				</span>
+			</div>
+
+				</form>
+
+{% endblock %}
