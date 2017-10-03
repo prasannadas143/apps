@@ -13,78 +13,91 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, \
     Table, TableStyle
+from django.contrib.syndication.views import Feed 
+from django.core.urlresolvers import reverse
 
-def exportbookings(request):
-	error_message = ""
-	if request.method == "POST":
-		# pdb.set_trace()
-		duration = request.POST['coming_period']
-		docformat = request.POST['format']
-		operation_type = request.POST['type']
-
-		today = datetime.now()
-		user_timezone = request.session['visitor_timezone']
-		visitor_tz = pytz.timezone(user_timezone[0])
-		date_string= today.strftime("%Y-%m-%d") 
-		datetime_without_tz_today  =dparser.parse(date_string)
-		datetime_with_tz_today = visitor_tz.localize(datetime_without_tz_today, is_dst=None)
-		# print(datetime_with_tz_today)	
-		bookingsdetails = list()
-		if duration == "coming":
-			bookings_done = AppschedulerBookings.objects.all()
-			for bkdn in bookings_done:
-				bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0]))
-				if bookingtime_done > datetime_with_tz_today:
+def getbookinginfos(duration, user_timezone):
+	today = datetime.now()
+	visitor_tz = pytz.timezone(user_timezone[0])
+	date_string= today.strftime("%Y-%m-%d") 
+	datetime_without_tz_today  =dparser.parse(date_string)
+	datetime_with_tz_today = visitor_tz.localize(datetime_without_tz_today, is_dst=None)
+	# print(datetime_with_tz_today)	
+	bookingsdetails = list()
+	if duration == "coming":
+		bookings_done = AppschedulerBookings.objects.all()
+		for bkdn in bookings_done:
+			bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0]))
+			if bookingtime_done > datetime_with_tz_today:
+				bookingid = bkdn.id
+				bookingdetails = getbookingdetails( bookingid, user_timezone ) 
+				bookingsdetails.append( bookingdetails )
+	else:
+		dates_list = getdatelist(duration, visitor_tz, datetime_with_tz_today )
+		year = dates_list[0].year
+		bookings_done = AppschedulerBookings.objects.filter(date__year = year)
+		for bkdn in bookings_done:
+			bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
+			for dateselected in dates_list:
+				if bookingtime_done.day == dateselected.day and bookingtime_done.month == dateselected.month:
+		#create a booked list and prepare dictionary
 					bookingid = bkdn.id
 					bookingdetails = getbookingdetails( bookingid, user_timezone ) 
 					bookingsdetails.append( bookingdetails )
-		else:
-			dates_list = getdatelist(duration, visitor_tz, datetime_with_tz_today )
-			year = dates_list[0].year
-			bookings_done = AppschedulerBookings.objects.filter(date__year = year)
-			for bkdn in bookings_done:
-				bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
-				for dateselected in dates_list:
-					if bookingtime_done.day == dateselected.day and bookingtime_done.month == dateselected.month:
-			#create a booked list and prepare dictionary
-						bookingid = bkdn.id
-						bookingdetails = getbookingdetails( bookingid, user_timezone ) 
-						bookingsdetails.append( bookingdetails )
+	return bookingsdetails
+
+
+def exportbookings(request):
+	error_message = ""
+	pdb.set_trace()
+	if request.GET :
+		# pdb.set_trace()
+		duration = request.GET['coming_period']
+		docformat = request.GET['format']
+		operation_type = request.GET['type']
+		user_timezone = request.session['visitor_timezone']
+
+		bookingsdetails = getbookinginfos(duration, user_timezone)
+		
 		# create xml or pdf or csv as requested  
 		
+		if operation_type == "feed":
+			pass
+			instance = BookingsFeed(bookingsdetails)
 		#get the booking id and all other details and create dictionary
-		if len(bookingsdetails):
-			if docformat == "csv":
-				response = HttpResponse(content_type='text/csv')
-				response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
-				headings = bookingsdetails[0].keys()
-				csvWriter = csv.DictWriter(response, fieldnames=headings, dialect='excel', quoting=csv.QUOTE_NONNUMERIC)
-				csvWriter.writeheader()
-				for data in bookingsdetails:
-					csvWriter.writerow(data)
-			if docformat == "xml":
-				xml = dicttoxml(bookingsdetails, custom_root='Bookings', attr_type=False)
-				response = HttpResponse( xml,content_type='application/xml')
-				response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
+		elif operation_type == "file":
+			if len(bookingsdetails):
+				if docformat == "csv":
+					response = HttpResponse(content_type='text/csv')
+					response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
+					headings = bookingsdetails[0].keys()
+					csvWriter = csv.DictWriter(response, fieldnames=headings, dialect='excel', quoting=csv.QUOTE_NONNUMERIC)
+					csvWriter.writeheader()
+					for data in bookingsdetails:
+						csvWriter.writerow(data)
+				if docformat == "xml":
+					xml = dicttoxml(bookingsdetails, custom_root='Bookings', attr_type=False)
+					response = HttpResponse( xml,content_type='application/xml')
+					response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
 
-			if docformat == "pdf":
-				fields =list()
-				for key in bookingsdetails[0].keys():
+				if docformat == "pdf":
+					fields =list()
+					for key in bookingsdetails[0].keys():
 
-					fields.append((key,key))
-				buffer = BytesIO()
+						fields.append((key,key))
+					buffer = BytesIO()
 
-				doc = DataToPdf(fields, bookingsdetails, 
-				                title='Log Files Over 1MB')
-				doc.export(buffer)
-				response = HttpResponse( content_type='application/xml')
-				response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
-				pdf = buffer.getvalue()
-				buffer.close()
-				response.write(pdf)
-			return 	response
-		else:
-			error_message ="Booking not available for this " + duration
+					doc = DataToPdf(fields, bookingsdetails, 
+					                title='Booking Details')
+					doc.export(buffer)
+					response = HttpResponse( content_type='application/xml')
+					response['Content-Disposition'] = 'attachment; filename='+ "bookings" + duration + "." + docformat
+					pdf = buffer.getvalue()
+					buffer.close()
+					response.write(pdf)
+				return 	response
+			else:
+				error_message ="Booking not available for this " + duration
 	template_name = "exportbookings.html"
 	return render(request, template_name, {"error_message" : error_message })   
 
@@ -166,6 +179,34 @@ def getdatelist(duration, visitor_tz, datetime_with_tz_today ):
 		print("==================================================================================")
 		dates_list = [ first_day_month + timedelta(n) for n in range(int((last_day_month - first_day_month).days)+1)]
 	return dates_list
+
+
+class BookingsFeed(Feed):
+	# description_template = "articles.html"
+	title = "Bookings"
+	description = "Booking Details"
+	link = "booking"
+	# title_template = 'feeds/title.html'
+	# description_template = 'feeds/description.html'
+	# def __init__(self, bookingsdetails):
+	# 	self.data = bookingsdetails
+
+	def items(self):
+		data = []
+		user_timezone = ['Europe/Helsinki']
+		duration = "thismonth"
+
+		bookingsdetails = getbookinginfos(duration, user_timezone)
+
+		return  bookingsdetails
+
+	# item_link is only needed if NewsItem has no get_absolute_url method.
+	def item_link(self, item):
+	    return ''
+
+	def item_description(self, item):
+		return self.description
+
 
 
 

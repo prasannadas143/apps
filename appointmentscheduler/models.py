@@ -59,6 +59,9 @@ class AppschedulerBookings(models.Model):
         
     ) 
     
+    def get_absolute_url(self):
+        return "/editbooking/%i/" % self.id
+
     def get_duedate(self):
         return self.date
 

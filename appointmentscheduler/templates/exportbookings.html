@@ -8,7 +8,7 @@
 {% block content %} 
 <div>{{ error_message|default:"" }}</div>
 
-<form action="/appointmentschduler/exportbookings/" method="post" id="frmExportBookings" class="form pj-form">{% csrf_token %}
+<form action="/appointmentschduler/exportbookings/" method="get" id="frmExportBookings" class="form pj-form">
 		<input type="hidden" name="bookings_export" value="1">
 		<p>
 			<label class="title">Format</label>
