@@ -11,20 +11,19 @@ from appointmentscheduler.models import AppschedulerOptions
 from django.http import JsonResponse
 import datetime, pdb
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-import io
-from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.files import File
 from base64 import decodestring
 from django.http import JsonResponse
-import datetime,pdb,os,json,re
+import datetime,pdb,os,json,re,pytz
 from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.forms.models import model_to_dict
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse, HttpResponseRedirect
+from appointmentscheduler.views.Options.Editor import ckEditor
+from appointmentscheduler.models import AppschedulerBookings
 
 
 @csrf_exempt
@@ -41,7 +40,7 @@ def SendMail(request):
 		msg['To'] = toaddr
 		msg['Subject']  = request.POST['Subject']
 		body =  request.POST['Body']
-		msg['EMAIL_USE_TLS'] = True
+		# msg['EMAIL_USE_TLS'] = True
 		msg.attach(MIMEText(body, 'plain'))
 		server = smtplib.SMTP('smtp.gmail.com', 587)
 		server.starttls()
@@ -54,9 +53,20 @@ def SendMail(request):
 		server.quit()						
 		return HttpResponse(status=200)
 	else :
+		tab_id = 5;
+
+		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+		o_FromEmail = item[0].value;
+		o_FromEmailPassword = item[1].value;
+		items = {
+		"o_FromEmail":o_FromEmail,
+		"o_FromEmailPassword":o_FromEmailPassword
+		}
+		EmailConfigdata = dict()
+		EmailConfigdata['items'] = items
 		template_name="EmailNotification.html"
 		templatename=  os.path.join('Options','Booking',template_name)
-		return render(request,templatename)
+		return render(request,templatename, EmailConfigdata)
 
 
 def update_value(field_id, tab_id, newstep):
@@ -82,9 +92,9 @@ def SaveMailSettings(request):
 	o_FromEmailPassword = item[1].value;
 	items = {
 	"o_FromEmail":o_FromEmail,
-	"o_FromEmailPassword":o_Fr+omEmailPassword
+	"o_FromEmailPassword":o_FromEmailPassword
 	}
-	EmailConfigdata['items'] = i1tems
+	EmailConfigdata['items'] = items
 
 	# Then, do a redirect for example
 	template_name="EmailNotification.html"
@@ -92,25 +102,38 @@ def SaveMailSettings(request):
 	return render(request,templatename, EmailConfigdata)
 
 
-def SendMailFromBooking(EmailAddress,Subject,Body):
+def SendMailFromBooking(bookingid):
+	pdb.set_trace()
+	templateid = 2
+	tmpdtls=ckEditor.GetTemplateDetailByTemplateID(templateid)
+	emailres = tmpdtls.DesignedTemplate
+	Subject = tmpdtls.subject
+
+
 	tab_id = 5;
 	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
 	o_FromEmail = item[0].value;
 	o_FromEmailPassword = item[1].value;
+	booking = AppschedulerBookings.objects.filter(id = bookingid)[0]
+	customer_name = booking.c_name
+	bookingid = booking.bookingid
+	date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
+	day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+	toaddr = booking.c_email
+
 	fromaddr = o_FromEmail
-	toaddr = EmailAddress
+	emailbody = emailres.format(Name=customer_name,bookingID=bookingid, date=date,Day=day)
+
 	msg = MIMEMultipart()
 	msg['From'] = fromaddr
 	msg['To'] = toaddr
 	msg['Subject']  = Subject
-	body =  Body
 	# msg['EMAIL_USE_TLS'] = True
-	print(o_FromEmail);
+	print(fromaddr);
 	print(o_FromEmailPassword);
 	print(Subject);
-	print(Body);
-	print(EmailAddress);
-	msg.attach(MIMEText(body, "html"))
+	print(emailbody);
+	msg.attach(MIMEText(emailbody, "html"))
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()

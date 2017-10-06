@@ -22,6 +22,7 @@ from appointmentscheduler.form.bookingform import BookingForm
 from appointmentscheduler.views.Options.SMS import SMS
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.views.Options.Booking import EmailNotification
+from appointmentscheduler.tasks import send_email
 
 @requires_csrf_token
 def show_bookings(request):
@@ -67,13 +68,13 @@ def editbooking(request, id=None):
     "c_address_2" : "no"
     }
    
-    emailres=ckEditor.GetTemplateDetailByTemplateID(2)
-    SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
-    # res=res.replace("{name}","Anupam Singh").replace("{date}","9:30").replace("{Day}","Monday")
-    SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
-    emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
-    #SMS.SendSMSDyncamic("727-723-4147 ",res1)
-    #EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
+    # emailres=ckEditor.GetTemplateDetailByTemplateID(2)
+    # SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
+    # # res=res.replace("{name}","Anupam Singh").replace("{date}","9:30").replace("{Day}","Monday")
+    # SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    # emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    # #SMS.SendSMSDyncamic("727-723-4147 ",res1)
+    # #EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
 
     default_status_if_paid = "confirmed"
     default_status_if_not_paid = "pending"
@@ -149,12 +150,16 @@ def editbooking(request, id=None):
 
         request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
         request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
-        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
-        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        # request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        # request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
         svc_start_time = request.POST['service_start_time']
         svc_end_time = request.POST['service_end_time']
+        visitor_tz = pytz.timezone(str(user_timezone[0]))
+
+        request.POST['time_zone'] =  visitor_tz
+
         bookings_done = AppschedulerBookings.objects.filter(employee=employee_id).exclude(id=id)
         svc_datetime = servicedate.split('-')
         year = int(svc_datetime[0].lstrip('0') )
@@ -189,7 +194,7 @@ def editbooking(request, id=None):
             form.errors["customerror"] = errors
 
 
-
+        pdb.set_trace()
         # if form.errors:
         #     return render(request, template_name, {"form" : form })
         if form.is_valid():
@@ -201,8 +206,11 @@ def editbooking(request, id=None):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
+            # send_email.delay(bookingobj)
+
+            # EmailNotification.SendMailFromBooking(bookingobj.id)            
             return HttpResponseRedirect('/appointmentschduler/bookings/')
-   
+               
 
     bookingdetails['bookingdetails'] = bookings_old 
     Countries = AppschedulerCountries.objects.filter(status = 1 )
@@ -221,6 +229,14 @@ def editbooking(request, id=None):
     bookingdetails['svc_end_time'] = bookings_old.service_end_time.astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
     return render(request, template_name, bookingdetails)
 
+def sendsms(id):
+    emailres=ckEditor.GetTemplateDetailByTemplateID(2)
+    emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
+
+    # SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
+    # SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
+    # SMS.SendSMSDyncamic("727-723-4147 ",SMSRes1)
 
 @requires_csrf_token
 def deletebooking(request,id=None):
@@ -333,8 +349,10 @@ def addbooking(request):
 
         request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
         request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
-        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
-        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        # request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        # request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        visitor_tz = pytz.timezone(str(user_timezone[0]))
+        request.POST['time_zone'] = visitor_tz
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
         bookings_done = AppschedulerBookings.objects.filter(employee=employee_id)
@@ -364,7 +382,7 @@ def addbooking(request):
                     if not customer_fields[field]:
                         errors += field + " field required"
         form = BookingForm(request.POST or None )
-
+        pdb.set_trace()
         if errors :
             bookingdetails['formerrors'] = deepcopy( form.errors )
             bookingdetails['customerrors'] = errors           
@@ -378,6 +396,7 @@ def addbooking(request):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
+
             return HttpResponseRedirect('/appointmentschduler/bookings/')
 
     bookingid = "BI" + str(uuid.uuid1().node)

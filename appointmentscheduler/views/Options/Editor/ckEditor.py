@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
-from appointmentscheduler.models import AppschedulerCountries
 from django.http import JsonResponse
 import datetime, pdb
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
@@ -21,7 +20,7 @@ from appointmentscheduler.form.Options.Editor.AddTemplate import addTemplate
 from appointmentscheduler.form.Options.Editor.TemplateDetails import TemplateDetails, AppschedulerTemplatesDetails
 from django.forms.models import model_to_dict
 from appsplatform.settings import JSONFILES
-from appointmentscheduler.models import  AppschedulerTemplates
+from appointmentscheduler.models import  AppschedulerTemplates, AppschedulerCountries
 
 
 @csrf_exempt
@@ -54,13 +53,14 @@ def GetTemplateDetails(request):
 
 @csrf_exempt
 def GetTemplateList(request):
-	Templates = AppschedulerTemplates.objects.all()
-	for Templ in reversed(list(Templates)):
-		data=dict()
-		data['id'] = Templ.id
-		data['templatename'] = Templ.TemplateName
-		Template_info.append(data)
-	return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json') 	
+    Templates = AppschedulerTemplates.objects.all()
+    Template_info = []
+    for Templ in reversed(list(Templates)):
+        data=dict()
+        data['id'] = Templ.id
+        data['templatename'] = Templ.TemplateName
+        Template_info.append(data)
+    return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
 
 @csrf_exempt
 
@@ -136,7 +136,7 @@ def editTemplate(request,id):
     templatename=  os.path.join('Options','Editor',template_name)
     Templateinfo = model_to_dict(appscheduleobj)
     Templateinfo['status'] = int(Templateinfo['status'])
-    return render(request,templatename, {'appscheduleTemplate': Tenfo, "id" : id } )
+    return render(request,templatename, {'appscheduleTemplate': Templateinfo, "id" : id } )
 
 @csrf_exempt
 def TemplateList(request):
@@ -201,7 +201,7 @@ def TemplateDetailsData(request):
 @csrf_exempt
 def GetTemplateDetailByTemplateID(TemplateID):
     Template = AppschedulerTemplatesDetails.objects.filter(TemplateID=TemplateID)[0]
-    return Template.DesignedTemplate
+    return Template
 
 @csrf_exempt
 def GetSMSTemplateDetailByTemplateID(TemplateID):

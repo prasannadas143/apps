@@ -30,7 +30,6 @@ def update_value(field_id, tab_id, newstep):
 
 @csrf_exempt
 def SendSMSDyncamic(MobileNumber,Message):
-	pdb.set_trace();
 	toNumber = MobileNumber
 	print(toNumber);
 	Message = Message
@@ -43,11 +42,9 @@ def SendSMSDyncamic(MobileNumber,Message):
 	print(TWILIO_AUTH_TOKEN);
 	TWILIO_FROM_NUMBER = item[2].value;
 	print(TWILIO_FROM_NUMBER);
-	pdb.set_trace();
 	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
 	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
 	print(result);
-	pdb.set_trace();
 	return HttpResponse(status=200)   
 
 @csrf_exempt
