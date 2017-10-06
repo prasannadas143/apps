@@ -27,9 +27,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Address of Redis instance, our Celery broker
+CELERY_BROKER_URL = 'amqp://localhost'
+
+# Reminder time: how early text messages are sent in advance of appointments
+REMINDER_TIME = 30 # minutes
 
 # Application definition
-
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# CELERY_ENABLE_UTC = True
+CELERY_ALWAYS_EAGER = False
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,11 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'timezone_field',
     'phonenumber_field',
     'djng',
     'bootstrap3',
     'appointmentscheduler',
     'appointmentscheduler.templatetags',
+    # 'djcelery',
 
 ]
 
@@ -128,7 +137,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -139,8 +147,7 @@ USE_TZ = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'daspython@gmail.com'
-EMAIL_HOST_PASSWORD = "Putu2#orissa"
+
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -161,3 +168,7 @@ STATICFILES_FINDERS = (
 
 STATIC_URL = '/static/'
 JSONFILES = os.path.join(BASE_DIR, 'appointmentscheduler','views', 'Options','Json')
+
+import djcelery
+djcelery.setup_loader()
+# BROKER_URL="django:// "
