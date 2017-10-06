@@ -1,4 +1,3 @@
-from appointmentscheduler.models import AppschedulerTemplatesDetails
 from django import forms
 
 from appointmentscheduler.models import  AppschedulerTemplatesDetails

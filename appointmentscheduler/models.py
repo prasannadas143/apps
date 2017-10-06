@@ -9,10 +9,15 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.text import slugify
+from django.conf import settings
+from .celery import app as celery_app
 
-import re,pdb,os,datetime,uuid
+import re,pdb,os,datetime,uuid,arrow
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core import validators
+from timezone_field import TimeZoneField
+from django.core.exceptions import ValidationError
+
 
 
 class AppschedulerBookings(models.Model):
@@ -46,6 +51,13 @@ class AppschedulerBookings(models.Model):
     subscribed_sms = models.BooleanField(default=False)
     reminder_email = models.BooleanField(default=False)
     reminder_sms = models.BooleanField(default=False)
+    time_zone = TimeZoneField(default='US/Pacific')
+
+    # Additional fields not visible to users
+    task_id_sms = models.CharField(max_length=50, blank=True, editable=False)
+    task_id_email = models.CharField(max_length=50, blank=True, editable=False)
+
+    
     employee = models.ForeignKey(
         'AppschedulerEmployees',
         on_delete=models.CASCADE,
@@ -59,26 +71,77 @@ class AppschedulerBookings(models.Model):
         
     ) 
     
+    def __str__(self):
+        return 'Appointment #{0} - {1}'.format(self.pk, self.name)
+        
     def get_absolute_url(self):
         return "/editbooking/%i/" % self.id
 
     def get_duedate(self):
         return self.date
 
-    
-    # def get_booking_tax(self):
-    #     tax_percentage = 10
-    #     tax = float(self.booking_price) * float(tax_percentage/100)
-    #     return round(float(tax),2)
+    def clean(self):
+        """Checks that appointments are not scheduled in the past"""
 
-    # def get_booking_total(self):
-    #     total = float(self.booking_price) + float(self.booking_tax)
-    #     return round(float(total),2)
+        appointment_time = arrow.get(self.service_start_time, self.time_zone.zone)
+
+        # if appointment_time < arrow.utcnow():
+        #     raise ValidationError('You cannot schedule an appointment for the past. Please check your time and time_zone')
+
+    def schedule_sms(self):
+        """Schedules a Celery task to send a reminder about this appointment"""
+
+        # Calculate the correct time to send this reminder
+        appointment_time = arrow.get(self.service_start_time)
+        reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
+
+        # Schedule the Celery task
+        from .tasks import send_sms
+        result = send_sms.apply_async((self.pk,), eta=reminder_time)
+
+        return result.id
+
+    def schedule_email(self):
+        """Schedules a Celery task to send a reminder about this appointment"""
+
+        # Calculate the correct time to send this reminder
+        # appointment_time = arrow.get(self.service_start_time, self.time_zone.zone)
+        appointment_time = arrow.get(self.service_start_time)
+
+        reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
+
+        # Schedule the Celery task
+        from .tasks import send_email
+        # result = send_email.apply_async((self.pk,), eta=reminder_time)
+        send_email.apply_async((self,))
+        result = send_email.apply_async((self,), eta=reminder_time)
+
+        return result.id
+
+    def save(self, *args, **kwargs):
+        """Custom save method which also schedules a reminder"""
+        # Check if we have scheduled a reminder for this appointment before
+        if self.task_id_sms:
+            # Revoke that task in case its time has changed
+            celery_app.control.revoke(self.task_id_sms)
+        if self.task_id_email:
+            # Revoke that task in case its time has changed
+            celery_app.control.revoke(self.task_id_sms)
+        # Save our appointment, which populates self.pk,
+        # which is used in schedule_reminder
+        super(AppschedulerBookings, self).save(*args, **kwargs)
+
+        # Schedule a new reminder task for this appointment1
+        # self.task_id_sms = self.schedule_sms()
+        
+        self.task_id_email = self.schedule_email()
+
+        # Save our appointment again, with the new task_id
+        super(AppschedulerBookings, self).save(*args, **kwargs)    
+  
 
     duedate = property( get_duedate )  
-    # booking_tax = property( get_booking_tax )  
-    # booking_total = property( get_booking_total )
-
+   
 
     class Meta:
         # managed = False
