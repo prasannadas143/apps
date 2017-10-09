@@ -111,12 +111,18 @@ class AppschedulerBookings(models.Model):
         reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
 
         # Schedule the Celery task
-        from .tasks import send_email
+        from .tasks import send_email,send_sms
         # result = send_email.apply_async((self.pk,), eta=reminder_time)
-        send_email.apply_async((self,))
-        result = send_email.apply_async((self,), eta=reminder_time)
+        if self.subscribed_email:
+            send_email.apply_async((self.id,))
+        if self.reminder_email:
+            self.task_id_email = send_email.apply_async((self.id,), eta=reminder_time)
+        if self.subscribed_sms:
+            send_sms.apply_async((self.id,))
+        if self.reminder_sms:
+            self.task_id_sms = send_sms.apply_async((self.id,), eta=reminder_time)
 
-        return result.id
+        return 
 
     def save(self, *args, **kwargs):
         """Custom save method which also schedules a reminder"""
@@ -134,7 +140,7 @@ class AppschedulerBookings(models.Model):
         # Schedule a new reminder task for this appointment1
         # self.task_id_sms = self.schedule_sms()
         
-        self.task_id_email = self.schedule_email()
+        self.schedule_email()
 
         # Save our appointment again, with the new task_id
         super(AppschedulerBookings, self).save(*args, **kwargs)    

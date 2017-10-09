@@ -61,16 +61,13 @@ def SendSMS(request):
 	print(TWILIO_AUTH_TOKEN);
 	TWILIO_FROM_NUMBER = item[2].value;
 	print(TWILIO_FROM_NUMBER);
-	pdb.set_trace();
 	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
 	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
 	print(result);
-	pdb.set_trace();
 	return HttpResponse(status=200)
 
 @csrf_exempt
 def SMSConfig(request):
-	pdb.set_trace();
 	tab_id = 101;
 	message=None
 	Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)

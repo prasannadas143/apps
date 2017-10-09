@@ -66,16 +66,14 @@ def GetTemplateList(request):
 
 
 def SaveTemplate(request):
-    pdb.set_trace();
     if request.method == 'POST': 
         appscheduleTemplate = TemplateDetails(request.POST or None)
         if appscheduleTemplate.is_valid():
             appscheduleTemplate.save()
-        return HttpResponse(status=200)
+    return HttpResponse(status=200)
 
 @csrf_exempt
 def UpdateTemplate(request,id=None):
-    pdb.set_trace();
     if request.method == 'POST':
         Templates = AppschedulerTemplatesDetails.objects.filter(id=id)[0]
         appscheduleTemplate = TemplateDetails(request.POST or None,instance=Templates)
@@ -205,9 +203,7 @@ def GetTemplateDetailByTemplateID(TemplateID):
 
 @csrf_exempt
 def GetSMSTemplateDetailByTemplateID(TemplateID):
-    Template = "Hi {Name}, "
-    Template+= " Your booking is {bookingID}  confirmed with us at {date} on {Day}. Please go ahead for enjoy the services at Herolocity."
+    Template = "Hi {Name},  Your booking is {bookingid} confirmed with us at {date} on {Day}. Please go ahead for enjoy the services at Herolocity."
     Template+= "Thanks "
     Template+= "Herolocity"
-    pdb.set_trace();
     return Template

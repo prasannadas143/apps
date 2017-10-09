@@ -150,8 +150,8 @@ def editbooking(request, id=None):
 
         request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
         request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
-        # request.POST['reminder_email'] = int(formparams['reminder_email_value'])
-        # request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         request.POST['ip'] =  request.session['visitor_ip'] 
         request.POST['created'] = getust(str(datetime.now()), user_timezone)
         svc_start_time = request.POST['service_start_time']
@@ -166,6 +166,8 @@ def editbooking(request, id=None):
         month = int(svc_datetime[1].lstrip('0') )
         day = int( svc_datetime[2].lstrip('0') )
 
+
+      
         if not formparams['book_exist']:
             for bkdn in bookings_done:
                 bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
@@ -194,7 +196,6 @@ def editbooking(request, id=None):
             form.errors["customerror"] = errors
 
 
-        pdb.set_trace()
         # if form.errors:
         #     return render(request, template_name, {"form" : form })
         if form.is_valid():
@@ -349,8 +350,8 @@ def addbooking(request):
 
         request.POST['subscribed_email'] = int(formparams['subscribed_email_value'])
         request.POST['subscribed_sms'] = int(formparams['subscribed_sms_value'])
-        # request.POST['reminder_email'] = int(formparams['reminder_email_value'])
-        # request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
+        request.POST['reminder_email'] = int(formparams['reminder_email_value'])
+        request.POST['reminder_sms'] = int(formparams['reminder_sms_value'])
         visitor_tz = pytz.timezone(str(user_timezone[0]))
         request.POST['time_zone'] = visitor_tz
         request.POST['ip'] =  request.session['visitor_ip'] 
@@ -382,7 +383,6 @@ def addbooking(request):
                     if not customer_fields[field]:
                         errors += field + " field required"
         form = BookingForm(request.POST or None )
-        pdb.set_trace()
         if errors :
             bookingdetails['formerrors'] = deepcopy( form.errors )
             bookingdetails['customerrors'] = errors           
