@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 # Address of Redis instance, our Celery broker
 CELERY_BROKER_URL = 'amqp://localhost'
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERYD_TASK_TIME_LIMIT = 60
 
 # Reminder time: how early text messages are sent in advance of appointments
 REMINDER_TIME = 30 # minutes

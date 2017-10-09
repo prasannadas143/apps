@@ -8,6 +8,8 @@ from django.conf import settings
 import arrow
 import os,pdb
 import smtplib
+from twilio.rest import Client
+
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -20,61 +22,90 @@ from appointmentscheduler.models import AppschedulerBookings, AppschedulerOption
 # Uses credentials from the TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN
 # environment variables
 
-@shared_task
-def send_sms(appointment_id):
+@task(bind=True, default_retry_delay=2*60)  
+def send_sms(self,bookingid):
     """Send a reminder to a phone using Twilio SMS"""
     # Get our appointment from the database
     try:
-        appointment = AppschedulerBookings.objects.get(pk=appointment_id)
-    except AppschedulerBookings.DoesNotExist:
-        # The appointment we were trying to remind someone about
-        # has been deleted, so we don't need to do anything
-        return
-    SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
-    SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
-    SMS.SendSMSDyncamic("727-723-4147 ",SMSRes1)
+        booking = AppschedulerBookings.objects.get(id=bookingid)
+        templateid = 2
+        smstmpdtls=ckEditor.GetSMSTemplateDetailByTemplateID(templateid)
+   
+        # SMS.SendSMSDyncamic("727-723-4147 ",SMSRes1)
+    
+        customer_name = booking.c_name
+        bookingid = booking.bookingid
+        date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
+        day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+        Message = smstmpdtls.format(Name=customer_name,bookingid=bookingid, date=date,Day=day)
+        toNumber = str(booking.c_phone)
+        print(toNumber);
+      
+        tab_id = 101;
+        item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+        TWILIO_ACCOUNT_SID = item[0].value;
+        print(TWILIO_ACCOUNT_SID);
+        TWILIO_AUTH_TOKEN = item[1].value;
+        print(TWILIO_AUTH_TOKEN);
+        TWILIO_FROM_NUMBER = item[2].value;
+        print(TWILIO_FROM_NUMBER);
+        client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
+        result= client.api.account.messages.create(to=toNumber, from_=TWILIO_FROM_NUMBER,body=Message)
+        print(result)
+
+    except Exception as exc:
+       # overrides the default delay to retry after 1 minute
+        raise self.retry(exc=exc, countdown=2*60)                 
+
+    return 
+
+@task(bind=True, default_retry_delay=2*60)  
+def send_email(self,bookingid):
+    try:
+        booking = AppschedulerBookings.objects.get(pk=bookingid)
+        bookingid = booking.pk
+        templateid = 2
+        tmpdtls=ckEditor.GetTemplateDetailByTemplateID(templateid)
+        emailres = tmpdtls.DesignedTemplate
+        Subject = tmpdtls.subject
+
+
+        tab_id = 5;
+        item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+        o_FromEmail = item[0].value;
+        o_FromEmailPassword = item[1].value;
+        customer_name = booking.c_name
+        bookingid = booking.bookingid
+        date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
+        day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+        toaddr = booking.c_email
+
+        fromaddr = o_FromEmail
+        emailbody = emailres.format(Name=customer_name,bookingID=bookingid, date=date,Day=day)
+
+        msg = MIMEMultipart()
+        msg['From'] = fromaddr
+        msg['To'] = toaddr
+        msg['Subject']  = Subject
+        # msg['EMAIL_USE_TLS'] = True
+        print(fromaddr);
+        print(o_FromEmailPassword);
+        print(Subject);
+        print(emailbody);
+        msg.attach(MIMEText(emailbody, "html"))
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(fromaddr, o_FromEmailPassword)
+        text = msg.as_string()
+        print(fromaddr);
+        print(toaddr);
+        server.sendmail(fromaddr, toaddr, text)
+        server.quit()   
+    except Exception as exc:
+       # overrides the default delay to retry after 1 minute
+        raise self.retry(exc=exc, countdown=2*60)                 
+    return 
 
    
-@shared_task  
-def send_email(booking):  
-    bookingid = booking.pk
-    templateid = 2
-    tmpdtls=ckEditor.GetTemplateDetailByTemplateID(templateid)
-    emailres = tmpdtls.DesignedTemplate
-    Subject = tmpdtls.subject
-
-
-    tab_id = 5;
-    item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-    o_FromEmail = item[0].value;
-    o_FromEmailPassword = item[1].value;
-    customer_name = booking.c_name
-    bookingid = booking.bookingid
-    date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
-    day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
-    toaddr = booking.c_email
-
-    fromaddr = o_FromEmail
-    emailbody = emailres.format(Name=customer_name,bookingID=bookingid, date=date,Day=day)
-
-    msg = MIMEMultipart()
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    msg['Subject']  = Subject
-    # msg['EMAIL_USE_TLS'] = True
-    print(fromaddr);
-    print(o_FromEmailPassword);
-    print(Subject);
-    print(emailbody);
-    msg.attach(MIMEText(emailbody, "html"))
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(fromaddr, o_FromEmailPassword)
-    text = msg.as_string()
-    print(fromaddr);
-    print(toaddr);
-    server.sendmail(fromaddr, toaddr, text)
-    server.quit()                       
-    return 
