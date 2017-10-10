@@ -352,9 +352,10 @@ $('#datatables tbody').on('click', 'button', function () {
 });
 
     $('#confirm').on('click', '#delete', function (e) {
-
+    let data = table.row($(this).parents('tr')).data();
+        alert(data['id']);
         $.ajax({
-              url: "/appointmentschduler/deleteTemplate/" + id + "/",
+              url: "/appointmentschduler/deleteTemplate/" +  data['id'] + "/",
               method: 'POST'
           }).success(function (data, textStatus, jqXHR) {
                table.row( '#' + id ).remove().draw();

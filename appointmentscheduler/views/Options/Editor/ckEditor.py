@@ -120,6 +120,7 @@ def Templates(request):
 @csrf_exempt
 def deleteTemplate(request,id=None):
     aCountry=AppschedulerCountries.objects.get(id=id)
+    pdb.set_trace()
     aCountry.delete()
     return HttpResponse(status=204)        
 1
@@ -197,13 +198,13 @@ def TemplateDetailsData(request):
 
 
 @csrf_exempt
-def GetTemplateDetailByTemplateID(TemplateID):
-    Template = AppschedulerTemplatesDetails.objects.filter(TemplateID=TemplateID)[0]
+def GetTemplateDetailByTemplateID(TemplateName=None):
+    try:
+        templates = AppschedulerTemplates.objects.filter(TemplateName__iexact=TemplateName.upper().strip())
+        if len(templates) :
+            templateid = templates[0].id
+            Template = AppschedulerTemplatesDetails.objects.filter(TemplateID=templateid)[0]
+    except Exception as e:
+        print( '%s (%s)' % (e.message, type(e)) )
     return Template
 
-@csrf_exempt
-def GetSMSTemplateDetailByTemplateID(TemplateID):
-    Template = "Hi {Name},  Your booking is {bookingid} confirmed with us at {date} on {Day}. Please go ahead for enjoy the services at Herolocity."
-    Template+= "Thanks "
-    Template+= "Herolocity"
-    return Template

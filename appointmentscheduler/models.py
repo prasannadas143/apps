@@ -28,12 +28,13 @@ class AppschedulerBookings(models.Model):
     booking_tax = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     booking_status = models.CharField(max_length=9, blank=False, null=False)
     c_name = models.CharField(max_length=255, blank=True, null=True)
-    c_email = models.EmailField(unique=True, blank=False, null=False, validators=[validators.validate_email,])
-    c_phone = PhoneNumberField(unique=True,  blank=False, null=False)
+    c_email = models.EmailField( blank=False, null=False, validators=[validators.validate_email,])
+    c_phone = PhoneNumberField(  blank=False, null=False)
     country = models.ForeignKey(
         'AppschedulerCountries',
         on_delete=models.CASCADE,
         related_name="country", blank=True,null=True
+        
         
     ) 
     c_city = models.CharField(max_length=255, blank=True, null=True)
@@ -88,20 +89,9 @@ class AppschedulerBookings(models.Model):
         # if appointment_time < arrow.utcnow():
         #     raise ValidationError('You cannot schedule an appointment for the past. Please check your time and time_zone')
 
-    def schedule_sms(self):
-        """Schedules a Celery task to send a reminder about this appointment"""
 
-        # Calculate the correct time to send this reminder
-        appointment_time = arrow.get(self.service_start_time)
-        reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
 
-        # Schedule the Celery task
-        from .tasks import send_sms
-        result = send_sms.apply_async((self.pk,), eta=reminder_time)
-
-        return result.id
-
-    def schedule_email(self):
+    def schedule(self, opertype):
         """Schedules a Celery task to send a reminder about this appointment"""
 
         # Calculate the correct time to send this reminder
@@ -112,19 +102,20 @@ class AppschedulerBookings(models.Model):
 
         # Schedule the Celery task
         from .tasks import send_email,send_sms
-        # result = send_email.apply_async((self.pk,), eta=reminder_time)
         if self.subscribed_email:
-            send_email.apply_async((self.id,))
+            send_email.apply_async((self.id,opertype,))
         if self.reminder_email:
-            self.task_id_email = send_email.apply_async((self.id,), eta=reminder_time)
+            self.task_id_email = send_email.apply_async((self.id,opertype,), eta=reminder_time)
         if self.subscribed_sms:
-            send_sms.apply_async((self.id,))
+            send_sms.apply_async((self.id,opertype,))
         if self.reminder_sms:
-            self.task_id_sms = send_sms.apply_async((self.id,), eta=reminder_time)
+            self.task_id_sms = send_sms.apply_async((self.id,opertype,), eta=reminder_time)
+        # send_sms(self.id,opertype, reminder_time)
+        # send_email(self.id,opertype, reminder_time)
 
         return 
 
-    def save(self, *args, **kwargs):
+    def send_email_sms(self, opertype):
         """Custom save method which also schedules a reminder"""
         # Check if we have scheduled a reminder for this appointment before
         if self.task_id_sms:
@@ -132,18 +123,13 @@ class AppschedulerBookings(models.Model):
             celery_app.control.revoke(self.task_id_sms)
         if self.task_id_email:
             # Revoke that task in case its time has changed
-            celery_app.control.revoke(self.task_id_sms)
+            celery_app.control.revoke(self.task_id_email)
         # Save our appointment, which populates self.pk,
         # which is used in schedule_reminder
-        super(AppschedulerBookings, self).save(*args, **kwargs)
-
         # Schedule a new reminder task for this appointment1
-        # self.task_id_sms = self.schedule_sms()
+        self.schedule(opertype)
         
-        self.schedule_email()
-
         # Save our appointment again, with the new task_id
-        super(AppschedulerBookings, self).save(*args, **kwargs)    
   
 
     duedate = property( get_duedate )  

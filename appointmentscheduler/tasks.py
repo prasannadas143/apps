@@ -23,21 +23,30 @@ from appointmentscheduler.models import AppschedulerBookings, AppschedulerOption
 # environment variables
 
 @task(bind=True, default_retry_delay=2*60)  
-def send_sms(self,bookingid):
+def send_sms(self,bookingid,opertype):
     """Send a reminder to a phone using Twilio SMS"""
     # Get our appointment from the database
     try:
         booking = AppschedulerBookings.objects.get(id=bookingid)
-        templateid = 2
-        smstmpdtls=ckEditor.GetSMSTemplateDetailByTemplateID(templateid)
-   
-        # SMS.SendSMSDyncamic("727-723-4147 ",SMSRes1)
-    
+        templateid = 5
+        opertype = opertype + "SMS"
+        tmpdtls=ckEditor.GetTemplateDetailByTemplateID(opertype)
+        if tmpdtls :
+            smstmpdtls = tmpdtls.DesignedTemplate
+            Subject = tmpdtls.subject
+        else :
+            smstmpdtls =" customername {customer_name} bookingid {bookingid} date {date} day {day}"
         customer_name = booking.c_name
         bookingid = booking.bookingid
         date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
         day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
-        Message = smstmpdtls.format(Name=customer_name,bookingid=bookingid, date=date,Day=day)
+        service = booking.service.service_name
+        duration =  booking.service.total 
+        servicedesc =  booking.service.service_desc
+        Empname = booking.employee.emp_name
+
+        
+        Message = smstmpdtls.format(customer_name=customer_name,bookingid=bookingid, date=date,day=day)
         toNumber = str(booking.c_phone)
         print(toNumber);
       
@@ -53,6 +62,7 @@ def send_sms(self,bookingid):
         result= client.api.account.messages.create(to=toNumber, from_=TWILIO_FROM_NUMBER,body=Message)
         print(result)
 
+
     except Exception as exc:
        # overrides the default delay to retry after 1 minute
         raise self.retry(exc=exc, countdown=2*60)                 
@@ -60,28 +70,37 @@ def send_sms(self,bookingid):
     return 
 
 @task(bind=True, default_retry_delay=2*60)  
-def send_email(self,bookingid):
+def send_email(self,bookingid, opertype):
     try:
         booking = AppschedulerBookings.objects.get(pk=bookingid)
-        bookingid = booking.pk
         templateid = 2
-        tmpdtls=ckEditor.GetTemplateDetailByTemplateID(templateid)
-        emailres = tmpdtls.DesignedTemplate
-        Subject = tmpdtls.subject
+        opertype = opertype + "EMAIL"
+        tmpdtls=ckEditor.GetTemplateDetailByTemplateID(opertype)
+        if tmpdtls :
+            emailres = tmpdtls.DesignedTemplate
+            Subject = tmpdtls.subject
+        else :
+            emailres =" customername {customer_name} bookingid {bookingid} date {date} day {day}"
 
 
-        tab_id = 5;
+
+        tab_id = 5
         item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-        o_FromEmail = item[0].value;
-        o_FromEmailPassword = item[1].value;
+        o_FromEmail = item[0].value
+        o_FromEmailPassword = item[1].value
         customer_name = booking.c_name
         bookingid = booking.bookingid
         date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
         day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+        service = booking.service.service_name
+        duration =  booking.service.total 
+        servicedesc =  booking.service.service_desc
+        empname = booking.employee.emp_name
+
         toaddr = booking.c_email
 
         fromaddr = o_FromEmail
-        emailbody = emailres.format(Name=customer_name,bookingID=bookingid, date=date,Day=day)
+        emailbody = emailres.format(customer_name=customer_name,bookingid=bookingid, date=date,day=day)
 
         msg = MIMEMultipart()
         msg['From'] = fromaddr
@@ -103,6 +122,7 @@ def send_email(self,bookingid):
         print(toaddr);
         server.sendmail(fromaddr, toaddr, text)
         server.quit()   
+
     except Exception as exc:
        # overrides the default delay to retry after 1 minute
         raise self.retry(exc=exc, countdown=2*60)                 
