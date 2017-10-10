@@ -114,7 +114,7 @@ def getbookingdetails(user_timezone, selecteddate ):
 	year = int(svc_datetime[0].lstrip('0') )
 	month = int(svc_datetime[1].lstrip('0') )
 	day = int( svc_datetime[2].lstrip('0') )
-	adates = AppschedulerBookings.objects.all()
+	adates = AppschedulerBookings.objects.exclude(booking_status = "cancelled")
 
 	# Get all bookings info from the date/time/year of booking. 
 	bookedtimes = []

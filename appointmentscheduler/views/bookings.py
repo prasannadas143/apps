@@ -22,7 +22,6 @@ from appointmentscheduler.form.bookingform import BookingForm
 from appointmentscheduler.views.Options.SMS import SMS
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.views.Options.Booking import EmailNotification
-from appointmentscheduler.tasks import send_email
 
 @requires_csrf_token
 def show_bookings(request):
@@ -198,6 +197,7 @@ def editbooking(request, id=None):
 
         # if form.errors:
         #     return render(request, template_name, {"form" : form })
+
         if form.is_valid():
 
             bookingobj = form.save(commit=False)
@@ -207,6 +207,8 @@ def editbooking(request, id=None):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
+            bookingobj.send_email_sms("edit")
+
             # send_email.delay(bookingobj)
 
             # EmailNotification.SendMailFromBooking(bookingobj.id)            
@@ -242,7 +244,10 @@ def sendsms(id):
 @requires_csrf_token
 def deletebooking(request,id=None):
     print("Delete booking")
-    SendMail();
+    bookingobj = AppschedulerBookings.objects.filter(id=id)[0]
+
+    bookingobj.send_email_sms("delete")
+
     return  HttpResponse(status=204)   
 
 @requires_csrf_token
@@ -255,6 +260,8 @@ def cancelbooking(request, id):
     booking = AppschedulerBookings.objects.filter(id=id)[0]
     booking.booking_status = "cancelled"
     booking.save()
+    booking.send_email_sms("cancel")
+
     return  HttpResponse(status=204)   
 
 @requires_csrf_token
@@ -396,7 +403,7 @@ def addbooking(request):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
-
+            bookingobj.send_email_sms("")
             return HttpResponseRedirect('/appointmentschduler/bookings/')
 
     bookingid = "BI" + str(uuid.uuid1().node)
