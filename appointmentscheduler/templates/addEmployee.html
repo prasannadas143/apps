@@ -193,7 +193,7 @@ function validateemployeeform() {
 		
 				<label class="title">Employee name:</label>
 				<span class="inline_block">
-                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="emp_name" ng-minlength="3" ng-maxlength="100" ng-pattern="/^\w+$/" type="text" required />
+                   <input id="id_emp_name" maxlength="100" name="emp_name" ng-model="emp_name" ng-minlength="3" ng-maxlength="100" type="text" required />
       	</span>
       	<span ng-messages="frmCreateEmployee.emp_name.$error" style="color:maroon" role="alert">
 				  <span ng-message="required">This field is required</span>
