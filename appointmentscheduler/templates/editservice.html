@@ -163,7 +163,7 @@ function check_duplicated_name(current_svcname) {
           <label class="title">
                 Service name:</label>
             <span class="inline_block">
-                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="100" ng-pattern="/^\w+$/"  ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name('{{appscheduleinst.service_name}}')"  required  />
+                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="100"   ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name('{{appscheduleinst.service_name}}')"  required  />
 
             </span>
            

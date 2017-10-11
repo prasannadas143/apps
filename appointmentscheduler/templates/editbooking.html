@@ -685,7 +685,7 @@ function addservices() {
 						$('#booking_status').val(default_status_if_paid);
 					}
 
-                 	if (parseFloat(booking_deposit) <= parseFloat(required_deposit) )
+                 	if (parseFloat(booking_deposit) < parseFloat(required_deposit) )
                     {	
 	                	alert(" Minimum deposit is atleast " + required_deposit);
 						document.getElementById("booking_deposit").value= "";
@@ -918,7 +918,7 @@ function  get_employee_details() {
 			$('#booking_status').val(default_status_if_paid);
 		}
 
-     	if (parseFloat(booking_deposit) <= parseFloat(required_deposit) )
+     	if (parseFloat(booking_deposit) < parseFloat(required_deposit) )
         {	
         	alert(" Minimum deposit is atleast " + required_deposit);
 			document.getElementById("booking_deposit").value= "";
