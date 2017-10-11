@@ -80,35 +80,41 @@ def editbooking(request, id=None):
     bookingdetails = dict()
 
     if request.method == 'POST':
+        pdb.set_trace()
         formparams= request.POST.dict()
         request.POST._mutable = True
         request.POST.clear()
         request.POST["bookingid"] = bookings.bookingid
         # verify price from form is same  with DB
         serviceid = formparams["service_booked_id"]
-        price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
+        # price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
         booking_price = formparams["booking_price"]  
- 
-        if round(float(booking_price),2)== round(float(price_db),2):
-            request.POST['booking_price'] = price_db
-        else :
-            return HttpResponse(status=403)
+        request.POST['booking_price'] = booking_price
+        # if round(float(booking_price),2)== round(float(price_db),2):
+        #     request.POST['booking_price'] = price_db
+        # else :
+        #     return HttpResponse(status=403)
 
         booking_tax = formparams["booking_tax"]  
-        tax_percentage = 10
-        tax = price_db * round(float(tax_percentage/100),2)
+        request.POST['booking_tax'] = booking_tax
 
-        if round(float(tax),2) == round(float(booking_tax),2):
-            request.POST['booking_tax'] = round(float(tax),2)
-        else :
-            return HttpResponse(status=403)
+        # tax_percentage = 10
+        # tax = price_db * round(float(tax_percentage/100),2)
 
-        total = round(float(price_db),2) + round(float(tax),2)
-        booking_total = round(float( formparams["booking_total"] ) ,2)
-        if round(float(total),2) == round(float(booking_total),2):
-            request.POST['booking_total'] = total
-        else :
-            return HttpResponse(status=403)
+        # if round(float(tax),2) == round(float(booking_tax),2):
+        #     request.POST['booking_tax'] = round(float(tax),2)
+        # else :
+        #     return HttpResponse(status=403)
+
+        booking_total =  round(float( formparams["booking_total"] ) ,2)
+
+        request.POST['booking_total'] = booking_total
+        # total = round(float(price_db),2) + round(float(tax),2)
+        # booking_total = round(float( formparams["booking_total"] ) ,2)
+        # if round(float(total),2) == round(float(booking_total),2):
+        #     request.POST['booking_total'] = total
+        # else :
+        #     return HttpResponse(status=403)
 
         booking_deposit = round(float(formparams['booking_deposit']),2)
         request.POST['booking_deposit'] = booking_deposit
@@ -232,28 +238,20 @@ def editbooking(request, id=None):
     bookingdetails['svc_end_time'] = bookings_old.service_end_time.astimezone(pytz.timezone(user_timezone[0])).strftime("%I:%M %p")
     return render(request, template_name, bookingdetails)
 
-def sendsms(id):
-    emailres=ckEditor.GetTemplateDetailByTemplateID(2)
-    emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
-    EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
-
-    # SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
-    # SMSRes1 = SMSRes.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
-    # SMS.SendSMSDyncamic("727-723-4147 ",SMSRes1)
-
 @requires_csrf_token
 def deletebooking(request,id=None):
-    print("Delete booking")
     bookingobj = AppschedulerBookings.objects.filter(id=id)[0]
-
-    bookingobj.send_email_sms("delete")
-
+    bookingobj.delete()
     return  HttpResponse(status=204)   
 
 @requires_csrf_token
 def deletebookings(request):
-    print("Delete bookings")
-    return  HttpResponse(json.dumps({"data" :"delete all bookings" }), content_type='application/json')   
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
+        bookingobj=AppschedulerBookings.objects.get(id=id)
+        bookingobj.delete()
+    
+    return  HttpResponse(status=204)   
 
 @requires_csrf_token
 def cancelbooking(request, id):
