@@ -152,7 +152,7 @@ def delete_services(request):
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
         aservc=AppschedulerServices.objects.get(id=id)
-        # aservc.delete()
+        aservc.delete()
     return HttpResponse(status=204)
 
     # return HttpResponseRedirect('/services/showservices/')
