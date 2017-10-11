@@ -36,6 +36,7 @@ def send_sms(self,bookingid,opertype):
             Subject = tmpdtls.subject
         else :
             smstmpdtls =" customername {customer_name} bookingid {bookingid} date {date} day {day}"
+       
         customer_name = booking.c_name
         bookingid = booking.bookingid
         date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
@@ -43,10 +44,19 @@ def send_sms(self,bookingid,opertype):
         service = booking.service.service_name
         duration =  booking.service.total 
         servicedesc =  booking.service.service_desc
-        Empname = booking.employee.emp_name
-
-        
-        Message = smstmpdtls.format(customer_name=customer_name,bookingid=bookingid, date=date,day=day)
+        empname = booking.employee.emp_name
+        getstarttime = booking.service_start_time.astimezone(booking.time_zone)
+        format = '%Y-%m-%d %H:%M %p'
+        service_start_time = getstarttime.strftime(format)
+        getendtime = booking.service_start_time.astimezone(booking.time_zone)
+        service_start_time = getendtime.strftime(format)
+        service_price = booking.booking_price
+        tax = booking.booking_tax
+        total_price = booking.booking_total
+        booking_deposit = booking.booking_deposit
+        booking_status = booking.booking_status
+      
+        Message = smstmpdtls.format(**locals())
         toNumber = str(booking.c_phone)
         print(toNumber);
       
@@ -96,11 +106,19 @@ def send_email(self,bookingid, opertype):
         duration =  booking.service.total 
         servicedesc =  booking.service.service_desc
         empname = booking.employee.emp_name
-
+        getstarttime = booking.service_start_time.astimezone(booking.time_zone)
+        format = '%Y-%m-%d %H:%M %p'
+        service_start_time = getstarttime.strftime(format)
+        getendtime = booking.service_start_time.astimezone(booking.time_zone)
+        service_start_time = getendtime.strftime(format)
+        service_price = booking.booking_price
+        tax = booking.booking_tax
+        total_price = booking.booking_total
+        booking_deposit = booking.booking_deposit
+        booking_status = booking.booking_status
         toaddr = booking.c_email
-
         fromaddr = o_FromEmail
-        emailbody = emailres.format(customer_name=customer_name,bookingid=bookingid, date=date,day=day)
+        emailbody = emailres.format(**locals())
 
         msg = MIMEMultipart()
         msg['From'] = fromaddr
@@ -127,5 +145,3 @@ def send_email(self,bookingid, opertype):
        # overrides the default delay to retry after 1 minute
         raise self.retry(exc=exc, countdown=2*60)                 
     return 
-
-   

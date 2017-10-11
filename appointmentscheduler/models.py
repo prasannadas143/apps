@@ -99,7 +99,7 @@ class AppschedulerBookings(models.Model):
         appointment_time = arrow.get(self.service_start_time)
 
         reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
-
+        pdb.set_trace()
         # Schedule the Celery task
         from .tasks import send_email,send_sms
         if self.subscribed_email:
