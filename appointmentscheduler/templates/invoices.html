@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
+
+
+      
+
+<table id="datatables" class="table table-hover">
+        <thead>
+        <tr>
+         <th><input name="select_all" value="1" id="select-all-records" type="checkbox" /></th> 
+            <th>Order No</th>
+            <th>Issue Date</th>
+            <th>Due Date</th>
+            <th>Created</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th></th>
+
+        </tr>
+        </thead>
+      
+    </table>
+
+  
+<button type="button" id="multicheckbox"  >Delete </button>
+<div class="modal fade" id="confirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cancelmodal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="cnbooking">cancel booking</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+
+draw_datatable();
+var rows_selected = [];
+
+function draw_datatable() {
+
+
+
+   table = $('#datatables').DataTable({
+       
+        "processing": true,
+        "ajax": {
+            "url": "/appointmentschduler/getinvoices/",
+            "type": "GET"
+        },        
+
+        "createdRow": function( row, data, dataIndex ) {
+                        $(row).attr('id', data.id);
+           
+          },
+       
+        "columnDefs": [ 
+
+            {
+              'targets': 0,
+              'orderable': false,
+              'className': 'dt-body-center',
+              "data": null,
+              render: function ( data, type, row ) {
+                return  '<input type="checkbox" name="id[]" value="">' 
+               }
+            },
+            {
+             'targets': 1,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+              'data': "invoiceid",
+
+              
+            },
+           {
+             'targets': 2,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+               'data': "created",
+
+            },
+
+           
+
+            {
+             'targets': 3,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+               'data':  "duedate",
+            },
+          
+           {
+             'targets': 4,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+               'data':  "issued",
+
+            },
+          
+            {
+             'targets': 5,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+               'data':  "status",
+
+            },
+            {
+             'targets': 6,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+               'data':  "total",
+
+            },
+            {
+              'targets':7,
+              "data": null,
+              "defaultContent": 
+              '<button type="button" class="btn btn-info" id="view">View</button><button type="button" class="btn btn-danger" id="delete">Delete</button> '
+            }
+            
+        
+        ],
+            'rowCallback': function(row, data, dataIndex){
+             // Get row ID
+             var rowId = data[0];
+            
+             // If row ID is in the list of selected row IDs
+               if($.inArray(rowId, rows_selected) !== -1){
+                  $(row).find('input[type="checkbox"]').prop('checked', true);
+               
+               }
+            }
+      });
+}
+    let id = 0;
+
+   // Handle click on "Select all" control
+   $('#select-all-records').on('click', function(){
+      // select-all-records/uncheck all checkboxes in the table
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      $('input[type="checkbox"]', rows).prop('checked', this.checked);
+   });
+
+ // Handle table draw event
+   table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+   });
+
+function updateDataTableSelectAllCtrl(table){
+   var $table             = table.table().node();
+   var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
+   var $chkbox_checked    = $('tbody input[type="checkbox"]:checked', $table);
+   var chkbox_select_all  = $('thead input[name="select_all"]', $table).get(0);
+ 
+   // If none of the checkboxes are checked
+   if($chkbox_checked.length === 0){
+      chkbox_select_all.checked = false;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+ 
+   // If all of the checkboxes are checked
+   } else if ($chkbox_checked.length === $chkbox_all.length){
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+ 
+   // If some of the checkboxes are checked
+   } else {
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = true;
+      }
+   }
+}
+
+
+  // Handle click on checkbox
+$('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
+      var $row = $(this).closest('tr');
+ 
+      // Get row data
+      var data = table.row($row).data();
+ 
+      // Get row ID
+      var rowId = data.id;
+ 
+      // Determine whether row ID is in the list of selected row IDs 
+      var index = $.inArray(rowId, rows_selected);
+ 
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1){
+         rows_selected.push(rowId);
+ 
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1){
+         rows_selected.splice(index, 1);
+      }
+ 
+      if(this.checked){
+         $row.addClass('selected');
+      } else {
+         $row.removeClass('selected');
+      }
+ 
+       // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+ 
+   // Handle click on table cells with checkboxes
+   $('#datatables').on('click', 'tbody td, thead th:first-child', function(e){
+      $(this).parent().find('input[type="checkbox"]').trigger('click');
+   });
+ 
+   // Handle click on "Select all" control
+   $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatables tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatables tbody input[type="checkbox"]:checked').trigger('click');
+      }
+ 
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+ 
+ 
+   $("#multicheckbox").on('click',function(){
+      var ids = $.map(table.rows('.selected').data(), function (item) {
+            return item.id;
+        });
+      alert(ids);
+      if(ids!=""){
+        rowids = ids.join(",");
+      }
+      else {
+          alert("no rows selected");
+     }
+       $.ajax({
+                url: "{% url 'appointmentschduler:delete_invoices' %}",
+                method: 'POST',
+                data : {
+                        "rowids":rowids,
+                      },
+          }).success(function (data, textStatus, jqXHR) {
+                $.each(ids, function( index, value ) {
+                  table.row( '#' + value ).remove().draw();
+
+                });
+            }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });    
+   
+   });
+ 
+
+
+      // FOR TESTING ONLY
+      
+      // // Output form data to a console
+      // $('#example-console').text($(form).serialize()); 
+      // console.log("Form submission", $(form).serialize()); 
+       
+      // Prevent actual form submission
+    
+    
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    let op_id = $(this).attr('id');
+
+ 	if( op_id == 'delete') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    else if( op_id == 'view') {
+        // DELETE button
+  		location.href ='/appointmentschduler/getinvoice/' + data.id
+    }
+
+
+    id = data['id'];
+
+});
+
+    $('#confirm').on('click', '#delete', function (e) {
+
+        $.ajax({
+              url: "/appointmentschduler/delete_invoice/" + id + "/",
+              method: 'POST'
+          }).success(function (data, textStatus, jqXHR) {
+
+               table.row( '#' + id ).remove().draw();
+
+          }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });         
+  });
+
+
+
+
+</script>
+
+{% endblock %}
