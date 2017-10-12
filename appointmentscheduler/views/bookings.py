@@ -30,7 +30,7 @@ def show_bookings(request):
     user_timezone = request.session['visitor_timezone']
     bookings = AppschedulerBookings.objects.all()
 
-    bookingsdetails = []
+    bookingslist = []
     for booking in  reversed(list(bookings)):
         bookingdetails = dict()
         bookingdetails["bookingid"] = booking.id
@@ -44,8 +44,8 @@ def show_bookings(request):
         getvisitortime = booking.service_start_time.astimezone(pytz.timezone(user_timezone[0]))
         format = '%Y-%m-%d %H:%M %p'
         bookingdetails["booking_time"] = getvisitortime.strftime(format)
-        bookingsdetails.append( bookingdetails )
-    return  HttpResponse(json.dumps({"data" :bookingsdetails }), content_type='application/json')   
+        bookingslist.append( bookingdetails )
+    return  HttpResponse(json.dumps({"data" :bookingslist }), content_type='application/json')   
 
 @requires_csrf_token
 def editbooking(request, id=None):

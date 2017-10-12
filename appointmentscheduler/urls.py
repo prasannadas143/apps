@@ -73,8 +73,12 @@ urlpatterns = [
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
     url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="cancelbooking"),
 
+    url(r'^getinvoices/$', invoice.list_invoices, name ="getinvoice"),
     url(r'^getinvoice/(?P<id>\d+)/$', invoice.generate_invoice, name ="getinvoice"),
     url(r'^printinvoice/(?P<id>\d+)/$', invoice.print_invoice_pdf, name ="getinvoicepdf"),
+    url(r'^invoices/$', TemplateView.as_view(template_name='invoices.html'), name="bookings"),
+    url(r'^delete_invoices/$', invoice.delete_invoices, name ="delete_invoices"),
+    url(r'^delete_invoice/(?P<id>\d+)/$', invoice.delete_invoice, name ="delete_invoice"),
 
     url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
     url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),

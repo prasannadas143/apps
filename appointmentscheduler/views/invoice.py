@@ -24,12 +24,46 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 
 @requires_csrf_token
+def list_invoices(request):
+	user_timezone = request.session['visitor_timezone']
+	invoice_lists = AppschedulerInvoice.objects.all()
+	invoices = []
+	for invoice in  reversed(list(invoice_lists)):
+		invoicedetails = dict()
+		bkid = invoice.booking.id
+		booking_instance = AppschedulerBookings.objects.filter(id=bkid)[0]
+		invoicedetails['id'] = bkid
+		invoicedetails['invoiceid'] = invoice.invoiceid
+		invoicedetails['created'] = booking_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime( "%Y-%m-%d" )
+		invoicedetails['duedate'] = booking_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d %I:%M %p")
+		invoicedetails['issued'] = booking_instance.date.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d ")
+		invoicedetails['status'] =  booking_instance.booking_status
+		invoicedetails['total'] =  round(float(booking_instance.booking_total),2)
+		invoices.append( invoicedetails )
+	# pdb.set_trace()
+	return HttpResponse(json.dumps({"data" :invoices }), content_type='application/json') 
+@requires_csrf_token
 def generate_invoice(request,id):
 	template_name = "invoice.html"
 	user_timezone = request.session['visitor_timezone']
 	invoicedetails =getinvoicedetails(  id, user_timezone)
 	invoicedetails['id'] = id
 	return render(request, template_name, invoicedetails)
+
+@ensure_csrf_cookie
+def delete_invoice(request,id=None):
+    ainvoice=AppschedulerInvoice.objects.get( id=int(id) )
+    ainvoice.delete()
+    return HttpResponse(status=204)
+
+
+@ensure_csrf_cookie
+def delete_invoices(request):
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
+        ainvoice=AppschedulerInvoice.objects.get(id=int( id ) )
+        ainvoice.delete()
+    return HttpResponse(status=204)
 
 @ensure_csrf_cookie
 def print_invoice_pdf(request,id):
