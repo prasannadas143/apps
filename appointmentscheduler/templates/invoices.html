@@ -134,7 +134,10 @@ function draw_datatable() {
               'orderable': true,
               'className': 'dt-body-center',
               'data': "invoiceid",
+              render:function(data, type, full) {
+                return '<a href=' + '/appointmentschduler/getinvoice/' + full.id + ">" + full.invoiceid + '</a>' ;
 
+              }
               
             },
            {
