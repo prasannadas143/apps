@@ -22,6 +22,7 @@ from appointmentscheduler.form.bookingform import BookingForm
 from appointmentscheduler.views.Options.SMS import SMS
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.views.Options.Booking import EmailNotification
+from appointmentscheduler.views.Options.Invoice import Invoice
 
 @requires_csrf_token
 def show_bookings(request):
@@ -74,6 +75,8 @@ def editbooking(request, id=None):
     # emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
     # #SMS.SendSMSDyncamic("727-723-4147 ",res1)
     # #EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
+    CustomerFields= BookingForm.GetBookingValidation(4)
+    InvoiceCompanyvalues= Invoice.GetInvoiceCompanyvalues(100)
 
     default_status_if_paid = "confirmed"
     default_status_if_not_paid = "pending"
