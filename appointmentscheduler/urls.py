@@ -79,6 +79,9 @@ urlpatterns = [
     url(r'^invoices/$', TemplateView.as_view(template_name='invoices.html'), name="bookings"),
     url(r'^delete_invoices/$', invoice.delete_invoices, name ="delete_invoices"),
     url(r'^delete_invoice/(?P<id>\d+)/$', invoice.delete_invoice, name ="delete_invoice"),
+    url(r'^sendmail_invoice/$', invoice.sendmail_invoice, name ="sendmail_invoice"),
+    url(r'^sendmsg_invoice/$', invoice.sendmsg_invoice, name ="sendmsg_invoice"),
+
 
     url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
     url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),

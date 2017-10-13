@@ -569,7 +569,7 @@ def employee_in_booking(request):
         bookedtimes = []
         empid = employee.id
         #Get all bookings for the employee 
-        bookings = AppschedulerBookings.objects.filter(employee_id=empid)
+        bookings = AppschedulerBookings.objects.filter(employee_id=empid, booking_status__ne="cancelled")
 
         #iterate all bookings and filter all booking for the requested date and the given employee.
         

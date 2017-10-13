@@ -35,12 +35,12 @@ def send_sms(self,bookingid,opertype):
             smstmpdtls = tmpdtls.DesignedTemplate
             Subject = tmpdtls.subject
         else :
-            smstmpdtls =" customername {customer_name} bookingid {bookingid} date {date} day {day}"
+            smstmpdtls =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
        
         customer_name = booking.c_name
         bookingid = booking.bookingid
-        date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
-        day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+        service_start_time = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
+        issued = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
         service = booking.service.service_name
         duration =  booking.service.total 
         servicedesc =  booking.service.service_desc
@@ -90,7 +90,7 @@ def send_email(self,bookingid, opertype):
             emailres = tmpdtls.DesignedTemplate
             Subject = tmpdtls.subject
         else :
-            emailres =" customername {customer_name} bookingid {bookingid} date {date} day {day}"
+            emailres =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
 
 
 
@@ -100,8 +100,8 @@ def send_email(self,bookingid, opertype):
         o_FromEmailPassword = item[1].value
         customer_name = booking.c_name
         bookingid = booking.bookingid
-        date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
-        day = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
+        service_start_time = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )
+        issued = booking.date.astimezone(booking.time_zone).strftime("%Y-%m-%d")
         service = booking.service.service_name
         duration =  booking.service.total 
         servicedesc =  booking.service.service_desc
