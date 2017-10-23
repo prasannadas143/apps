@@ -70,3 +70,34 @@ def Company(request):
 	template_name="CompanyDetails.html"
 	templatename=  os.path.join('Options','Invoice',template_name)
 	return render(request,templatename, CompanyFormdata)
+
+
+def GetInvoiceCompanyvalues(tab_id):
+	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+	o_Website = item[10].value;
+	o_Email = item[9].value;
+	o_Fax = item[8].value;
+	o_Phone = item[7].value;
+	o_Zip = item[6].value;
+	o_State = item[5].value;
+	o_City = item[4].value;
+	o_Country = item[3].value;
+	o_StreetAddress = item[2].value;
+	o_Name = item[1].value;
+	o_CompanyName = item[0].value;
+
+	items = {
+	"o_CompanyName":o_CompanyName,
+	"o_Name":o_Name,
+    "o_StreetAddress":o_StreetAddress,
+    "o_Country":o_Country,
+    "o_City":o_City,
+    "o_State":o_State,
+    "o_Zip":o_Zip,
+    "o_Phone":o_Phone,
+    "o_Fax":o_Fax,
+    "o_Email":o_Email,
+    "o_Website":o_Website
+	}
+	return items;
+

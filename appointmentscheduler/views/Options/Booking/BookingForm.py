@@ -129,3 +129,86 @@ def BookingFormOptions(request):
 
    BookingFormdata['items'] = items
    return render(request,'BookingForm.html', BookingFormdata)
+
+
+
+def GetBookingValidation(tab_id):
+  
+   item = AppschedulerOptions.objects.filter(tab_id=4)
+   o_bf_zipList = item[11].value.split('::')
+   o_bf_zip = o_bf_zipList[0].split('|')
+   o_bf_zip_selected = o_bf_zipList[-1]
+   o_bf_zip_id = item[11].id
+
+   
+   labels = item[11].label.split('::')[0].split('|')
+   o_bf_termsList = item[10].value.split('::')
+   o_bf_terms = o_bf_termsList[0].split('|')
+   o_bf_terms_selected = o_bf_termsList[-1]
+   o_bf_terms_id = item[10].id
+
+   
+   o_bf_stateList = item[9].value.split('::')
+   o_bf_state = o_bf_stateList[0].split('|')
+   o_bf_state_selected = o_bf_stateList[-1]
+   o_bf_state_id = item[9].id
+
+
+   o_bf_phoneList = item[8].value.split('::')
+   o_bf_phone = o_bf_phoneList[0].split('|')
+   o_bf_phone_selected = o_bf_phoneList[-1]
+   o_bf_phone_id = item[8].id
+
+   o_bf_notesList = item[8].value.split('::')
+   o_bf_notes = o_bf_phoneList[0].split('|')
+   o_bf_notes_selected = o_bf_phoneList[-1]
+   o_bf_notes_id = item[8].id
+
+   o_bf_nameList = item[7].value.split('::')
+   o_bf_name = o_bf_nameList[0].split('|')
+   o_bf_name_selected = o_bf_nameList[-1]
+   o_bf_name_id = item[7].id
+
+   o_bf_emailList = item[6].value.split('::')
+   o_bf_email = o_bf_emailList[0].split('|')
+   o_bf_email_selected = o_bf_emailList[-1]
+   o_bf_email_id = item[6].id
+
+   o_bf_countryList = item[5].value.split('::')
+   o_bf_country = o_bf_emailList[0].split('|')
+   o_bf_country_selected = o_bf_emailList[-1]
+   o_bf_country_id = item[5].id
+
+   o_bf_cityList = item[4].value.split('::')
+   o_bf_city = o_bf_cityList[0].split('|')
+   o_bf_city_selected = o_bf_cityList[-1]
+   o_bf_city_id = item[4].id
+
+
+   o_bf_captchaList = item[3].value.split('::')
+   o_bf_captcha = o_bf_captchaList[0].split('|')
+   o_bf_captcha_selected = o_bf_captchaList[-1]
+   o_bf_captcha_id = item[3].id
+
+   o_bf_address_2List = item[2].value.split('::')
+   o_bf_address_2 = o_bf_cityList[0].split('|')
+   o_bf_address_2_selected = o_bf_cityList[-1]
+   o_bf_address_2_id = item[2].id
+
+   o_bf_address_1List = item[1].value.split('::')
+   o_bf_address_1 = o_bf_address_1List[0].split('|')
+
+   o_bf_address_1_selected = o_bf_address_1List[-1]
+   o_bf_address_1_id = item[1].id
+
+   showlabels= {'1': "No", '2': "Yes", '3' : "required"}
+   items = {"c_zip":showlabels[o_bf_zip_selected],"o_bf_terms_selected":o_bf_terms_selected,
+   "o_bf_state_selected":showlabels[o_bf_state_selected],"o_bf_phone_selected":showlabels[o_bf_phone_selected],
+   "o_bf_notes_selected":showlabels[o_bf_notes_selected],"o_bf_name_selected":showlabels[o_bf_name_selected],
+   "o_bf_email_selected":showlabels[o_bf_email_selected],
+
+   "o_bf_country_selected":showlabels[o_bf_country_selected],"o_bf_city_selected":showlabels[o_bf_city_selected],
+   "o_bf_captcha_selected":showlabels[o_bf_captcha_selected],"o_bf_address_2_selected":showlabels[o_bf_address_2_selected],
+   "o_bf_address_1_selected":showlabels[o_bf_address_1_selected]
+   }
+   return items;   
