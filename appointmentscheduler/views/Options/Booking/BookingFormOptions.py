@@ -19,6 +19,9 @@ from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from json import dump, load
 
+
+tab_id = 4;
+
 def update_value(field_id, tab_id, newstep):
    item = AppschedulerOptions.objects.get(tab_id=int(tab_id), id = int(field_id))
    getsteps = item.value.split('::')
@@ -31,7 +34,6 @@ def update_value(field_id, tab_id, newstep):
 
 @csrf_exempt
 def BookingFormOptions(request):
-   tab_id = 4;
    message=None
    Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
    # you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
@@ -132,9 +134,9 @@ def BookingFormOptions(request):
 
 
 
-def GetBookingValidation(tab_id):
+def GetBookingValidation():
   
-   item = AppschedulerOptions.objects.filter(tab_id=4)
+   item = AppschedulerOptions.objects.filter(tab_id=tab_id)
    o_bf_zipList = item[11].value.split('::')
    o_bf_zip = o_bf_zipList[0].split('|')
    o_bf_zip_selected = o_bf_zipList[-1]
@@ -202,13 +204,14 @@ def GetBookingValidation(tab_id):
    o_bf_address_1_id = item[1].id
 
    showlabels= {'1': "No", '2': "Yes", '3' : "required"}
-   items = {"c_zip":showlabels[o_bf_zip_selected],"o_bf_terms_selected":o_bf_terms_selected,
-   "o_bf_state_selected":showlabels[o_bf_state_selected],"o_bf_phone_selected":showlabels[o_bf_phone_selected],
-   "o_bf_notes_selected":showlabels[o_bf_notes_selected],"o_bf_name_selected":showlabels[o_bf_name_selected],
-   "o_bf_email_selected":showlabels[o_bf_email_selected],
+   items = {"c_zip":showlabels[o_bf_zip_selected],
+   "c_state":showlabels[o_bf_state_selected],"c_phone":showlabels[o_bf_phone_selected],
+   "c_notes":showlabels[o_bf_notes_selected],"c_name":showlabels[o_bf_name_selected],
+   "c_email":showlabels[o_bf_email_selected],
 
-   "o_bf_country_selected":showlabels[o_bf_country_selected],"o_bf_city_selected":showlabels[o_bf_city_selected],
-   "o_bf_captcha_selected":showlabels[o_bf_captcha_selected],"o_bf_address_2_selected":showlabels[o_bf_address_2_selected],
-   "o_bf_address_1_selected":showlabels[o_bf_address_1_selected]
+   "c_country":showlabels[o_bf_country_selected],"c_city":showlabels[o_bf_city_selected],
+   "c_address_2":showlabels[o_bf_address_2_selected],
+   "c_address_1":showlabels[o_bf_address_1_selected]
    }
+   #,"c_terms":o_bf_terms_selected, "c_captcha":showlabels[o_bf_captcha_selected], 
    return items;   

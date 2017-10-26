@@ -212,7 +212,7 @@ def convert_to_ust(custom_date,time,user_timezone):
 		user_time = user_timezone_instance.localize(datetime_without_tz)
 		datetime_in_utc  = user_time.astimezone(pytz.utc)
 	except ValueError:
-	    return False
+		print("There was in formatting date to")	
 	else:
 		return  datetime_in_utc 
 		# 	return True

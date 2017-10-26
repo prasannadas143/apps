@@ -49,7 +49,6 @@ def getbookinginfos(duration, user_timezone):
 
 def exportbookings(request):
 	error_message = ""
-	pdb.set_trace()
 	if request.GET :
 		# pdb.set_trace()
 		duration = request.GET['coming_period']

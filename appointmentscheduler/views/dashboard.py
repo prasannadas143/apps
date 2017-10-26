@@ -103,7 +103,7 @@ def getbookingdetails(user_timezone, selecteddate ):
 	elif selecteddate == "tomorrow":
 		visitor_tz = pytz.timezone(str(user_timezone[0]))
 		datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
-		tomorrowdate = visitor_tz.localize(datetime_without_tz, is_dst=None) + + dtm.timedelta(days=1)
+		tomorrowdate = visitor_tz.localize(datetime_without_tz, is_dst=None) + timedelta(days=1)
 		servicedate = tomorrowdate.strftime("%Y-%m-%d")
 	else:
 		servicedate = selecteddate

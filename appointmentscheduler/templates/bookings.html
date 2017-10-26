@@ -410,6 +410,10 @@ $('#cancelmodal').on('click', '#cnbooking', function (e) {
           // alert(    table.cell(1,3));
           // alert(    table.cell(2,5).data());
            // table.cell(1,3).data("cancelled");
+           if(data.valid_booking) {
+            alert("Booking can be cancelled before " + data.accept_booking_before_start + " hours");
+            return false;
+           }
            location.reload()
 
       }).error(function (jqXHR, textStatus, errorThrown) {

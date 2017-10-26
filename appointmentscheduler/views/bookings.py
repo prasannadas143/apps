@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 import dateutil.parser as dparser
 from copy import deepcopy
 from appointmentscheduler.form.bookingform import BookingForm
+
+from appointmentscheduler.views.Options.Booking import BookingFormOptions,Payments,Options
 from appointmentscheduler.views.Options.SMS import SMS
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.views.Options.Booking import EmailNotification
@@ -56,18 +58,17 @@ def editbooking(request, id=None):
     errors =""
     template_name = "editbooking.html"
 
-    customer_fields = {
-    "c_country": "no",
-    "c_state" : "no",
-    "c_city" : "no",
-    "c_zip"  : "no",
-    "c_name"  : "required",
-    "c_email" : "required",
-    "c_phone" : "required",
-    "c_address_1" : "no",
-    "c_address_2" : "no"
-    }
-   
+    # customer_fields = {
+    # "c_country": "no",
+    # "c_state" : "no", 
+    # "c_city" : "no",
+    # "c_zip"  : "no",
+    # "c_name"  : "required",
+    # "c_email" : "required",
+    # "c_phone" : "required",
+    # "c_address_1" : "no",
+    # "c_address_2" : "no"
+    # }
     # emailres=ckEditor.GetTemplateDetailByTemplateID(2)
     # SMSRes=ckEditor.GetSMSTemplateDetailByTemplateID(2)
     # # res=res.replace("{name}","Anupam Singh").replace("{date}","9:30").replace("{Day}","Monday")
@@ -75,35 +76,49 @@ def editbooking(request, id=None):
     # emailres1 = emailres.format(Name="Anupam Singh",bookingID="B11-453ffdf665656", date="9:30",Day="29-10-2017")
     # #SMS.SendSMSDyncamic("727-723-4147 ",res1)
     # #EmailNotification.SendMailFromBooking("anupamsinghjadoun@gmail.com","TEST Subject",emailres1)
-    CustomerFields= BookingForm.GetBookingValidation(4)
-    InvoiceCompanyvalues= Invoice.GetInvoiceCompanyvalues(100)
+    customer_fields= BookingFormOptions.GetBookingValidation()
+    # locals.update(payments_options)
+    booking_options = Options.getbookingOptions()
+    STEP = booking_options["STEP"]
+    STATUS_IF_PAID =  booking_options["STATUS_IF_PAID"]
+    STATUS_IF_NOT_PAID =  booking_options["STATUS_IF_NOT_PAID"]
+    ACCEPT_BOOKING_BEFORE_START =  booking_options["ACCEPT_BOOKING_BEFORE_START"]
+    CANCEL_BOOKING_BEFORE_START =   booking_options["CANCEL_BOOKING_BEFORE_START"]
+    ACCEPT_BOOKING_AHEAD =  int(booking_options["ACCEPT_BOOKING_AHEAD"])
+    pdb.set_trace()
 
-    default_status_if_paid = "confirmed"
-    default_status_if_not_paid = "pending"
+    default_status_if_paid = STATUS_IF_PAID
+    default_status_if_not_paid = STATUS_IF_NOT_PAID
     bookingdetails = dict()
 
     if request.method == 'POST':
         formparams= request.POST.dict()
         request.POST._mutable = True
         request.POST.clear()
+        payments_options = Payments.getPaymentOptions()
+        DISABLE_PAYMENTS = int( payments_options["DISABLE_PAYMENTS"] )
+        DEPOSIT_TYPE = payments_options["DEPOSIT_TYPE"]
+        DEPOSIT = int( payments_options["DEPOSIT"] )
+        TAX = int( payments_options["TAX"] )
+
         request.POST["bookingid"] = bookings.bookingid
         # verify price from form is same  with DB
         serviceid = formparams["service_booked_id"]
         price_db =  round(float(AppschedulerServices.objects.filter(id = serviceid)[0].price),2)
         booking_price = formparams["booking_price"]  
         request.POST['booking_price'] = booking_price
-        if round(float(booking_price),2) != round(float(bookings.booking_price),2) \
-               or round(float(booking_price),2) != round(float(price_db),2):
+        if not ( round(float(booking_price),2) == round(float(bookings.booking_price),2) \
+               or round(float(booking_price),2) == round(float(price_db),2) ):
             return HttpResponse(status=403)
 
         booking_tax = formparams["booking_tax"]  
         request.POST['booking_tax'] = booking_tax
-
-        tax_percentage = 10
+        request.POST['booking_notes'] = formparams["booking_notes"] 
+        tax_percentage = TAX
         tax = price_db * round(float(tax_percentage/100),2)
 
-        if round(float(booking_tax),2) != round(float(bookings.booking_tax),2) \
-           or round(float(booking_tax),2) != round(float(tax),2):
+        if not ( round(float(booking_tax),2) == round(float(bookings.booking_tax),2) \
+           or round(float(booking_tax),2) == round(float(tax),2) ):
                 return HttpResponse(status=403)
 
         booking_total =  round(float( formparams["booking_total"] ) ,2)
@@ -115,13 +130,13 @@ def editbooking(request, id=None):
         #     request.POST['booking_total'] = total
         # else :
         #     return HttpResponse(status=403)
-        if round(float(booking_total),2) != round(float(bookings.booking_total),2) \
-           or round(float(booking_total),2) != round(float(total),2):
+        if not ( round(float(booking_total),2) == round(float(bookings.booking_total),2) \
+           or round(float(booking_total),2) == round(float(total),2) ):
                 return HttpResponse(status=403)
-
+        formparams['booking_deposit']=0  if not  formparams['booking_deposit'] else formparams['booking_deposit']
         booking_deposit = round(float(formparams['booking_deposit']),2)
         request.POST['booking_deposit'] = booking_deposit
-        expected_deposit_percentage = 20
+        expected_deposit_percentage = DEPOSIT
         expected_booking_deposit = round(booking_total * float(expected_deposit_percentage/100),2)
         if not booking_deposit  >= expected_booking_deposit:
             errors += "need minimum booking deposit"
@@ -173,8 +188,18 @@ def editbooking(request, id=None):
         year = int(svc_datetime[0].lstrip('0') )
         month = int(svc_datetime[1].lstrip('0') )
         day = int( svc_datetime[2].lstrip('0') )
+        if valid_bookingdate(user_timezone, servicedate):
+            msg = "Booking needs to be greater than today"
+            errors += msg
 
+        if  valid_bookingtime(user_timezone, servicedate, ACCEPT_BOOKING_AHEAD) :
+            msg = "Booking needs to be " + str(ACCEPT_BOOKING_AHEAD) + " days before"
+            errors += msg
 
+        if get_valid_starttime(user_timezone, servicedate, formparams['svc_start_time'],\
+         ACCEPT_BOOKING_BEFORE_START):
+            msg = "Booking needs to be " + str(ACCEPT_BOOKING_BEFORE_START) + " hours before"
+            errors += msg
       
         if not formparams['book_exist']:
             for bkdn in bookings_done:
@@ -196,7 +221,7 @@ def editbooking(request, id=None):
                 if customer_fields[field]  == "required":
                     if not customer_fields[field]:
                         errors += field + " field required"
-
+                
         form = BookingForm(request.POST or None, instance=bookings )
         if errors :
             bookingdetails['formerrors'] = deepcopy( form.errors )
@@ -255,36 +280,68 @@ def deletebookings(request):
 
 @requires_csrf_token
 def cancelbooking(request, id):
+    user_timezone = request.session['visitor_timezone']
     booking = AppschedulerBookings.objects.filter(id=id)[0]
-    booking.booking_status = "cancelled"
-    booking.save()
-    booking.send_email_sms("cancel")
-
-    return  HttpResponse(status=204)   
+    booking_options = Options.getbookingOptions()
+    CANCEL_BOOKING_BEFORE_START =  int( booking_options["CANCEL_BOOKING_BEFORE_START"] )
+    
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+    booking_todaydate = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    CANCEL_BOOKING_BEFORE_START =36
+    expected_cancelled_date = booking_todaydate + timedelta(hours=CANCEL_BOOKING_BEFORE_START) 
+    start_time_visitorzn = booking.service_start_time.astimezone(pytz.timezone(user_timezone[0]))
+    if  expected_cancelled_date > start_time_visitorzn :
+        data = { "accept_booking_before_start": CANCEL_BOOKING_BEFORE_START,
+             "valid_booking" : True,
+             }
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else :
+        data = { 
+         "valid_booking" : True,
+         }
+        booking.booking_status = "cancelled"
+        booking.save()
+        booking.send_email_sms("cancel")
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 @requires_csrf_token
 def addbooking(request):
     template_name = "addbooking.html"
     bookingdetails = dict()
     errors =""
-    customer_fields = {
-        "c_country": "no",
-        "c_state" : "no",
-        "c_city" : "no",
-        "c_zip"  : "no",
-        "c_name"  : "required",
-        "c_email" : "required",
-        "c_phone" : "required",
-        "c_address_1" : "no",
-        "c_address_2" : "no"
-    }
-
+    # customer_fields = {
+    #     "c_country": "no",
+    #     "c_state" : "no",
+    #     "c_city" : "no",
+    #     "c_zip"  : "no",
+    #     "c_name"  : "required",
+    #     "c_email" : "required",
+    #     "c_phone" : "required",
+    #     "c_address_1" : "no",
+    #     "c_address_2" : "no"
+    # }
+    customer_fields= BookingFormOptions.GetBookingValidation()
+    payments_options = Payments.getPaymentOptions()
+    DISABLE_PAYMENTS = int( payments_options["DISABLE_PAYMENTS"] )
+    DEPOSIT_TYPE = payments_options["DEPOSIT_TYPE"]
+    DEPOSIT = int( payments_options["DEPOSIT"] )
+    TAX = int( payments_options["TAX"] )
+    booking_options = Options.getbookingOptions()
+    STEP = booking_options["STEP"]
+    STATUS_IF_PAID =  booking_options["STATUS_IF_PAID"]
+    STATUS_IF_NOT_PAID =  booking_options["STATUS_IF_NOT_PAID"]
+    ACCEPT_BOOKING_BEFORE_START =  booking_options["ACCEPT_BOOKING_BEFORE_START"]
+    CANCEL_BOOKING_BEFORE_START =   booking_options["CANCEL_BOOKING_BEFORE_START"]
+    ACCEPT_BOOKING_AHEAD =  int( booking_options["ACCEPT_BOOKING_AHEAD"] )
     default_status_if_paid = "confirmed"
     default_status_if_not_paid = "pending"
     if request.method == 'POST':
         formparams= request.POST.dict()
         request.POST._mutable = True
         request.POST.clear()
+
+
         request.POST["bookingid"] = formparams['uuid']
         # verify price from form is same  with DB
         serviceid = formparams["service_booked_id"]
@@ -296,7 +353,7 @@ def addbooking(request):
             return HttpResponse(status=403)
 
         booking_tax = formparams["booking_tax"]  
-        tax_percentage = 10
+        tax_percentage = TAX
         tax = price_db * round(float(tax_percentage/100),2)
 
         if round(float(tax),2) == round(float(booking_tax),2):
@@ -313,7 +370,7 @@ def addbooking(request):
             formparams['booking_deposit'] = 0 
         booking_deposit = round(float(formparams['booking_deposit']),2)
         request.POST['booking_deposit'] = booking_deposit
-        expected_deposit_percentage = 20
+        expected_deposit_percentage = DEPOSIT
         expected_booking_deposit = round(booking_total * float(expected_deposit_percentage/100),2)
         if not booking_deposit  >= expected_booking_deposit:
             errors += "need minimum booking deposit"
@@ -367,6 +424,20 @@ def addbooking(request):
         month = int(svc_datetime[1].lstrip('0') )
         day = int( svc_datetime[2].lstrip('0') )
         # Throws error if booked time is already allotted
+       
+        if valid_bookingdate(user_timezone, servicedate):
+            msg = "Booking needs to be greater than today"
+            errors += msg
+
+        if  valid_bookingtime(user_timezone, servicedate, ACCEPT_BOOKING_AHEAD) :
+            msg = "Booking needs to be " + str(ACCEPT_BOOKING_AHEAD) + " days before"
+            errors += msg
+
+        if get_valid_starttime(user_timezone, servicedate, formparams['svc_start_time'],\
+         ACCEPT_BOOKING_BEFORE_START):
+            msg = "Booking needs to be " + str(ACCEPT_BOOKING_BEFORE_START) + " hours before"
+            errors += msg
+
         if not formparams['book_exist']:
             for bkdn in bookings_done:
                 bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
@@ -572,10 +643,10 @@ def employee_in_booking(request):
         bookedtimes = []
         empid = employee.id
         #Get all bookings for the employee 
-        bookings = AppschedulerBookings.objects.filter(employee_id=empid, booking_status__ne="cancelled")
+        bookings = AppschedulerBookings.objects.filter(employee_id=empid).exclude(booking_status="cancelled")
 
         #iterate all bookings and filter all booking for the requested date and the given employee.
-        
+            
         for bktm in bookings:
             bookingtime_local = bktm.date.astimezone(pytz.timezone(user_timezone[0])).date()
 
@@ -661,8 +732,13 @@ def get_serviceprice(request):
         appscheduleobj = AppschedulerServices.objects.get(id=serviceid)
         price = float(appscheduleobj.price)
         total_price += price 
-        tax_percentage = 10
-        deposit_percentage = 30
+        payments_options = Payments.getPaymentOptions()
+        DISABLE_PAYMENTS = int( payments_options["DISABLE_PAYMENTS"] )
+        DEPOSIT_TYPE = payments_options["DEPOSIT_TYPE"]
+        DEPOSIT = int( payments_options["DEPOSIT"] )
+        TAX = int( payments_options["TAX"] )
+        tax_percentage = TAX
+        deposit_percentage = DEPOSIT
         deposit += round( price * (deposit_percentage/100), 2)
         tax += round(price * (tax_percentage/100),2)
         total += price + tax
@@ -679,5 +755,94 @@ def getust( date_string,user_timezone):
     datetime_in_utc  = datetime_with_tz.astimezone(pytz.utc)
     return datetime_in_utc
 
+def check_x_days_before(request):
+    servicedate = request.GET['servicedate']
+    # convert it to visitor timezone.
+    # get the current date.
+    # ensure it is less than x days back
+    # use timedelta to verify it 
+# convert it to visitor timezone.
+    # get the current date.
+    # ensure it is less than x days back
+    # use timedelta to verify it 
+    user_timezone = request.session['visitor_timezone']
+    booking_options = Options.getbookingOptions()
+    ACCEPT_BOOKING_AHEAD =  int(booking_options["ACCEPT_BOOKING_AHEAD"])
+    valid_booking = valid_bookingtime(user_timezone, servicedate, ACCEPT_BOOKING_AHEAD)
+    data = { "accept_booking_ahead": ACCEPT_BOOKING_AHEAD,
+             "valid_booking" : valid_booking }
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+
+def valid_bookingtime(user_timezone, servicedate, accept_booking_ahead):
+
+    date_string= servicedate 
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(date_string)
+    booking_datetime_with_tz = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(booking_datetime_with_tz)
+    # below line is for testing , will be commented out 
+    accept_booking_ahead = 0
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+    booking_servicedate = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(booking_servicedate)
+    two_days_timezone = booking_servicedate + timedelta(days=accept_booking_ahead)
+
+    if not booking_datetime_with_tz > booking_servicedate  :
+        return True
+
+    if two_days_timezone < booking_datetime_with_tz :
+        return False
+    else :
+        return True
+
+def valid_bookingdate(user_timezone, servicedate):
+
+    date_string= servicedate 
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(date_string)
+    booking_datetime_with_tz = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(booking_datetime_with_tz)
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+    booking_servicedate = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(booking_servicedate)
+
+    if not booking_datetime_with_tz > booking_servicedate  :
+        return True
+
+def check_x_hours_before(request):
+    start_time = request.GET['start_time']
+    servicedate = request.GET['servicedate']
+    user_timezone = request.session['visitor_timezone']
+    booking_options = Options.getbookingOptions()
+    ACCEPT_BOOKING_BEFORE_START =  booking_options["ACCEPT_BOOKING_BEFORE_START"]
+    valid_start_time = get_valid_starttime(user_timezone,servicedate,start_time,ACCEPT_BOOKING_BEFORE_START)
+    data = { "accept_booking_before_start": ACCEPT_BOOKING_BEFORE_START,
+             "valid_booking" : valid_start_time,
+             }
+    return HttpResponse(json.dumps(data), content_type='application/json')
+ 
+
+def get_valid_starttime(user_timezone,servicedate,start_time, accept_booking_before_start):
+    date_string =  servicedate + " " +  start_time 
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(date_string)
+    service_starttime_with_tz = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(service_starttime_with_tz)
+    # below line is for testing , will be commented out 
+    accept_booking_before_start = 0
+    visitor_tz = pytz.timezone(str(user_timezone[0]))
+    datetime_without_tz  =dparser.parse(datetime.now().strftime("%Y-%m-%d %I:%M %p"))
+    booking_todaydate = visitor_tz.localize(datetime_without_tz, is_dst=None)
+    print(booking_todaydate)
+    booking_start = booking_todaydate + timedelta(hours=accept_booking_before_start)
+    if not service_starttime_with_tz > booking_todaydate  :
+        return True
+
+    if booking_start <= service_starttime_with_tz :
+        return False
+    else :
+        return True   

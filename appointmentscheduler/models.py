@@ -27,6 +27,8 @@ class AppschedulerBookings(models.Model):
     booking_deposit = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     booking_tax = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     booking_status = models.CharField(max_length=9, blank=False, null=False)
+    booking_notes = models.TextField(blank=True, null=True)
+
     c_name = models.CharField(max_length=255, blank=True, null=True)
     c_email = models.EmailField( blank=False, null=False, validators=[validators.validate_email,])
     c_phone = PhoneNumberField(  blank=False, null=False)
