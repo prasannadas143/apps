@@ -16,7 +16,11 @@
  <p>
   <label class="title">Image</label>
   <div class="fieldWrapper">
+      {% if uploaded_file_url %}
+
     <img id="service_img" src='{{ items.o_company_logo }}'  width=25% height= 25% />
+      {% endif %}
+
     <input type="file" name="o_company_logo"  id="o_company_logo">
   </div>
 </p>
