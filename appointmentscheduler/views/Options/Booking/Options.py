@@ -18,6 +18,8 @@ from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 
+tab_id = 3
+
 def update_value(field_id, tab_id, newstep):
    item = AppschedulerOptions.objects.get(tab_id=int(tab_id), id = int(field_id) ) 
    getsteps = item.value.split('::')
@@ -31,7 +33,6 @@ def update_value(field_id, tab_id, newstep):
 @csrf_exempt
 def BookingOptions(request):
    # pdb.set_trace()
-   tab_id = 3;
    message=None
    Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
    # you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
@@ -44,7 +45,7 @@ def BookingOptions(request):
       message="opion is saved"
    else :
 
-      item = AppschedulerOptions.objects.filter(tab_id=3)
+      item = AppschedulerOptions.objects.filter(tab_id=tab_id)
       getsteps = item[4].value.split('::')
       steps = getsteps[0].split('|')
       step_selected = getsteps[-1]
@@ -92,4 +93,50 @@ def BookingOptions(request):
       # Then, do a redirect for example
    return render(request,'Options.html', {'items':items ,"message":message })
 
+def getbookingOptions():
+
+      item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+      getsteps = item[4].value.split('::')
+      steps = getsteps[0].split('|')
+      step_selected = getsteps[-1]
+      step_id = item[4].id
+
+      status_if_paid = item[3].value.split('::')
+      status_if_paid_list = status_if_paid[0].split('|')
+      status_if_paid_selected = status_if_paid[-1]
+      status_id= item[3].id
+      
+      status_if_not_paid = item[2].value.split('::')
+      status_if_not_paid_list = status_if_not_paid[0].split('|')
+      status_if_not_paid_selected = status_if_not_paid[-1]
+      status_not_id= item[2].id
+
+
+      hide_prices = item[1].value.split("::")
+      hide_prices_list=hide_prices[0].split('|')
+      hide_prices_list_selected=hide_prices[-1]
+      hide_prices_id = item[1].id
+
+
+      accept_booking_ahead = item[5].value.split("::")
+      accept_booking_ahead_list=accept_booking_ahead[0].split('|')
+      accept_booking_ahead_selected=accept_booking_ahead[-1]
+      accept_booking_ahead_id = item[5].id
+
+
+      accept_booking = item[0].value.split("::")
+      accept_booking_list=accept_booking[0].split('|')
+      accept_booking_selected=accept_booking[-1]
+      accept_booking_id = item[0].id
+
+      items = {  "STEP": step_selected,
+      "STATUS_IF_PAID":status_if_paid_selected,
+      "STATUS_IF_NOT_PAID":status_if_not_paid_selected,
+      "ACCEPT_BOOKING_BEFORE_START":hide_prices_list_selected,
+      "CANCEL_BOOKING_BEFORE_START":accept_booking_selected, 
+      "ACCEPT_BOOKING_AHEAD" : accept_booking_ahead_selected,
+
+      }
+
+      return items
 

@@ -2,16 +2,15 @@ from django.conf.urls import url
 from .views import service,employees,bookings,dashboard
 from .views.exportbookings import BookingsFeed
 
-from .views import service,employees,invoice,exportbookings
+from .views import service,employees,invoice,exportbookings,report
 from .views.Options import General
-from .views.Options.Booking import Options,Payments,BookingForm
+from .views.Options.Booking import Options,Payments,BookingFormOptions,EmailNotification
 from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
 from .views.Options.Editor import ckEditor
 from django.views.generic import TemplateView
 from .views.Options.SMS import SMS
-from .views.Options.Booking import Options,Payments,BookingForm,EmailNotification
 
 
 urlpatterns = [
@@ -45,7 +44,7 @@ urlpatterns = [
     url(r'^updateGeneral/$', General.updateGeneral, name="updateGeneral"),
     url(r'^BookingOptions/$', Options.BookingOptions, name="BookingOptions"),
     url(r'^PaymentOptions/$', Payments.PaymentOptions, name="PaymentOptions"),
-    url(r'^BookingFormOptions/$', BookingForm.BookingFormOptions, name="BookingFormOptions"), 
+    url(r'^BookingFormOptions/$', BookingFormOptions.BookingFormOptions, name="BookingFormOptions"), 
 
     url(r'^CustomTimeOptions/$', DefaultTime.CustomtimeOptions, name="customtimeoptions"),
     url(r'^Customtimes/$', DefaultTime.ShowCustomtimes, name="customtimes"),
@@ -72,6 +71,10 @@ urlpatterns = [
     url(r'^employee_in_booking/$', bookings.employee_in_booking, name="employeeinbooking"),
     url(r'^getserviceprice/$', bookings.get_serviceprice, name ="getserviceprice"),
     url(r'^cancelbooking/(?P<id>\d+)/$', bookings.cancelbooking, name ="cancelbooking"),
+    url(r'^check_x_days_before/$', bookings.check_x_days_before, name ="check_x_days_before"),
+    url(r'^check_x_hours_before/$', bookings.check_x_hours_before, name ="check_x_hours_before"),
+
+
 
     url(r'^getinvoices/$', invoice.list_invoices, name ="getinvoice"),
     url(r'^getinvoice/(?P<id>\d+)/$', invoice.generate_invoice, name ="getinvoice"),
@@ -88,6 +91,11 @@ urlpatterns = [
     url(r'^printdashboard/$', dashboard.printdashboard),
 
     url(r'^exportbookings/$', exportbookings.exportbookings, name="exportbookings"),
+
+    url(r'^employee_report/$', report.employee_report, name="employee_report"),
+    url(r'^employee_report_details/$', report.employee_report_details, name="employee_report_details"),
+    url(r'^service_report/$', report.service_report, name="service_report"),
+    url(r'^service_report_details/$', report.service_report_details, name="service_report_details"),
 
 
     url(r'^EditorTemplate/$', ckEditor.EditorTemplate, name="EditorTemplate"),

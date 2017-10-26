@@ -227,7 +227,7 @@
 					<div class="float_right w350 t15">
 						<p>
 							<label class="title">Notes:</label>
-							<textarea name="c_notes" id="c_notes" class="pj-form-field w334 h120"  value="{{ bookingdetails.c_notes }}"></textarea>
+							<textarea name="booking_notes" id="booking_notes" class="pj-form-field w334 h120"  value="{{ bookingdetails.booking_notes }}"></textarea>
 						</p>
 					</div>
 				</fieldset>
@@ -449,7 +449,21 @@
 				</p>
 	 			{% endif %}
 	 			<p>
-				
+				{% if customer_fields.c_notes in  'yes,required' %}
+				<p>
+					<label class="title">customer notes:</label>
+					{% if customer_fields.c_notes == "yes" %}
+					<input type="text" name="c_notes" id="c_notes" class="pj-form-field w500" ng-init='c_notes="{{bookingdetails.c_notes}}"' value="{{ bookingdetails.c_notes }}">
+					{% elif customer_fields.c_notes == "required"  %}
+					<input type="text" name="c_notes" id="c_notes" class="pj-form-field w500"
+					 ng-model="c_notes"   ng-init='c_notes="{{bookingdetails.c_notes}}"' value="{{ bookingdetails.c_notes }}" required>
+					{% endif %}
+					<span ng-messages="addbooking.c_notes.$error" style="color:maroon" role="alert">
+			 			 <span ng-message="required">Customer Note field is required</span>
+					</span>
+				</p>
+	 			{% endif %}
+	 			<p>
  				<span>
  				<label><input name="reminder_email" id="reminder_email"  type="checkbox" {% if bookingdetails.reminder_email == 1 %} checked {% endif %}> Send reminder email  when new booking is made</label>
  				<input name="reminder_email_value" id="reminder_email_value"  type="hidden" >
@@ -525,6 +539,7 @@ $('body').on('click', 'input.deleteDep', function() {
    $('#booking_price').val("");
    $('#booking_tax').val("");
    $('#booking_total').val("");
+   $('#booking_deposit').val("");
    $('#booking_status').val("");
 
    btn.disabled = false;
@@ -543,6 +558,28 @@ window.onclick = function(event) {
 
 // When the user clicks the button, open the modal
 services.onchange = function() {
+	msg = ""
+	$.ajax({
+		method:'get',
+		url:"{% url 'appointmentschduler:check_x_days_before'  %}",
+		async: false,
+		data: {
+			"servicedate" : $('#servicedate').val(),
+		},
+
+		success:function(data){
+			if(data.valid_booking) {
+				msg = "Booking needs to be " + data.accept_booking_ahead + " days before"
+				
+			}
+			
+		}
+	});
+	if(msg) {
+		alert(msg);
+		msg=""
+		return false;
+	}
     modal.style.display = "none";
 
     serviceModal.style.display = "block";
@@ -552,7 +589,28 @@ services.onchange = function() {
 }
 
  $('#servicedate_updated').on("change" ,function() {
+	msg = ""
+	$.ajax({
+		method:'get',
+		url:"{% url 'appointmentschduler:check_x_days_before'  %}",
+		async: false,
+		data: {
+			"servicedate" : $('#servicedate').val(),
+		},
 
+		success:function(data){
+			if(data.valid_booking) {
+				msg = "Booking needs to be " + data.accept_booking_ahead + " days before"
+				
+			}
+			
+		}
+	});
+	if(msg) {
+		alert(msg);
+		msg=""
+		return false;
+	}
 
 	$('#employeeidselected').val("");
 	$('#asEmployeeInfo').val("");
@@ -582,6 +640,11 @@ addservice.onclick = function() {
 }
 
 function validatebookingform() {
+
+	booking_deposit =$('#booking_deposit').val()
+	if (!booking_deposit) {
+		alert("Enter minimum deposit ");
+	}
 	var subscribed_email = document.getElementById("subscribed_email");
 	$('#subscribed_email_value').val(Number(subscribed_email.checked)) ;
 	
@@ -884,7 +947,32 @@ function  get_employee_details() {
  	end_t = res[1];
      var start_t = start_t.replace(/(AM|PM)/g," $1");
      var end_t = end_t.replace(/(AM|PM)/g, " $1");
+     servicedate =  $('#servicedate_updated').val();
 
+	$.ajax({
+		method:'get',
+		url:"{% url 'appointmentschduler:check_x_hours_before'  %}",
+		async: false,
+		data: {
+			"start_time" : start_t,
+			"servicedate" : servicedate
+		},
+
+		success:function(data){
+			if(data.valid_booking) {
+				msg = "Booking needs to be " + data.accept_booking_before_start + " hours before"
+				
+			}
+			
+		}
+	});
+
+	if(msg) {
+		alert(msg);
+		msg=""
+
+		return false;
+	}
 
  	$('#starttime').val(start_t);
  	 $('#endtime').val(end_t);
@@ -899,6 +987,7 @@ function  get_employee_details() {
  }
 
  function validate_deposit() {
+ 	booking_deposit = 0
  	booking_deposit  = document.getElementById("booking_deposit").value;
  	// $('booking_deposit').val();
  	required_deposit  =  document.getElementById("required_deposit").value;
@@ -907,24 +996,22 @@ function  get_employee_details() {
  	default_status_if_not_paid = $('#default_status_if_not_paid').val();
 
 	total_price = $('#booking_total').val();
- 	 if( booking_deposit &&  Boolean( booking_deposit.trim()) ) {
 
-		if ( parseFloat(booking_deposit) < parseFloat(total_price) ){
-			// add to html default_status_if_not_paid
-			$('#booking_status').val( default_status_if_not_paid);
-		}
-		else {
-			// add to html default_status_if_paid
-			$('#booking_status').val(default_status_if_paid);
-		}
-
-     	if (parseFloat(booking_deposit) < parseFloat(required_deposit) )
-        {	
-        	alert(" Minimum deposit is atleast " + required_deposit);
-			document.getElementById("booking_deposit").value= "";
-		}
+	if ( parseFloat(booking_deposit) < parseFloat(total_price) ){
+		// add to html default_status_if_not_paid
+		$('#booking_status').val( default_status_if_not_paid);
+	}
+	else {
+		// add to html default_status_if_paid
+		$('#booking_status').val(default_status_if_paid);
 	}
 
+ 	if (parseFloat(booking_deposit) < parseFloat(required_deposit) )
+    {	
+    	alert(" Minimum deposit is atleast " + required_deposit);
+		document.getElementById("booking_deposit").value= "";
+	}
+	
  }
 
 

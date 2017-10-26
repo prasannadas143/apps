@@ -11,8 +11,15 @@
 
 <div id="CountryFormOptions">
 	<h2 align="center">Company Details</h2>
- <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" action="{% url 'appointmentschduler:Company' %}">
-
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" action="{% url 'appointmentschduler:Company' %}" enctype="multipart/form-data"> {% csrf_token %}
+  
+ <p>
+  <label class="title">Image</label>
+  <div class="fieldWrapper">
+    <img id="service_img" src='{{ items.o_company_logo }}'  width=25% height= 25% />
+    <input type="file" name="o_company_logo"  id="o_company_logo">
+  </div>
+</p>
 
 <div class="form-group">
     <label class="col-sm-6 control-label " for="o_CompanyName">Company Name</label>

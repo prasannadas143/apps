@@ -103,7 +103,6 @@ def SaveMailSettings(request):
 
 
 def SendMailFromBooking(bookingid):
-	pdb.set_trace()
 	templateid = 2
 	tmpdtls=ckEditor.GetTemplateDetailByTemplateID(templateid)
 	emailres = tmpdtls.DesignedTemplate

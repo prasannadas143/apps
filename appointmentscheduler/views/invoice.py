@@ -186,25 +186,26 @@ def print_invoice_pdf(request,id):
 	result = BytesIO()
 	invoicedetails =getinvoicedetails(  id, user_timezone)
 	# if getpdf:
-	v_country ="califarnia"
-	v_add1 =  "sunnyvale"
-	v_add2 = "home tree"
-	v_zip = "2344455"
-	v_country_abbr = "cl"
-	v_phone = "+91992888377"
-	v_email = "ggggd@hhhh.com"
-	v_website = "sddff@hjjjs.com"
+	# v_country ="califarnia"
+	# v_add1 =  "sunnyvale"
+	# v_add2 = "home tree"
+	# v_zip = "2344455"
+	# v_country_abbr = "cl"
+	# v_phone = "+91992888377"
+	# v_email = "ggggd@hhhh.com"
+	# v_website = "sddff@hjjjs.com"
 	 
-	vendor_address = {
-	"v_country" : v_country,
-	"v_add1" : v_add1,
-	"v_add2" : v_add2,
-	"v_zip" : v_zip,
-	"v_country_abbr" : v_country_abbr,
-	"v_phone" : v_phone,
-	"v_email" : v_email,
-	"v_website" : v_website
-	}
+	# vendor_address = {
+	# "v_country" : v_country,
+	# "v_add1" : v_add1,
+	# "v_add2" : v_add2,
+	# "v_zip" : v_zip,
+	# "v_country_abbr" : v_country_abbr,
+	# "v_phone" : v_phone,
+	# "v_email" : v_email,
+	# "v_website" : v_website
+	# }
+	vendor_address= Invoice.GetInvoiceCompanyvalues()
 	file = "invoice_{0}.pdf".format(id)
 	response = HttpResponse(content_type='application/pdf')
 	response['Content-Disposition'] = 'inline; filename="{}"'.format(file)
@@ -297,7 +298,7 @@ def createinvoicepdf(canvas , invoicedetails, vendor_address):
 	canvas.drawString(x_val,pos_y,str(invoicedetails['amount_due']))	
 	 
 	pos_y-= 50	
-
+	
 	canvas.drawString(pos_x,pos_y,vendor_address['v_country'])
 	pos_y-= 10	
 	canvas.line(pos_x,pos_y,end_pos_x,pos_y)
@@ -329,6 +330,9 @@ def getinvoicedetails(id, user_timezone):
 	invoicedetails['add1'] = invoice_instance.c_address_1 
 	invoicedetails['add2'] = invoice_instance.c_address_2
 	invoicedetails['phone'] = str(invoice_instance.c_phone) 
+	invoicedetails['ip'] = invoice_instance.ip
+	invoicedetails['c_name'] = invoice_instance.c_name
+	invoicedetails['c_email'] = invoice_instance.c_email
 
 	# todaydate= datetime.now().strftime("%Y-%m-%d")
 	# bookingdetails["defaultdate"] = todaydate 

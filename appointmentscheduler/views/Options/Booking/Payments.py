@@ -17,7 +17,8 @@ from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.files import ImageField
 from django.db.models.fields.related import ForeignKey, OneToOneField
-
+   
+tab_id = 7;
 def update_value(field_id, tab_id, newstep):
    item = AppschedulerOptions.objects.get(tab_id=int(tab_id), id = int(field_id) ) 
    getsteps = item.value.split('::')
@@ -31,23 +32,19 @@ def update_value(field_id, tab_id, newstep):
 @csrf_exempt
 def PaymentOptions(request):
    # pdb.set_trace()
-   tab_id = 7;
    message=None
    Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
    # you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
    # you can remove the preview assignment (form =request.POST)
    paymentdata = dict()
    if request.method == 'POST':
-      pdb.set_trace();
       for field in request.POST.keys():
          newstep = request.POST[field.strip()]
          update_value(field, tab_id , newstep.strip() )
       paymentdata['message'] ="opion is saved"
    else :
 
-      item = AppschedulerOptions.objects.filter(tab_id=7)
-
-      pdb.set_trace();
+      item = AppschedulerOptions.objects.filter(tab_id=tab_id)
 
       #o_allow_authorize
       o_disable_paymentsList = item[11].value.split('::')
@@ -79,5 +76,33 @@ def PaymentOptions(request):
       # Then, do a redirect for example
    return render(request,'Payments.html', paymentdata)
 
+def getPaymentOptions():
+
+   item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+
+   #o_allow_authorize
+   o_disable_paymentsList = item[11].value.split('::')
+   o_disable_payments = o_disable_paymentsList[0].split('|')
+   o_disable_payments_selected = o_disable_paymentsList[-1]
+   o_disable_payments_id = item[11].id
+
+   #o_deposit_type
+   o_deposit_typeList = item[10].value.split('::')
+   o_deposit_type = o_deposit_typeList[0].split('|')
+   o_deposit_type_selected = o_deposit_typeList[-1]
+   o_deposit_type_id = item[10].id
+
+   #o_deposit
+   o_deposit = item[9].value
+   o_deposit_id = item[9].id
+
+   #o_tax
+   o_tax = item[13].value
+   o_tax_id = item[13].id
 
 
+   items = { "DISABLE_PAYMENTS": o_disable_payments_selected,
+    "DEPOSIT_TYPE":o_deposit_type_selected,
+   "DEPOSIT":o_deposit,"TAX":o_tax
+   }
+   return items
