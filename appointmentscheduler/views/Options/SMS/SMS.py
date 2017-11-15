@@ -1,6 +1,6 @@
 from twilio.rest import Client
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
+from django.shortcuts import render, render_to_response, HttpResponseRedirect,get_object_or_404
 from appointmentscheduler.models import AppschedulerOptions
 from django.http import JsonResponse
 import datetime, pdb
@@ -21,7 +21,7 @@ from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.forms.models import model_to_dict
 
 def update_value(field_id, tab_id, newstep):
-   item = AppschedulerOptions.objects.get(tab_id=int(tab_id), key = field_id)
+   item = get_object_or_404(AppschedulerOptions,tab_id=int(tab_id), key = field_id)
    item.value = newstep;
    print(newstep);
    item.save()
@@ -35,12 +35,16 @@ def SendSMSDyncamic(MobileNumber,Message):
 	Message = Message
 	print(Message);
 	tab_id = 101;
-	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-	TWILIO_ACCOUNT_SID = item[0].value;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
 	print(TWILIO_ACCOUNT_SID);
-	TWILIO_AUTH_TOKEN = item[1].value;
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
 	print(TWILIO_AUTH_TOKEN);
-	TWILIO_FROM_NUMBER = item[2].value;
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
 	print(TWILIO_FROM_NUMBER);
 	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
 	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
@@ -54,13 +58,16 @@ def SendSMS(request):
 	Message = request.POST['Message']
 	print(Message);
 	tab_id = 101;
-	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-	TWILIO_ACCOUNT_SID = item[0].value;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
 	print(TWILIO_ACCOUNT_SID);
-	TWILIO_AUTH_TOKEN = item[1].value;
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
 	print(TWILIO_AUTH_TOKEN);
-	TWILIO_FROM_NUMBER = item[2].value;
-	print(TWILIO_FROM_NUMBER);
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
 	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
 	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
 	print(result);
@@ -80,15 +87,20 @@ def SMSConfig(request):
 			newstep = request.POST[field.strip()]
 			update_value(field, tab_id , newstep.strip() )
 
-	item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-	o_TWILIO_ACCOUNT_SID = item[0].value;
-	o_TWILIO_AUTH_TOKEN = item[1].value;
-	o_TWILIO_FROM_NUMBER = item[2].value;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
 
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
+	print(TWILIO_ACCOUNT_SID);
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
+	print(TWILIO_AUTH_TOKEN);
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
 	items = {
-	"o_TWILIO_ACCOUNT_SID":o_TWILIO_ACCOUNT_SID,
-	"o_TWILIO_AUTH_TOKEN":o_TWILIO_AUTH_TOKEN,
-    "o_TWILIO_FROM_NUMBER":o_TWILIO_FROM_NUMBER
+	"o_TWILIO_ACCOUNT_SID": TWILIO_ACCOUNT_SID,
+	"o_TWILIO_AUTH_TOKEN": TWILIO_AUTH_TOKEN,
+    "o_TWILIO_FROM_NUMBER": TWILIO_FROM_NUMBER
 	}
 	SMSConfigdata['items'] = items
 	# Then, do a redirect for example

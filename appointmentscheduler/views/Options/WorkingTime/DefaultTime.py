@@ -1,15 +1,12 @@
-from django.http import HttpResponse
-from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
+from django.shortcuts import  render, HttpResponse, get_object_or_404
 from appointmentscheduler.models  import AppschedulerDates
-from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
-from django.db.models.fields import DateField, TimeField
+import os,json
+from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie
 from appointmentscheduler.form.Options.WorkingTime.DefaultTimeForm import customtimeform
 from datetime import datetime
-import datetime,re,pytz,calendar
+import datetime,pytz
 from django.contrib.gis.geoip2 import GeoIP2
-from easy_timezones.utils import get_ip_address_from_request, is_valid_ip, is_local_ip
+from easy_timezones.utils import is_valid_ip
 from pytz import country_timezones
 import dateutil.parser as dparser
 
@@ -24,15 +21,15 @@ def ShowCustomtimes(request):
 	if 'querydata' in request.GET:
 		querydata = request.GET['querydata']
 	if querydata == "all":
-		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0] )
+		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0] ).order_by('-id')
 	elif querydata == "yes":
-		customrecords = AppschedulerDates.objects.filter(is_dayoff = 1 ,visitor_timezone = user_timezone[0])
+		customrecords = AppschedulerDates.objects.filter(is_dayoff = 1 ,visitor_timezone = user_timezone[0]).order_by('-id')
 	elif querydata == "no":
-		customrecords = AppschedulerDates.objects.filter(is_dayoff = 0,visitor_timezone = user_timezone[0] )
+		customrecords = AppschedulerDates.objects.filter(is_dayoff = 0,visitor_timezone = user_timezone[0] ).order_by('-id')
 	else:
-		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0])
+		customrecords = AppschedulerDates.objects.filter(visitor_timezone = user_timezone[0]).order_by('-id')
 
-	for customtime in reversed(list(customrecords)):
+	for customtime in customrecords.iterator():
 		data=dict()
 		data['id'] = customtime.pk
 		datetime_in_pacific = customtime.date.astimezone(pytz.timezone(user_timezone[0]))
@@ -122,7 +119,7 @@ def CustomtimeOptions(request, id=None):
 						errors += "Launch time needs to be between  start and end working hours  \n"
 
 		if id is not None :
-			dateobj = AppschedulerDates.objects.get(id=id)
+			dateobj = get_object_or_404(AppschedulerDates,id=id)
 			form = customtimeform( request.POST or None , instance=dateobj )
 		else :
 			form = customtimeform(request.POST or None )
@@ -133,7 +130,7 @@ def CustomtimeOptions(request, id=None):
 			message = "Customtime saved"
 			form.save()
 	elif id is not None :
-		dateobj = AppschedulerDates.objects.get(id=id)
+		dateobj = get_object_or_404(AppschedulerDates,id=id)
 		user_timezone = request.session['visitor_timezone']
 		data=dict()
 		data['id'] = dateobj.pk	
@@ -232,7 +229,7 @@ def getusertimezone(ip):
 	return country_timezones[geoinfo['country_code']]
 
 def DeleteCustomtime(request, id):
-	adate = AppschedulerDates.objects.filter(id = id)
+	adate = get_object_or_404(AppschedulerDates,id = id)
 	adate.delete()
 	return HttpResponse(status=204)
 
@@ -240,7 +237,7 @@ def DeleteCustomtime(request, id):
 def DeleteCustomtimes(request):
 	deleteids= request.POST['rowids']
 	for id in deleteids.split(",") :
-	    adate=AppschedulerDates.objects.get(id=id)
+	    adate=get_object_or_404(AppschedulerDates,id=id)
 	    adate.delete()
 	return HttpResponse(status=204)
 

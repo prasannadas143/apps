@@ -147,7 +147,7 @@
 								</div>
 								<div class="modal-body">
 
-								  <input type="text" name="servicedate" id="servicedate" class="pj-form-field w500" value="{{ defaultdate }}">
+								  <input type="text" name="servicedate" id="servicedate" class="pj-form-field w500" value="{{ svc_date }}">
 									<select name="services" id="services" >
 									</select>
 
@@ -169,7 +169,7 @@
 								</div>
 								<div class="modal-body">
 
-								  <input type="text" name="servicedate_updated" id="servicedate_updated" class="pj-form-field w500" value="{{ defaultdate }}">
+								  <input type="text" name="servicedate_updated" id="servicedate_updated" class="pj-form-field w500" value="{{ svc_date }}">
 									<select name="servicedetails" id="servicedetails">
 									</select>
 									<div class="asContainer" id="employeedetails">
@@ -595,7 +595,7 @@ services.onchange = function() {
 		url:"{% url 'appointmentschduler:check_x_days_before'  %}",
 		async: false,
 		data: {
-			"servicedate" : $('#servicedate').val(),
+			"servicedate" : $('#servicedate_updated').val(),
 		},
 
 		success:function(data){

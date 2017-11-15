@@ -1,22 +1,8 @@
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from appointmentscheduler.models import AppschedulerCountries
-from django.http import JsonResponse
-import datetime, pdb
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-from PIL import Image
-import io
-from django.core.files.base import ContentFile
-from io import BytesIO
-from django.core.files import File
-from base64 import decodestring
-from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.related import ForeignKey, OneToOneField
+import pdb,os,json
+from django.views.decorators.csrf import csrf_exempt
 from  appointmentscheduler.form.Options.Countries.Countries import Countries
 from django.forms.models import model_to_dict
 
@@ -34,15 +20,15 @@ def CountriesList(request):
     if 'querydata' in request.GET:
         querydata = request.GET['querydata']
         if querydata == "all":
-            Countries = AppschedulerCountries.objects.all()
+            Countries = AppschedulerCountries.objects.all().order_by('-id')
         elif querydata == "active":
-            Countries = AppschedulerCountries.objects.filter(status = 1 )
+            Countries = AppschedulerCountries.objects.filter(status = 1 ).order_by('-id')
         elif querydata == "inactive":
-            Countries = AppschedulerCountries.objects.filter(status = 0 )
+            Countries = AppschedulerCountries.objects.filter(status = 0 ).order_by('-id')
     else:
-        Countries = AppschedulerCountries.objects.all()
+        Countries = AppschedulerCountries.objects.all().order_by('-id')
 
-    for Country in reversed(list(Countries)):
+    for Country in Countries:
         data=dict()
         data['id'] = Country.id
         data['CountryName'] = Country.CountryName

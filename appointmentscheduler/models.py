@@ -12,11 +12,10 @@ from django.utils.text import slugify
 from django.conf import settings
 from .celery import app as celery_app
 
-import re,pdb,os,datetime,uuid,arrow
+import re,pdb,os,datetime,arrow
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core import validators
 from timezone_field import TimeZoneField
-from django.core.exceptions import ValidationError
 
 
 
@@ -98,10 +97,11 @@ class AppschedulerBookings(models.Model):
 
         # Calculate the correct time to send this reminder
         # appointment_time = arrow.get(self.service_start_time, self.time_zone.zone)
+        pdb.set_trace()
         appointment_time = arrow.get(self.service_start_time)
 
         reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
-        pdb.set_trace()
+        # pdb.set_trace()
         # Schedule the Celery task
         from .tasks import send_email,send_sms
         if self.subscribed_email:
@@ -168,7 +168,7 @@ class AppschedulerDates(models.Model):
 def employee_img_location(instance, filename):
     filename, ext = os.path.splitext(filename.lower())
     filename = "%s_%s.%s" % (slugify(filename),datetime.datetime.now().strftime("%Y-%m-%d.%H-%M-%S"), ext)
-    imagepath = "%s/%s_%s/%s" %( "employee" ,instance.emp_name,instance.phone, filename)
+    imagepath = "%s/%s_%s/%s" %( 'employee/%Y/%m/%d' ,instance.emp_name,instance.phone, filename)
     print(imagepath)
     return re.sub('[!@#$+\s]','',imagepath)
 

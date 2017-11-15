@@ -1,28 +1,10 @@
-from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
-from django.http import JsonResponse
-import datetime,pdb,os,json,re,uuid
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.files import ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from django.core import serializers
-from django.core.files import File
-from django.utils.safestring import mark_safe
-from django.db.models import Count
-from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, AppschedulerDates,AppschedulerCountries,AppschedulerBookings
+from django.shortcuts import  render,HttpResponse,get_object_or_404
+import datetime,json
+from django.views.decorators.csrf import requires_csrf_token,ensure_csrf_cookie
+from appointmentscheduler.models  import  AppschedulerBookings
 from datetime import datetime
-from pytz import country_timezones, timezone
-from tzlocal import get_localzone
-import re,pytz,calendar
-from datetime import datetime, timedelta
-import dateutil.parser as dparser
-from copy import deepcopy
-from appointmentscheduler.form.bookingform import BookingForm
-from appointmentscheduler.views.Options.SMS import SMS
-from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.views.Options.WorkingTime.DefaultTime import convert_to_ust
-from django.db.models import Count, Min, Sum, Avg
+from django.db.models import Count, Sum
 
 @requires_csrf_token
 def employee_report(request):
@@ -54,9 +36,9 @@ def service_report_details(request):
 	if validate_date(todate):
 		todate_instance = convert_to_ust(todate,time,user_timezone)
 	if type(employeeid) is int :
-		allbookings = AppschedulerBookings.objects.filter( employee = employeeid)
+		allbookings = AppschedulerBookings.objects.filter( employee = employeeid).select_related('employee'	,	'service')
 	else :
-		allbookings = AppschedulerBookings.objects.all()
+		allbookings = AppschedulerBookings.objects.all().select_related('employee'	,	'service')
 
 	if fromdate_instance is not None and todate_instance is not None :
 		allbookings_of_dates = allbookings.filter(date__gte=fromdate_instance, date__lte=todate_instance)
@@ -82,7 +64,7 @@ def service_report_details(request):
 		bookings_confirmed = bookings_confirmed.annotate(booking_count=Count('service__id'))
 		bookings_pending = bookings_pending.annotate(booking_count=Count('service__id'))
 		bookings_cancelled = bookings_cancelled.annotate(booking_count=Count('service__id'))
-		for booking in bookings_all:
+		for booking in bookings_all.iterator():
 			report = dict()
 			service_name = booking['service__service_name'] 
 			report["service_name"] = service_name
@@ -97,7 +79,7 @@ def service_report_details(request):
 		bookings_confirmed = bookings_confirmed.annotate(booking_amount=Sum('booking_total'))
 		bookings_pending = bookings_pending.annotate(booking_amount=Sum('booking_total'))
 		bookings_cancelled = bookings_cancelled.annotate(booking_amount=Sum('booking_total'))
-		for booking in bookings_all:
+		for booking in bookings_all.iterator():
 			report = dict()
 			service_name = booking['service__service_name'] 
 			report["service_name"] = service_name
@@ -132,9 +114,10 @@ def employee_report_details(request):
 	if validate_date(todate):
 		todate_instance = convert_to_ust(todate,time,user_timezone)
 	if type(serviceid) is int :
-		allbookings = AppschedulerBookings.objects.filter( service = serviceid)
+		allbookings = AppschedulerBookings.objects.filter( service = serviceid).select_related('employee'\
+			,'service')
 	else :
-		allbookings = AppschedulerBookings.objects.all()
+		allbookings = AppschedulerBookings.objects.all().select_related('employee'	,	'service')
 
 	if fromdate_instance is not None and todate_instance is not None :
 		allbookings_of_dates = allbookings.filter(date__gte=fromdate_instance, date__lte=todate_instance)
@@ -160,7 +143,7 @@ def employee_report_details(request):
 		bookings_confirmed = bookings_confirmed.annotate(booking_count=Count('employee__id'))
 		bookings_pending = bookings_pending.annotate(booking_count=Count('employee__id'))
 		bookings_cancelled = bookings_cancelled.annotate(booking_count=Count('employee__id'))
-		for booking in bookings_all:
+		for booking in bookings_all.iterator():
 			report = dict()
 			emp_name = booking['employee__emp_name'] 
 			report["employee_name"] = emp_name
@@ -175,7 +158,7 @@ def employee_report_details(request):
 		bookings_confirmed = bookings_confirmed.annotate(booking_amount=Sum('booking_total'))
 		bookings_pending = bookings_pending.annotate(booking_amount=Sum('booking_total'))
 		bookings_cancelled = bookings_cancelled.annotate(booking_amount=Sum('booking_total'))
-		for booking in bookings_all:
+		for booking in bookings_all.iterator():
 			report = dict()
 			emp_name = booking['employee__emp_name'] 
 			report["employee_name"] = emp_name
@@ -191,7 +174,7 @@ def employee_report_details(request):
 	return  HttpResponse(json.dumps({"reports" :reports_summary }), content_type='application/json') 
 
 def getbookingcount_employee( bookings, emp_name ):
-	for booking in bookings:
+	for booking in bookings.iterator():
 		emp_name_booked = booking['employee__emp_name'] 
 		if emp_name == emp_name_booked :
 			return booking['booking_count'] 
@@ -199,7 +182,7 @@ def getbookingcount_employee( bookings, emp_name ):
 	return 0
 
 def getbookingtotal_employee( bookings, emp_name ):
-	for booking in bookings:
+	for booking in bookings.iterator():
 		emp_name_booked = booking['employee__emp_name'] 
 		if emp_name == emp_name_booked :
 			return round(float(booking['booking_amount']),2) 
@@ -207,7 +190,7 @@ def getbookingtotal_employee( bookings, emp_name ):
 	return 0
 
 def getbookingcount_service( bookings, service_name ):
-	for booking in bookings:
+	for booking in bookings.iterator():
 		service_name_booked = booking['service__service_name'] 
 		if service_name == service_name_booked :
 			return booking['booking_count'] 
@@ -215,7 +198,7 @@ def getbookingcount_service( bookings, service_name ):
 	return 0
 
 def getbookingtotal_service( bookings, service_name ):
-	for booking in bookings:
+	for booking in bookings.iterator():
 		service_name_booked = booking['service__service_name'] 
 		if service_name == service_name_booked :
 			return round(float(booking['booking_amount']),2) 

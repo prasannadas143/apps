@@ -1,38 +1,20 @@
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
+from django.shortcuts import render,  HttpResponseRedirect,get_object_or_404
 from appointmentscheduler.models import AppschedulerServices, AppschedulerEmployees
 from  appointmentscheduler.form.employeeform import EmployeeForm
-from django.http import JsonResponse
-import datetime, pdb
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-from PIL import Image
-import io
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.core.files import File
-from base64 import decodestring
-from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.files import ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from django.utils.safestring import mark_safe
-
-
-
+import os,json,re
+from django.views.decorators.csrf import requires_csrf_token, csrf_exempt,ensure_csrf_cookie
 
 @ensure_csrf_cookie
 def services_names(request):
-    services = AppschedulerServices.objects.all()
+    services = AppschedulerServices.objects.values('id','service_name')
     # DON'T USE
-    serviceslist = [dict([("name",service.service_name), ("id",service.id)]) for service in services ]
+    serviceslist = [dict([("name",service['service_name']), ("id",service['id'])]) for service in services ]
     return HttpResponse(json.dumps(serviceslist), content_type='application/json')
 
 @requires_csrf_token
 def employee_List(request):
+    """ Displays employee information of all employees """
 
     template_name="employeelist.html"
 
@@ -40,18 +22,20 @@ def employee_List(request):
 
 @requires_csrf_token
 def getemployees(request):
+    """  Ajax call to get list of employeees """
+
     employees_info=[]
     querydata = request.GET['querydata']
     if querydata == "all":
-        employees = AppschedulerEmployees.objects.all()
+        employees = AppschedulerEmployees.objects.all().prefetch_related('appschedulerservices_set').order_by('-id')
     elif querydata == "active":
-        employees = AppschedulerEmployees.objects.filter(is_active = 1 )
+        employees = AppschedulerEmployees.objects.filter(is_active = 1 ).prefetch_related('appschedulerservices_set').order_by('-id')
     elif querydata == "inactive":
-        employees = AppschedulerEmployees.objects.filter(is_active = 0 )
+        employees = AppschedulerEmployees.objects.filter(is_active = 0 ).prefetch_related('appschedulerservices_set').order_by('-id')
     else:
-        employees = AppschedulerEmployees.objects.all()
+        employees = AppschedulerEmployees.objects.all().prefetch_related('appschedulerservices_set').order_by('-id')
 
-    for employee in  reversed(list(employees)):
+    for employee in  employees:
         data=dict()
         data['id'] = employee.pk
         if employee.avatar.name != '' :
@@ -67,38 +51,46 @@ def getemployees(request):
 
 @ensure_csrf_cookie
 def delete_employee(request,id=None):
-    aservc=AppschedulerEmployees.objects.get(id=id)
+    """ Delete employee """
+
+    aservc=get_object_or_404(AppschedulerEmployees,  pk=int(id) )
     aservc.delete()
     return HttpResponse(status=204)
 
 
 @ensure_csrf_cookie
 def delete_employees(request):
+    """ Delete all selected employees """
+
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
-        aservc=AppschedulerEmployees.objects.get(id=id)
+        aservc=get_object_or_404(AppschedulerEmployees,  pk=int(id) )
         aservc.delete()
     return HttpResponse(status=204)
 
 @ensure_csrf_cookie
 def list_phones(request):
-    employees = AppschedulerEmployees.objects.all()
+    """ Displays phone no of each employee """
+
+    employees = AppschedulerEmployees.objects.values('id', 'phone')
     # DON'T USE
-    listphones= [dict([("phone",str(employee.phone)), ("id",employee.id)]) for employee in employees ]
+    listphones= [dict([("phone",str(employee['phone'])), ("id",employee['id'])]) for employee in employees ]
 
     return HttpResponse(json.dumps(listphones), content_type='application/json')
 
 @ensure_csrf_cookie
 def list_emails(request):
-    employees = AppschedulerEmployees.objects.all()
+    """ Displays email  of each employee """
+
+    employees = AppschedulerEmployees.objects.values('id', 'email')
     # DON'T USE
-    listemails = [dict([("email",str(employee.email)), ("id",employee.id)]) for employee in employees ]
+    listemails = [dict([("email",str(employee['email'])), ("id",employee['id'])]) for employee in employees ]
 
     return HttpResponse(json.dumps(listemails), content_type='application/json')
 
 @requires_csrf_token
 def add_Employee(request):
-    # DON'T USE
+    """ create a new  employee """
     if request.method == 'POST':
 
         # create a form instance and populate it with data from the request:
@@ -117,9 +109,9 @@ def add_Employee(request):
                 matchobj =  re.match(r'^check\d+', key)     
                 if matchobj:
                     fieldname = matchobj.group()
-                    empid= request.POST[fieldname]
-                    empinstance = AppschedulerServices.objects.get(id=int(empid))
-                    employee_instance.appschedulerservices_set.add(empinstance)
+                    svcid= request.POST[fieldname]
+                    svcnstance = get_object_or_404(AppschedulerServices,  pk=int(svcid) ) 
+                    employee_instance.appschedulerservices_set.add(svcnstance)
             return HttpResponseRedirect('/appointmentschduler/employeelist/')
 
             # if a GET (or any other method) we'll create a blank form
@@ -132,8 +124,11 @@ def add_Employee(request):
 
 @requires_csrf_token
 def edit_Employee(request, id):
+    """ Edit  the existing employee """
+
+
     template_name = "editEmployee.html"
-    appscheduleobj = AppschedulerEmployees.objects.get(id=id)
+    appscheduleobj = get_object_or_404(AppschedulerEmployees,  pk=int(id) ) 
     defaultimg=appscheduleobj.__class__._meta.get_field('avatar').default
     if request.method == "POST":
         form = EmployeeForm(request.POST or None, request.FILES or None, instance=appscheduleobj)
@@ -161,7 +156,7 @@ def edit_Employee(request, id):
                 if matchobj:
                     fieldname = matchobj.group()
                     serviceid= request.POST[fieldname]
-                    serviceinstance = AppschedulerServices.objects.get(id=int(serviceid))
+                    serviceinstance = get_object_or_404(AppschedulerServices,  pk=int(serviceid) )
                     employee_instance.appschedulerservices_set.add(serviceinstance)
             return HttpResponseRedirect('/appointmentschduler/employeelist/')
     else:
@@ -176,23 +171,26 @@ def get_Employees(request):
 
 @ensure_csrf_cookie
 def associated_service_names(request,id):
-    services = AppschedulerServices.objects.all()   
+    """ Get the associated employee with a service"""
+
+    services = AppschedulerServices.objects.values('id', 'service_name')   
     # DON'T USE
     servicelist = []
-    appscheduleobj = AppschedulerEmployees.objects.get(id=id)   
-    emp_service= appscheduleobj.appschedulerservices_set.all()
+    appscheduleobj = get_object_or_404(AppschedulerEmployees,  pk=int(id) ).prefetch_related('appschedulerservices_set') 
+    emp_service= appscheduleobj.appschedulerservices_set.values('id')
     for service in services  :
-        service_info = dict([("name",service.service_name), ("id",service.id)]) 
+        service_info = dict([("name",service['service_name']), ("id",service['id'])]) 
         for empl_in_service in emp_service:
-            if empl_in_service.id == service.id :
+            if empl_in_service['id'] == service['id'] :
                 service_info['checked'] = True
         servicelist.append(service_info)
     return HttpResponse(json.dumps(servicelist), content_type='application/json')
 
 @ensure_csrf_cookie
 def deleteemployeeimage(request,id):
-    #Implemented with angula js
-    appscheduleobj=AppschedulerEmployees.objects.get(id=id)
+    """Delete image of a employee"""
+
+    appscheduleobj= get_object_or_404(AppschedulerEmployees,  pk=int(id) )
     defaultimg =  appscheduleobj.__class__._meta.get_field('avatar').default
     oldimage =appscheduleobj.avatar.name
     oldimagepath=  os.path.dirname(appscheduleobj.avatar.path)
