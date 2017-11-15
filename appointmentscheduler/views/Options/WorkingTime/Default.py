@@ -1,16 +1,7 @@
-from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect, get_object_or_404
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.http import JsonResponse
-import pdb,os,json,re
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from pytz import country_timezones, timezone
-from tzlocal import get_localzone
-import re,pytz,calendar
-from datetime import datetime, timedelta
-import dateutil.parser as dparser
+from datetime import timedelta
 from appointmentscheduler.views.Options.WorkingTime.DefaultTime import *
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import  get_object_or_404
 
 global user_timezone 
 def getust( date_string):
@@ -63,7 +54,7 @@ def WorkingTimeOptions(request):
         adate = None
         adates = AppschedulerDates.objects.filter(date__year = year, visitor_timezone = user_timezone[0]  )
 
-        for dt in adates:
+        for dt in adates.iterator():
             getvisitortime = dt.date.astimezone(pytz.timezone(user_timezone[0]))
             if getvisitortime.date().day == day and getvisitortime.date().month == month :
                 adate = dt 
@@ -212,7 +203,7 @@ def WorkingTimeOptionsEdit(request):
                             errors += "End launch time needs to be more than start launch time \n"
                         if  not ((start_time_instance < start_launch_instance) and  (end_launch_instance < end_time_instance)) :
                             errors += "Launch time needs to be between  start and end working hours  \n"
-                dateobj = AppschedulerDates.objects.filter(date=request.POST['date'],visitor_timezone=user_timezone[0])[0]
+                dateobj = get_object_or_404(AppschedulerDates,date=request.POST['date'],visitor_timezone=user_timezone[0])
                 form = customtimeform(request.POST or None , instance=dateobj)
                 form.instance.visitor_timezone = user_timezone[0]
                 if errors :
@@ -220,7 +211,7 @@ def WorkingTimeOptionsEdit(request):
                 if form.is_valid():
                     message = "Customtime saved"
                     form.save()
-                updatedobj = AppschedulerDates.objects.filter(date=request.POST['date'], visitor_timezone=user_timezone[0])[0]
+                updatedobj = get_object_or_404(AppschedulerDates, date=request.POST['date'], visitor_timezone=user_timezone[0])
                 weekrecord_visitor = dict()
                 datetime_local = updatedobj.date.astimezone(pytz.timezone(user_timezone[0]))
                 weekrecord_visitor['start_date'] = datetime_local.strftime('%Y-%m-%d')

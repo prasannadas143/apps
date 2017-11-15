@@ -2,7 +2,7 @@ import re,pytz,calendar,pdb,csv
 from datetime import datetime, timedelta
 import dateutil.parser as dparser
 from appointmentscheduler.models  import AppschedulerBookings
-from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
+from django.shortcuts import  render, HttpResponse,get_object_or_404
 from dicttoxml import dicttoxml
 from io import BytesIO
 from operator import itemgetter
@@ -14,7 +14,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, \
     Table, TableStyle
 from django.contrib.syndication.views import Feed 
-from django.core.urlresolvers import reverse
+global user_timezone
 
 def getbookinginfos(duration, user_timezone):
 	today = datetime.now()
@@ -25,29 +25,30 @@ def getbookinginfos(duration, user_timezone):
 	# print(datetime_with_tz_today)	
 	bookingsdetails = list()
 	if duration == "coming":
-		bookings_done = AppschedulerBookings.objects.all()
-		for bkdn in bookings_done:
-			bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0]))
+		bookings_done = AppschedulerBookings.objects.values('id','date')
+		for bkdn in bookings_done.iterator():
+			bookingtime_done = bkdn['date'].astimezone(pytz.timezone(user_timezone[0]))
 			if bookingtime_done > datetime_with_tz_today:
-				bookingid = bkdn.id
-				bookingdetails = getbookingdetails( bookingid, user_timezone ) 
-				bookingsdetails.append( bookingdetails )
+				bookingid = bkdn['id']
+				bookingdetail = getbookingdetails( bookingid, user_timezone ) 
+				bookingsdetails.append( bookingdetail )
 	else:
 		dates_list = getdatelist(duration, visitor_tz, datetime_with_tz_today )
 		year = dates_list[0].year
-		bookings_done = AppschedulerBookings.objects.filter(date__year = year)
-		for bkdn in bookings_done:
-			bookingtime_done = bkdn.date.astimezone(pytz.timezone(user_timezone[0])).date()
+		bookings_done = AppschedulerBookings.objects.filter(date__year = year).values('id','date')
+		for bkdn in bookings_done.iterator():
+			bookingtime_done = bkdn['date'].astimezone(pytz.timezone(user_timezone[0])).date()
 			for dateselected in dates_list:
 				if bookingtime_done.day == dateselected.day and bookingtime_done.month == dateselected.month:
 		#create a booked list and prepare dictionary
-					bookingid = bkdn.id
-					bookingdetails = getbookingdetails( bookingid, user_timezone ) 
-					bookingsdetails.append( bookingdetails )
+					bookingid = bkdn['id']
+					bookingdetail = getbookingdetails( bookingid, user_timezone ) 
+					bookingsdetails.append( bookingdetail )
 	return bookingsdetails
 
 
 def exportbookings(request):
+	global user_timezone
 	error_message = ""
 	if request.GET :
 		# pdb.set_trace()
@@ -102,7 +103,7 @@ def exportbookings(request):
 
 
 def getbookingdetails( bookingid , user_timezone):
-	booking_instance = AppschedulerBookings.objects.filter(id = bookingid)[0]
+	booking_instance = get_object_or_404( AppschedulerBookings,  pk=int(bookingid) )
 	booked_details = dict()
 	booked_details['id'] = booking_instance.id
 	booked_details['booking_id'] = booking_instance.bookingid
@@ -192,7 +193,7 @@ class BookingsFeed(Feed):
 
 	def items(self):
 		data = []
-		user_timezone = ['Europe/Helsinki']
+		user_timezone = user_timezone
 		duration = "thismonth"
 
 		bookingsdetails = getbookinginfos(duration, user_timezone)

@@ -1,26 +1,19 @@
 from __future__ import absolute_import
-
-from celery import shared_task
 from celery.decorators import task
-from .celery import app as celery_app
-from django.conf import settings
-
-import arrow
-import os,pdb
 import smtplib
 from twilio.rest import Client
+from celery.utils.log import get_task_logger
 
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from appointmentscheduler.models import AppschedulerBookings
-from appointmentscheduler.views.Options.SMS import SMS
-from appointmentscheduler.views.Options.Editor import ckEditor
-from appointmentscheduler.views.Options.Booking import EmailNotification
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.models import AppschedulerBookings, AppschedulerOptions
+
 # Uses credentials from the TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN
 # environment variables
+
+logger = get_task_logger(__name__)
 
 @task(bind=True, default_retry_delay=2*60)  
 def send_sms(self,bookingid,opertype):

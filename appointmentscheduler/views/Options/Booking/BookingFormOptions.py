@@ -1,29 +1,13 @@
-from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render
 from appointmentscheduler.models import  *
-from django.http import JsonResponse
-import datetime, pdb
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.core.files import File
-from base64 import decodestring
-from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.files import ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from json import dump, load
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import  get_object_or_404
 
 
 tab_id = 4;
 
 def update_value(field_id, tab_id, newstep):
-   item = AppschedulerOptions.objects.get(tab_id=int(tab_id), id = int(field_id))
+   item =   get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), id = int(field_id) )
    getsteps = item.value.split('::')
    # get the user you want. (connect for example) in the var "user"
    if len(getsteps) >1 :
@@ -35,7 +19,7 @@ def update_value(field_id, tab_id, newstep):
 @csrf_exempt
 def BookingFormOptions(request):
    message=None
-   Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
+   # use filter() when you have sth to filter ;)
    # you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
    # you can remove the preview assignment (form =request.POST)
    BookingFormdata = dict()
@@ -45,73 +29,82 @@ def BookingFormOptions(request):
          update_value(field, tab_id , newstep.strip() )
          BookingFormdata['message'] ="Booking opion is saved"
 
-   item = AppschedulerOptions.objects.filter(tab_id=4)
-   o_bf_zipList = item[11].value.split('::')
+   items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('id','key', 'value')
+   items_dict = dict()
+   for item in items:
+      items_dict[item['key']] = item
+
+   obf_zip = items_dict['o_bf_zip']
+   o_bf_zipList = obf_zip['value'].split('::')
    o_bf_zip = o_bf_zipList[0].split('|')
    o_bf_zip_selected = o_bf_zipList[-1]
-   o_bf_zip_id = item[11].id
+   o_bf_zip_id = obf_zip['id']
 
-   labels = item[11].label.split('::')[0].split('|')
-   o_bf_termsList = item[10].value.split('::')
+   obf_terms = items_dict['o_bf_terms']
+   o_bf_termsList = obf_terms['value'].split('::')
    o_bf_terms = o_bf_termsList[0].split('|')
    o_bf_terms_selected = o_bf_termsList[-1]
-   o_bf_terms_id = item[10].id
+   o_bf_terms_id = obf_terms['id']
 
-
-   o_bf_stateList = item[9].value.split('::')
+   obf_states = items_dict['o_bf_state']
+   o_bf_stateList = obf_states['value'].split('::')
    o_bf_state = o_bf_stateList[0].split('|')
    o_bf_state_selected = o_bf_stateList[-1]
-   o_bf_state_id = item[9].id
+   o_bf_state_id = obf_states['id']
 
-   o_bf_phoneList = item[8].value.split('::')
+   obf_phone = items_dict['o_bf_phone']
+   o_bf_phoneList = obf_phone['value'].split('::')
    o_bf_phone = o_bf_phoneList[0].split('|')
    o_bf_phone_selected = o_bf_phoneList[-1]
-   o_bf_phone_id = item[8].id
+   o_bf_phone_id = obf_phone['id']
 
-   o_bf_notesList = item[8].value.split('::')
+   obf_notes = items_dict['o_bf_notes']
+   o_bf_notesList = obf_notes['value'].split('::')
    o_bf_notes = o_bf_phoneList[0].split('|')
    o_bf_notes_selected = o_bf_phoneList[-1]
-   o_bf_notes_id = item[8].id
+   o_bf_notes_id = obf_notes['id']
   
-
-   o_bf_nameList = item[7].value.split('::')
+   obf_name = items_dict['o_bf_name']
+   o_bf_nameList = obf_name['value'].split('::')
    o_bf_name = o_bf_nameList[0].split('|')
    o_bf_name_selected = o_bf_nameList[-1]
-   o_bf_name_id = item[7].id
+   o_bf_name_id = obf_name['id']
 
-
-   o_bf_emailList = item[6].value.split('::')
+   obf_email = items_dict['o_bf_email']
+   o_bf_emailList = obf_email['value'].split('::')
    o_bf_email = o_bf_emailList[0].split('|')
    o_bf_email_selected = o_bf_emailList[-1]
-   o_bf_email_id = item[6].id
+   o_bf_email_id = obf_email['id']
 
-   o_bf_countryList = item[5].value.split('::')
+   obf_country = items_dict['o_bf_country']
+   o_bf_countryList = obf_country['value'].split('::')
    o_bf_country = o_bf_emailList[0].split('|')
    o_bf_country_selected = o_bf_emailList[-1]
-   o_bf_country_id = item[5].id
+   o_bf_country_id = obf_country['id']
    
-
-   o_bf_cityList = item[4].value.split('::')
+   obf_city = items_dict['o_bf_city']
+   o_bf_cityList = obf_city['value'].split('::')
    o_bf_city = o_bf_cityList[0].split('|')
    o_bf_city_selected = o_bf_cityList[-1]
-   o_bf_city_id = item[4].id
+   o_bf_city_id = obf_city['id']
 
-
-   o_bf_captchaList = item[3].value.split('::')
+   obf_captcha = items_dict['o_bf_captcha']
+   o_bf_captchaList = obf_captcha['value'].split('::')
    o_bf_captcha = o_bf_captchaList[0].split('|')
    o_bf_captcha_selected = o_bf_captchaList[-1]
-   o_bf_captcha_id = item[3].id
+   o_bf_captcha_id = obf_captcha['id']
 
-   o_bf_address_2List = item[2].value.split('::')
+   obf_address_2 = items_dict['o_bf_address_2']
+   o_bf_address_2List = obf_address_2['value'].split('::')
    o_bf_address_2 = o_bf_cityList[0].split('|')
    o_bf_address_2_selected = o_bf_cityList[-1]
-   o_bf_address_2_id = item[2].id
+   o_bf_address_2_id = obf_address_2['id']
 
-   o_bf_address_1List = item[1].value.split('::')
+   obf_address_1 = items_dict['o_bf_address_1']
+   o_bf_address_1List = obf_address_1['value'].split('::')
    o_bf_address_1 = o_bf_address_1List[0].split('|')
    o_bf_address_1_selected = o_bf_address_1List[-1]
-   o_bf_address_1_id = item[1].id
-
+   o_bf_address_1_id = obf_address_1['id']
  
    showlabels= {'1': "No", '2': "Yes", '3' : "Yes(required)"}
    
@@ -136,72 +129,70 @@ def BookingFormOptions(request):
 
 def GetBookingValidation():
   
-   item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-   o_bf_zipList = item[11].value.split('::')
+   items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+   items_dict = dict()
+   for item in items:
+      items_dict[item['key']] = item
+
+   obf_zip = items_dict['o_bf_zip']
+   o_bf_zipList = obf_zip['value'].split('::')
    o_bf_zip = o_bf_zipList[0].split('|')
    o_bf_zip_selected = o_bf_zipList[-1]
-   o_bf_zip_id = item[11].id
 
-   
-   labels = item[11].label.split('::')[0].split('|')
-   o_bf_termsList = item[10].value.split('::')
+   obf_terms = items_dict['o_bf_terms']
+   o_bf_termsList = obf_terms['value'].split('::')
    o_bf_terms = o_bf_termsList[0].split('|')
    o_bf_terms_selected = o_bf_termsList[-1]
-   o_bf_terms_id = item[10].id
 
-   
-   o_bf_stateList = item[9].value.split('::')
+   obf_states = items_dict['o_bf_state']
+   o_bf_stateList = obf_states['value'].split('::')
    o_bf_state = o_bf_stateList[0].split('|')
    o_bf_state_selected = o_bf_stateList[-1]
-   o_bf_state_id = item[9].id
 
-
-   o_bf_phoneList = item[8].value.split('::')
+   obf_phone = items_dict['o_bf_phone']
+   o_bf_phoneList = obf_phone['value'].split('::')
    o_bf_phone = o_bf_phoneList[0].split('|')
    o_bf_phone_selected = o_bf_phoneList[-1]
-   o_bf_phone_id = item[8].id
 
-   o_bf_notesList = item[8].value.split('::')
+   obf_notes = items_dict['o_bf_notes']
+   o_bf_notesList = obf_notes['value'].split('::')
    o_bf_notes = o_bf_phoneList[0].split('|')
    o_bf_notes_selected = o_bf_phoneList[-1]
-   o_bf_notes_id = item[8].id
-
-   o_bf_nameList = item[7].value.split('::')
+  
+   obf_name = items_dict['o_bf_name']
+   o_bf_nameList = obf_name['value'].split('::')
    o_bf_name = o_bf_nameList[0].split('|')
    o_bf_name_selected = o_bf_nameList[-1]
-   o_bf_name_id = item[7].id
 
-   o_bf_emailList = item[6].value.split('::')
+   obf_email = items_dict['o_bf_email']
+   o_bf_emailList = obf_email['value'].split('::')
    o_bf_email = o_bf_emailList[0].split('|')
    o_bf_email_selected = o_bf_emailList[-1]
-   o_bf_email_id = item[6].id
 
-   o_bf_countryList = item[5].value.split('::')
+   obf_country = items_dict['o_bf_country']
+   o_bf_countryList = obf_country['value'].split('::')
    o_bf_country = o_bf_emailList[0].split('|')
    o_bf_country_selected = o_bf_emailList[-1]
-   o_bf_country_id = item[5].id
-
-   o_bf_cityList = item[4].value.split('::')
+   
+   obf_city = items_dict['o_bf_city']
+   o_bf_cityList = obf_city['value'].split('::')
    o_bf_city = o_bf_cityList[0].split('|')
    o_bf_city_selected = o_bf_cityList[-1]
-   o_bf_city_id = item[4].id
 
-
-   o_bf_captchaList = item[3].value.split('::')
+   obf_captcha = items_dict['o_bf_captcha']
+   o_bf_captchaList = obf_captcha['value'].split('::')
    o_bf_captcha = o_bf_captchaList[0].split('|')
    o_bf_captcha_selected = o_bf_captchaList[-1]
-   o_bf_captcha_id = item[3].id
 
-   o_bf_address_2List = item[2].value.split('::')
+   obf_address_2 = items_dict['o_bf_address_2']
+   o_bf_address_2List = obf_address_2['value'].split('::')
    o_bf_address_2 = o_bf_cityList[0].split('|')
    o_bf_address_2_selected = o_bf_cityList[-1]
-   o_bf_address_2_id = item[2].id
 
-   o_bf_address_1List = item[1].value.split('::')
+   obf_address_1 = items_dict['o_bf_address_1']
+   o_bf_address_1List = obf_address_1['value'].split('::')
    o_bf_address_1 = o_bf_address_1List[0].split('|')
-
    o_bf_address_1_selected = o_bf_address_1List[-1]
-   o_bf_address_1_id = item[1].id
 
    showlabels= {'1': "No", '2': "Yes", '3' : "required"}
    items = {"c_zip":showlabels[o_bf_zip_selected],

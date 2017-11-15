@@ -1,56 +1,35 @@
-from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
-from django.http import JsonResponse
-import pdb,os,json,re,uuid
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.files import ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from django.core import serializers
-from django.core.files import File
-from django.utils.safestring import mark_safe
-from django.db.models import Count
-from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, \
-AppschedulerDates,AppschedulerCountries,AppschedulerBookings,AppschedulerInvoice,AppschedulerOptions
-from datetime import datetime
-from pytz import country_timezones, timezone
-from tzlocal import get_localzone
-import re,pytz,calendar
-from datetime import datetime, timedelta
-import dateutil.parser as dparser
-from copy import deepcopy
+from django.shortcuts import  render, HttpResponse,get_object_or_404
+import json
+from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie
+from appointmentscheduler.models  import AppschedulerBookings,AppschedulerInvoice,AppschedulerOptions
+import pytz
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-import arrow
-import os,pdb
 import smtplib
 from twilio.rest import Client
 import html
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from appointmentscheduler.views.Options.SMS import SMS
-from appointmentscheduler.views.Options.Editor import ckEditor
-from appointmentscheduler.views.Options.Booking import EmailNotification
 from appointmentscheduler.views.Options.Editor import ckEditor
 
 @requires_csrf_token
 def list_invoices(request):
-	user_timezone = request.session['visitor_timezone']
-	invoice_lists = AppschedulerInvoice.objects.all()
+	user_timezone = request.session['visitor_timezone'] 
+
+	invoice_lists = AppschedulerInvoice.objects.order_by('-id').select_related('booking').values("booking__id", "invoiceid",\
+	 "booking__created",	"booking__date",  "booking__booking_status", "booking__booking_total")
 	invoices = []
-	for invoice in  reversed(list(invoice_lists)):
+	for invoice in  invoice_lists.iterator():
 		invoicedetails = dict()
-		bkid = invoice.booking.id
-		booking_instance = AppschedulerBookings.objects.filter(id=bkid)[0]
-		invoicedetails['id'] = bkid
-		invoicedetails['invoiceid'] = invoice.invoiceid
-		invoicedetails['created'] = booking_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime( "%Y-%m-%d" )
-		invoicedetails['duedate'] = booking_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d %I:%M %p")
-		invoicedetails['issued'] = booking_instance.date.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d ")
-		invoicedetails['status'] =  booking_instance.booking_status
-		invoicedetails['total'] =  round(float(booking_instance.booking_total),2)
+		invoicedetails['id'] = invoice['booking__id']
+		invoicedetails['invoiceid'] = invoice['invoiceid']
+		invoicedetails['created'] = booking_instance['booking__created'].astimezone(pytz.timezone(user_timezone[0])).strftime( "%Y-%m-%d" )
+		invoicedetails['duedate'] = booking_instance['booking__created'].astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d %I:%M %p")
+		invoicedetails['issued'] = booking_instance['booking__date'].astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d ")
+		invoicedetails['status'] =  booking_instance['booking__booking_status']
+		invoicedetails['total'] =  round(float(booking_instance['booking__booking_total']),2)
 		invoices.append( invoicedetails )
 
 	# pdb.set_trace()
@@ -66,7 +45,10 @@ def generate_invoice(request,id):
 	if tmpdtls :
 		emailres = tmpdtls.DesignedTemplate
 		subject_email = tmpdtls.subject
+
 	else :
+		subject_email = opertype
+
 		emailres =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
 	opertype="InvoiceSMS"
 	tmpdtls=ckEditor.GetTemplateDetailByTemplateID(opertype)
@@ -74,9 +56,10 @@ def generate_invoice(request,id):
 		smstmpdtls = tmpdtls.DesignedTemplate
 		subject_sms = tmpdtls.subject
 	else :
+		subject_sms = opertype
 		smstmpdtls =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
 
-	booking = AppschedulerBookings.objects.filter(id=id)[0]
+	booking = get_object_or_404( AppschedulerBookings,  pk=int(id) )
 	duration =  booking.service.total 
 	servicedesc =  booking.service.service_desc
 	empname = booking.employee.emp_name
@@ -112,7 +95,7 @@ def sendmail_invoice(request):
 		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
 		fromaddr = item[0].value
 		o_FromEmailPassword = item[1].value
-		booking = AppschedulerBookings.objects.filter(id=bookingpk)[0]
+		booking = get_object_or_404( AppschedulerBookings,  pk=int(bookingpk) )
 		toaddr = booking.c_email
 		empemail = booking.employee.email
 		emailbody = html.unescape(emailbody)
@@ -144,7 +127,7 @@ def sendmsg_invoice(request):
 	if request.method == "POST":
 		bookingpk = request.POST["bookingpk"]
 		msgbody = request.POST["msgcontent"]
-		booking = AppschedulerBookings.objects.filter(id=bookingpk)[0]
+		booking = get_object_or_404( AppschedulerBookings,  pk=int(bookingpk) )
 		toNumber = str(booking.c_phone)
 
 		tab_id = 101;
@@ -166,7 +149,7 @@ def sendmsg_invoice(request):
 
 @ensure_csrf_cookie
 def delete_invoice(request,id=None):
-    ainvoice=AppschedulerInvoice.objects.get( id=int(id) )
+    ainvoice=  get_object_or_404( AppschedulerInvoice,  pk=int(id) )
     ainvoice.delete()
     return HttpResponse(status=204)
 
@@ -175,7 +158,7 @@ def delete_invoice(request,id=None):
 def delete_invoices(request):
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
-        ainvoice=AppschedulerInvoice.objects.get(id=int( id ) )
+        ainvoice=get_object_or_404( AppschedulerInvoice,  pk=int(id) )
         ainvoice.delete()
     return HttpResponse(status=204)
 
@@ -319,7 +302,7 @@ def createinvoicepdf(canvas , invoicedetails, vendor_address):
 
 def getinvoicedetails(id, user_timezone):
 	invoicedetails = dict()
-	invoice_instance = AppschedulerBookings.objects.filter(id=id)[0]
+	invoice_instance = get_object_or_404( AppschedulerBookings,  pk=int(id) )
 	invoicedetails['id'] = id
 	invoicedetails['customer_name'] = invoice_instance.c_name 
 	if invoice_instance.country is not None:
@@ -338,7 +321,7 @@ def getinvoicedetails(id, user_timezone):
 	# bookingdetails["defaultdate"] = todaydate 
 	# bookingdetails["customer_fields"] = customer_fields
 	invoice_obj = AppschedulerInvoice.objects.filter(booking = invoice_instance)
-	if not invoice_obj.count():
+	if not invoice_obj.exists():
 		ctc_bookingid = invoice_instance.bookingid
 		in_id = int(ctc_bookingid[-12:]) 
 		invoiceid = ctc_bookingid[:-12] + str(in_id)
@@ -351,6 +334,7 @@ def getinvoicedetails(id, user_timezone):
 
 	invoicedetails['invoice_id'] = invoiceid
 	invoicedetails['invoiceno'] = invoice_no
+	invoicedetails['bookingid'] = invoice_instance.bookingid
 	invoicedetails['created'] = invoice_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime( "%Y-%m-%d" )
 	invoicedetails['duedate'] = invoice_instance.created.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d %I:%M %p")
 	invoicedetails['issued'] = invoice_instance.date.astimezone(pytz.timezone(user_timezone[0])).strftime("%Y-%m-%d ")

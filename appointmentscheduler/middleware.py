@@ -1,12 +1,8 @@
 from easy_timezones.utils import get_ip_address_from_request, is_valid_ip, is_local_ip
 from pytz import country_timezones
 from django.contrib.gis.geoip2 import GeoIP2
-import datetime,re,pytz,calendar
 
 class VisitorDetails(object):
-
-
-
     # Check if client IP is allowed
     def process_request(self, request):
         ip = get_ip_address_from_request(request)

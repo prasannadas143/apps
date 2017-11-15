@@ -1,32 +1,16 @@
-from django.shortcuts import  render, render_to_response,HttpResponseRedirect,HttpResponse
+from django.shortcuts import  render, HttpResponse,get_object_or_404
 from django.http import JsonResponse
-import pdb,os,json,re,uuid
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt,ensure_csrf_cookie
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.files import ImageField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from django.core import serializers
-from django.core.files import File
-from django.utils.safestring import mark_safe
-from django.db.models import Count
-from appointmentscheduler.models  import AppschedulerServices, AppschedulerEmployees, \
-AppschedulerDates,AppschedulerCountries,AppschedulerBookings,AppschedulerInvoice
-from pytz import country_timezones, timezone
-from tzlocal import get_localzone
-import re,pytz,calendar
+from django.views.decorators.csrf import requires_csrf_token
+from appointmentscheduler.models  import AppschedulerDates,AppschedulerBookings
+import pytz
 from datetime import datetime, timedelta
-import datetime as dtm
 import dateutil.parser as dparser
-from copy import deepcopy
 from collections import OrderedDict
-from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4, inch, landscape
 from io import BytesIO
 from reportlab.lib import colors
-from reportlab.rl_config import defaultPageSize
 
 @requires_csrf_token
 def dashboard(request):
@@ -114,11 +98,11 @@ def getbookingdetails(user_timezone, selecteddate ):
 	year = int(svc_datetime[0].lstrip('0') )
 	month = int(svc_datetime[1].lstrip('0') )
 	day = int( svc_datetime[2].lstrip('0') )
-	adates = AppschedulerBookings.objects.exclude(booking_status = "cancelled")
+	adates = AppschedulerBookings.objects.exclude(booking_status = "cancelled").select_related('service','employee')
 
 	# Get all bookings info from the date/time/year of booking. 
 	bookedtimes = []
-	for dt in adates:
+	for dt in adates.iterator():
 		getvisitortime = dt.date.astimezone(pytz.timezone(user_timezone[0])).date()
 		if getvisitortime.day == day and getvisitortime.month == month and getvisitortime.year == year:
 			bookedtimes.append( dt )
@@ -128,7 +112,7 @@ def getbookingdetails(user_timezone, selecteddate ):
 
 	cdates = AppschedulerDates.objects.filter(date__year=year,  visitor_timezone = user_timezone[0]  )
 	(cdt_obj, ctc_time, end_time) = (None, None, None)
-	for cdt in cdates:
+	for cdt in cdates.iterator():
 		ctime = cdt.date.astimezone(pytz.timezone(user_timezone[0]))
 		if ctime.date().day == day and ctime.date().month == month:
 			cdt_obj = cdt

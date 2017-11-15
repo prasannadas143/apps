@@ -1,26 +1,12 @@
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
-from django.http import JsonResponse
-import datetime, pdb
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-from PIL import Image
-import io
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.core.files import File
-from base64 import decodestring
-from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.related import ForeignKey, OneToOneField
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+import pdb,os,json
+from django.views.decorators.csrf import csrf_exempt
 from appointmentscheduler.form.Options.Editor.AddTemplate import addTemplate
 from appointmentscheduler.form.Options.Editor.TemplateDetails import TemplateDetails, AppschedulerTemplatesDetails
 from django.forms.models import model_to_dict
-from appsplatform.settings import JSONFILES
 from appointmentscheduler.models import  AppschedulerTemplates, AppschedulerCountries
+
 
 
 @csrf_exempt
@@ -29,7 +15,7 @@ def EditorTemplate(request):
     templatename=  os.path.join('Options','Editor',template_name)
     Template_info = []
     Templates = AppschedulerTemplates.objects.all()
-    for Templ in reversed(list(Templates)):
+    for Templ in Templates.iterator():
         data=dict()
         data['id'] = Templ.id
         data['templatename'] = Templ.TemplateName
@@ -42,7 +28,7 @@ def GetTemplateDetails(request):
     if request.method == "GET":
         Templates = AppschedulerTemplatesDetails.objects.filter(TemplateID=request.GET['TemplateID'])
         data=dict()
-        if Templates.count()>0 :
+        if Templates.exists() :
             Template =Templates[0]
             data['id'] = Template.id
             data['TemplateID'] = Template.TemplateID
@@ -53,9 +39,9 @@ def GetTemplateDetails(request):
 
 @csrf_exempt
 def GetTemplateList(request):
-    Templates = AppschedulerTemplates.objects.all()
+    Templates = AppschedulerTemplates.objects.all().order_by('-id')
     Template_info = []
-    for Templ in reversed(list(Templates)):
+    for Templ in Templates.iterator():
         data=dict()
         data['id'] = Templ.id
         data['templatename'] = Templ.TemplateName
@@ -63,8 +49,6 @@ def GetTemplateList(request):
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
 
 @csrf_exempt
-
-
 def SaveTemplate(request):
     if request.method == 'POST': 
         appscheduleTemplate = TemplateDetails(request.POST or None)
@@ -119,15 +103,14 @@ def Templates(request):
 
 @csrf_exempt
 def deleteTemplate(request,id=None):
-    aCountry=AppschedulerCountries.objects.get(id=id)
-    pdb.set_trace()
-    aCountry.delete()
+    atemplate=get_object_or_404(AppschedulerTemplates,id=id)
+    atemplate.delete()
     return HttpResponse(status=204)        
-1
+
 @csrf_exempt
 def editTemplate(request,id):
     template_name="EditTemplate.html"
-    appscheduleobj =AppschedulerTemplates.objects.get(id=id)
+    appscheduleobj =get_object_or_404(AppschedulerTemplates,id=id)
     appscheduleTemplate = addTemplate(request.POST or None ,instance=appscheduleobj)
     if appscheduleTemplate.is_valid():
         post = appscheduleTemplate.save()
@@ -143,15 +126,15 @@ def TemplateList(request):
     if 'querydata' in request.GET:
         querydata = request.GET['querydata']
         if querydata == "all":
-            Template = AppschedulerTemplates.objects.all()
+            Template = AppschedulerTemplates.objects.all().order_by('-id')
         elif querydata == "active":
-            Template = AppschedulerTemplates.objects.filter(status = 1 )
+            Template = AppschedulerTemplates.objects.filter(status = 1 ).order_by('-id')
         elif querydata == "inactive":
-            Template = AppschedulerTemplates.objects.filter(status = 0 )
+            Template = AppschedulerTemplates.objects.filter(status = 0 ).order_by('-id')
     else:
-        Template = AppschedulerTemplates.objects.all()
+        Template = AppschedulerTemplates.objects.all().order_by('-id')
 
-    for Templ in reversed(list(Template)):
+    for Templ in Template.iterator():
         data=dict()
         data['id'] = Templ.id
         data['TemplateName'] = Templ.TemplateName
@@ -175,20 +158,20 @@ def TemplateDetailsData(request):
     if 'querydata' in request.GET:
         querydata = request.GET['querydata']
         if querydata == "all":
-            Template = AppschedulerTemplatesDetails.objects.all()
+            Template = AppschedulerTemplatesDetails.objects.all().order_by('-id')
         elif querydata == "active":
-            Template = AppschedulerTemplatesDetails.objects.filter(status = 1 )
+            Template = AppschedulerTemplatesDetails.objects.filter(status = 1 ).order_by('-id')
         elif querydata == "inactive":
-            Template = AppschedulerTemplatesDetails.objects.filter(status = 0 )
+            Template = AppschedulerTemplatesDetails.objects.filter(status = 0 ).order_by('-id')
     else:
-        Template = AppschedulerTemplatesDetails.objects.all()
+        Template = AppschedulerTemplatesDetails.objects.all().order_by('-id')
 
-    for Templ in reversed(list(Template)):
+    for Templ in Template.iterator():
         data=dict()
         print(Templ.id);
         data['id'] = Templ.id
         data['TemplateID'] = Templ.TemplateID
-        data['TemplateName'] =  AppschedulerTemplates.objects.filter(id=Templ.TemplateID)[0].TemplateName
+        data['TemplateName'] =   get_object_or_404(AppschedulerTemplates,id=Templ.TemplateID).TemplateName
         data['subject'] = Templ.subject
         data['DesignedTemplate'] = Templ.DesignedTemplate
         data['status'] = str(Templ.status)
@@ -199,12 +182,17 @@ def TemplateDetailsData(request):
 
 @csrf_exempt
 def GetTemplateDetailByTemplateID(TemplateName=None):
+    Template = None
     try:
+   
         templates = AppschedulerTemplates.objects.filter(TemplateName__iexact=TemplateName.upper().strip())
-        if len(templates) :
+        if templates.exists() :
+           
             templateid = templates[0].id
-            Template = AppschedulerTemplatesDetails.objects.filter(TemplateID=templateid)[0]
+            template_dtls = AppschedulerTemplatesDetails.objects.filter(TemplateID=templateid)
+            if template_dtls.exists() :
+                Template = template_dtls[0]
     except Exception as e:
-        print( '%s (%s)' % (e.message, type(e)) )
+        print( '%s (%s)' % (str(e), type(e)) )
     return Template
 

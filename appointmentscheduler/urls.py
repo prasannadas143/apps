@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import service,employees,bookings,dashboard
+from .views import bookings,dashboard
 from .views.exportbookings import BookingsFeed
 
 from .views import service,employees,invoice,exportbookings,report
@@ -41,7 +41,7 @@ urlpatterns = [
     url(r'^deleteEmployee/(?P<id>\d+)/$', employees.delete_employee, name="deleteEmployee"),
     url(r'associated_service_names/(?P<id>\d+)/$', employees.associated_service_names, name="assiosiated_services"),
 
-    url(r'^updateGeneral/$', General.updateGeneral, name="updateGeneral"),
+    # url(r'^updateGeneral/$', General.updateGeneral, name="updateGeneral"),
     url(r'^BookingOptions/$', Options.BookingOptions, name="BookingOptions"),
     url(r'^PaymentOptions/$', Payments.PaymentOptions, name="PaymentOptions"),
     url(r'^BookingFormOptions/$', BookingFormOptions.BookingFormOptions, name="BookingFormOptions"), 
