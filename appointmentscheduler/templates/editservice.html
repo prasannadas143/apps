@@ -1,16 +1,14 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% load static from staticfiles %}
-
 {% load admin_urls %}
 {% load bootstrap3 %}
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
-
 {% block content %}
 
-<script>
 
+<script>
 $(document).ready(function() {
   // Handler for .ready() called.
   assiosiated_employees("{{ appscheduleinst.id }}");
@@ -66,7 +64,7 @@ function assiosiated_employees(serviceid) {
             url:"/appointmentschduler/associated_employee_names/" + serviceid  ,
             data: { },
             dataType: "json",
-           
+
             success:function(response){
                 console.log(response);
                 employeelist =eval(response);
@@ -80,7 +78,7 @@ function assiosiated_employees(serviceid) {
                                  checked = "checked" ;
                            }
                             employeename+= "<label for=" + employeelist[i].name +  ' > <input type="checkbox" name=' + "check" + employeelist[i].id  + ' ng-model=' + "servicedata.check" + employeelist[i].id.toString() +       " value=" + employeelist[i].id + " " + checked + " />" + employeelist[i].name + " </label>";
-                        
+
                       }
                       $( "#checkboxes" ).append( employeename);
 
@@ -89,7 +87,7 @@ function assiosiated_employees(serviceid) {
             }
       });
   }
-        
+
 function delete_image(serviceid) {
     $.ajax({
             method:'get',
@@ -105,10 +103,11 @@ function delete_image(serviceid) {
              error: function(xhr, status, error){
              var err = eval("(" + xhr.responseText + ")");
              }
-    });  
-
+    });
 }
 var invalid_svcname = true;
+
+
 
 function check_duplicated_name(current_svcname) {
 
@@ -124,179 +123,194 @@ function check_duplicated_name(current_svcname) {
                 if (servicelist != null &&  servicelist.length > 0  ){
                       for (var i = 0; i <  servicelist.length; i++)
                       {
-                          servicename= servicelist[i].name.toUpperCase(); 
+                          servicename= servicelist[i].name.toUpperCase();
                           if (servicename == textvalue && current_svcname != textvalue) {
                              alert("service name exist");
                              invalid_svcname = false ;
                              return false;
-                          }
+                      }
                           invalid_svcname = true
                       }
-
                 }
-
             }
       });
-} 
+}
  function validateserviceform() {
-   
     if( ! invalid_svcname ) {
         alert("service already exist");
-        return false; 
+        return false;
     }
-    return true;
-}   
-
+  return true;
+}
 </script>
 
 
 <span class="notice-info">&nbsp;</span> <span class="block bold">Edit service</span>
 <span  class="block">Fill in the form below to add a new service. You can add title, description,
     price, length and employees who do this service.</span><a href="#" class="notice-close"></a>
- 
+
 <div>{{ form.errors|default:"" }}</div>
 
+<!-- Start Services -->
+     <form  ng-app="ServiceMod" class="form pj-form form-horizontal"  name="serviceform" autocomplete="off" enctype="multipart/form-data"
+   novalidate="novalidate"  action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}"  method="post"   onsubmit="return validateserviceform()" >{% csrf_token %}
 
-  <form  ng-app="ServiceMod" class="form pj-form"  name="serviceform" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'appointmentschduler:edit_service' appscheduleinst.id %}"  method="post"   onsubmit="return validateserviceform()"  >{% csrf_token %}
-
-
-          <label class="title">
-                Service name:</label>
-            <span class="inline_block">
-                   <input id="service_name" maxlength="100" name="service_name" type="text"  ng-minlength="4" ng-maxlength="100"   ng-init='service_name="{{appscheduleinst.service_name}}"' ng-model="service_name"  onblur=" check_duplicated_name('{{appscheduleinst.service_name}}')"  required  />
-
-            </span>
-           
+      <div class="Services">
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Service name</h5>
+            <input id="id_service_name" maxlength="100" class="form-control first-input"  name="service_name"  placeholder="Service Name" aria-describedby="sizing-addon1" type="text" ng-model="service_name" ng-minlength="4" ng-maxlength="100" onblur="check_duplicated_name()" required />
              <span ng-messages="serviceform.service_name.$error" style="color:maroon" role="alert" >
                    <span ng-message="required"> Please fill service name </span>
-             </span>
+        </span>
+          <div ng-messages="serviceform.service_name.$error"  ng-show="serviceform.service_name.$invalid && !serviceform.service_name.$pristine "
+          style="color:maroon" role="alert">
 
-
-              <div ng-messages="serviceform.service_name.$error"  ng-show="serviceform.service_name.$invalid && !serviceform.service_name.$pristine " style="color:maroon" role="alert" >
-                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="minlength">Your field is too short </div>
                 <div ng-message="maxlength">Your field is too long</div>
                 <div ng-message="pattern">Must be a valid Service name</div>
 
-              </div>
- 
-        </p>
-        <p>
-            <label class="title">
-                Service description:</label>
-            <span class="inline_block">
-                   <input id="id_service_desc" maxlength="100" name="service_desc" ng-model="service_desc" ng-minlength="4" ng-maxlength="200" ng-init='service_desc="{{appscheduleinst.service_desc}}"' type="text"  />
-            </span>
+         </div>
 
-          <div ng-messages="serviceform.service_desc.$error"  ng-show="serviceform.service_desc.$invalid && !serviceform.service_desc.$pristine" style="color:maroon" role="alert">
+
+            <h5>Service description</h5>
+            <div class="description">
+
+                <textarea  id="id_service_desc" maxlength="100" class="form-control"  name="service_desc" ng-model="service_desc" ng-minlength="4" ng-maxlength="200" ng-init='service_desc="{{appscheduleinst.service_desc}}"' type="text"  >
+                </textarea>
+
+                <div ng-messages="serviceform.service_desc.$error"  ng-show="serviceform.service_desc.$invalid && !serviceform.service_desc.$pristine" style="color:maroon" role="alert">
                 <div ng-message="minlength">Your field is too short   </div>
                 <div ng-message="maxlength">Your field is too long</div>
+                </div>
+
             </div>
-        </p>
-        <p>
-            <label class="title">
-                Price</label>
-                <span class="inline_block">
-                    <input id="id_price" name="price"  step="0.01" type="number"   ng-model="price"        
+
+            <h5>price</h5>
+            <div class="input-group">
+              <span class="input-group-addon">$</span>
+               <input id="id_price" name="price"  step="0.01" type="number"  class="form-control" aria-label="Amount (to the nearest dollar)"    ng-model="price"
                      ng-init='price={{appscheduleinst.price}}' required />
-                </span>
-                 <div ng-messages="serviceform.price.$error"  ng-show="serviceform.price.$invalid && !serviceform.price.$pristine "style="color:maroon" role="alert">
-                  <div ng-message="number">Your field is not number</div>
-              </div>
-        </p>
-        <p>
-            <label class="title">
-                Image</label>
-           <div class="fieldWrapper">
-                 <img id="service_img" src='{{ appscheduleinst.service_img.url }}'  width=25% height= 25% />
-                  <p><label for="id_photo">service image</label>
-                </a> <br> <input type="file" name="photoname" id="id_photo"></p>
-                {% if appscheduleinst.service_img.name != defaultimg %}
-                           <input type="button"  value="Delete image" id="deleteimage" onclick='delete_image( "{{  appscheduleinst.id }}" )' >
-                {% endif %}
 
-               </div>
 
-        </p>
-        <p>
-            <label class="title">
-                Length (minutes)</label>
-              <span class="inline_block">
-                 <input id="length" name="length" type="number"  
-                  ng-model="length" ng-init="length={{ appscheduleinst.length}}" required />
-            </span>
-                <span ng-messages="serviceform.length.$error" style="color:maroon" role="alert" >
-                   <span ng-message="required">Please fill the length of the service </span>
-             </span>
-              <div ng-messages="serviceform.length.$error"  ng-show="serviceform.length.$invalid && !serviceform.length.$pristine"style="color:maroon" role="alert">
-                  <div ng-message="number">Your field is not number </div>
-              </div>
-        </p>
-        </p>
-        <p>
-            <label class="title">
-                Before (minutes)</label>
-            <span>
-                <input id="before" name="before"  type="number"   
+      <div ng-messages="serviceform.price.$error"  ng-show="serviceform.price.$invalid && !serviceform.price.$pristine "style="color:maroon" role="alert">
+       <div ng-message="number">Your field is not number</div>
+      </div>
+
+
+      </div>
+          <div class="table1">
+
+          <form>
+
+            <table>
+              <tr>
+              <td>Length (minutes)</td>
+              <td>
+
+                  <input id="id_price" name="price"  step="0.01" type="number"  class="form-control"    ng-model="price"
+                     ng-init='price={{appscheduleinst.price}}' required />
+                    <div ng-messages="serviceform.price.$error"  ng-show="serviceform.price.$invalid && !serviceform.price.$pristine "style="color:maroon" role="alert">
+                    <div ng-message="number">Your field is not number</div>
+                    </div>
+              </td>
+              <td></td>
+              </tr>
+
+             <tr>
+              <td>Before (minutes)</td>
+              <td>
+                 <input id="before" class="form-control"  name="before"  type="number"
                  ng-model="before" ng-init="before={{ appscheduleinst.before }}" required />
-            </span>
-            <span ng-messages="serviceform.before.$error" style="color:maroon" role="alert" >
+
+                 <span ng-messages="serviceform.before.$error" style="color:maroon" role="alert" >
                    <span ng-message="required">Please fill the field before </span>
              </span>
-        </p>
-        <p>
-            <label class="title">
-                After (minutes)</label>
-            <span>
-                          <input id="id_after" name="after" type="number" 
-                          ng-model="after"  ng-init="after={{ appscheduleinst.after }}"  required />
-             </span>      
+              </td>
+              <td></td>
+              </tr>
 
-             <span ng-messages="serviceform.after.$error" style="color:maroon" role="alert" >
+              <tr>
+              <td>After (minutes)</td>
+              <td>
+               <input id="id_after" class="form-control"  name="after" type="number"
+                          ng-model="after"  ng-init="after={{ appscheduleinst.after }}"  required />
+
+                          <span ng-messages="serviceform.after.$error" style="color:maroon" role="alert" >
                    <span ng-message="required">Please fill the field after </span>
-             </span>       
-        </p>
-        <p>
-            <label class="title">
-                Total (minutes)
-            </label>
-                  <span class="inline_block">
-                    <p>    {% verbatim %}
+             </span>
+              </td>
+              <td></td>
+              </tr>
+
+              <tr>
+              <td>Total (minutes)</td>
+              <td>
+
+                 <p class="selectpicker" >    {% verbatim %}
                               {{ length + before + after}}
                             {% endverbatim %}
-                   </p>
-                 </span>
-        </p>
-        <p>
-            <label class="title">
-                Status</label>
-            <span class="inline_block">
-              <select id="id_is_active" name="is_active" >
+                 </p>
+
+              </td>
+              <td></td>
+              </tr>
+
+              <tr>
+              <td>Status</td>
+              <td>
+             <select id="id_is_active" name="is_active"  class="selectpicker" >
                   <option {% if appscheduleinst.is_active|safe == "True" %} selected {% endif %} value="True" >active</option>
                   <option {% if appscheduleinst.is_active|safe == "False" %} selected {% endif %} value="False">inactive</option>
               </select>
-            </span>
-        </p>
-    <p>
-      <div class="multiselect">
-        <div class="selectBox" onclick="showCheckboxes()" >
-            <select>
-              <option>Select an option</option>
-            </select>
-            <div class="overSelect">
-              
+
+              </td>
+              <td></td>
+              </tr>
+
+              <tr>
+              <td>Employees</td>
+              <td>
+
+                  <div class="multiselect selectpicker">
+                  <div class="selectBox selectpicker" onclick="showCheckboxes()" >
+                  <select class="form-control ">
+                  <option>Select an option</option>
+                  </select>
+                  <div class="overSelect">
+
+                  </div>
+                  </div>
+                  <div id="checkboxes">
+
+                  </div>
+                  </div>
+
+              </td>
+              <td></td>
+              </tr>
+            </table>
+            <div class="text-center">
+              <input  type="submit" value="Submit"    class="ng-pristine ng-invalid ng-invalid-required clicked reset"  ng-disabled="serviceform.$invalid ">
             </div>
-        </div>
-        <div id="checkboxes"   >
+          </form>
 
         </div>
-    </div>
-    </p>
-    <p>
-      <div>
-        <input  type="submit" value="Submit"    class="ng-pristine ng-invalid ng-invalid-required"  ng-disabled="serviceform.$invalid ">
+          </div>
+          <div class="col-md-6">
+            <img  src='{{ appscheduleinst.service_img.url }}'  height="298" alt="Image preview...">
+            <h5>Choose file</h5>
+            <input type="file" class="upload" name="photoname" id="id_photo">
+             {% if appscheduleinst.service_img.name != defaultimg %}
+                           <input type="button"  value="Delete image" id="deleteimage" onclick='delete_image( "{{  appscheduleinst.id }}" )' >
+                {% endif %}
+          </div>
+        </div>
       </div>
-   </p>
+
+      <!-- End Services -->
+
   </form>
 
-
 {% endblock %}
+
