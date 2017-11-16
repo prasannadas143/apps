@@ -860,5 +860,36 @@
     font-size: 14px;
 }
 
+
+.btn-Save{
+	width: 100px;
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    margin-top: 20px;
+    margin-right: 0;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+.btn-BackToMyList{
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    margin-top: 20px;
+    margin-right: 0;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+.btn-topGrid{
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    margin-top: 20px;
+    margin-right: 0;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
 .Languages-Import-export .export .body button {display: block;}
 /*End Languages-Import-export*/

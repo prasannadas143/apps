@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -9,10 +9,10 @@
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
-<input type="button" value="Active"   id="active"  />
-<input type="button" value="Inactive"   id="inactive"  />
-<input type="button" value="All"   id="all"  />
-<input type="button" onclick="location.href='{% url 'appointmentschduler:EditorTemplate' %}'"  value="Add Template Details" />
+<input type="button" value="Active"  class="btn-topGrid"   id="active"  />
+<input type="button" value="Inactive"   class="btn-topGrid"  id="inactive"  />
+<input type="button" value="All"  class="btn-topGrid"   id="all"  />
+<input type="button"  class="btn-topGrid"  onclick="location.href='{% url 'appointmentschduler:EditorTemplate' %}'"  value="Add Template Details" />
 {% csrf_token %}
 <table id="datatables" class="table table-hover">
         <thead>
