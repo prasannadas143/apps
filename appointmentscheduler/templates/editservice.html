@@ -14,6 +14,12 @@ $(document).ready(function() {
   assiosiated_employees("{{ appscheduleinst.id }}");
 });
 
+
+function ShowServiceLsit(){
+window.location.href="/appointmentschduler/services";
+}
+
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -292,6 +298,8 @@ function check_duplicated_name(current_svcname) {
             </table>
             <div class="text-center">
               <input  type="submit" value="Submit"    class="ng-pristine ng-invalid ng-invalid-required clicked reset"  ng-disabled="serviceform.$invalid ">
+              <input type="button" class="btn-BackToMyList"  name="countrylist" onclick="ShowServiceLsit();" value="Back to country list">
+
             </div>
           </form>
 

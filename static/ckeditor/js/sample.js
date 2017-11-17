@@ -14,7 +14,6 @@ CKEDITOR.config.height = 150;
 CKEDITOR.config.width = 'auto';
 
 var initSample = ( function() {
-	alert('INIT');
 	var wysiwygareaAvailable = isWysiwygareaAvailable(),
 		isBBCodeBuiltIn = !!CKEDITOR.plugins.get( 'bbcode' );
 
