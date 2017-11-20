@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -10,178 +10,189 @@
 {% endblock %}
 {% block content %}
 
-<div id="BookingFormOptions">
-	<h2>Booking Form</h2>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <form class="form-horizontal" role="form" method="POST" action="{% url 'appointmentschduler:BookingFormOptions' %}">
+<div class="Booking">
+<div class="table1">
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_name">Name</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_name_id }}">
+    <form role="form" method="POST" action="{% url 'appointmentschduler:BookingFormOptions' %}">
+	<table>
+         <tr>
+							<th>Option</th>
+							<th class="value">Value</th>
+							<th></th>
+		</tr>
+
+          <tr>
+							<td>Name</td>
+							<td>
+								<select class="selectpicker" name="{{ items.o_bf_name_id }}">
     {% for entry in items.o_bf_name %}
     <option {% if entry == items.o_bf_name_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_name_selected  %} selected {% endif %}
-    </div>
+							</td>
+							<td></td>
+          </tr>
 
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_email">Email</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_email_id }}">
+         <tr>
+							<td>Email</td>
+							  <td>
+								<select class="selectpicker" name="{{ items.o_bf_email_id }}">
     {% for entry in items.o_bf_email %}
     <option {% if entry == items.o_bf_email_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_email_selected  %} selected {% endif %}
-    </div>
+							  </td>
+							  <td></td>
+		</tr>
 
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_phone">Phone</label>
-
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_phone_id }}">
+          <tr>
+							<td>Phone</td>
+							<td>
+								<select class="selectpicker" name="{{ items.o_bf_phone_id }}">
     {% for entry in items.o_bf_phone %}
     <option {% if entry == items.o_bf_phone_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_phone_selected  %} selected {% endif %}
-    </div>
+							</td>
+							<td></td>
+	     </tr>
 
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_address_1">Address 1</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_address_1_id }}">
+         <tr>
+							<td>Address 1</td>
+							 <td>
+							<select  class="selectpicker" name="{{ items.o_bf_address_1_id }}">
     {% for entry in items.o_bf_address_1 %}
     <option {% if entry == items.o_bf_address_1_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_address_1_selected  %} selected {% endif %}
-    </div>
+							</td>
+							<td></td>
+	     </tr>
 
 
-
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_address_2">Address 2</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_address_2_id }}">
+        <tr>
+							<td>Address 2</td>
+							 <td>
+							<select  class="selectpicker" name="{{ items.o_bf_address_2_id }}">
     {% for entry in items.o_bf_address_2 %}
     <option {% if entry == items.o_bf_address_2_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_address_2_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							 <td></td>
+	 </tr>
 
 
-    <div class="form-group">
-   <label class="col-sm-6 control-label " for="o_bf_notes">Notes</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_notes_id }}">
+  <tr>
+							<td>Notes</td>
+							  <td>
+								 <select  class="selectpicker" name="{{ items.o_bf_notes_id }}">
     {% for entry in items.o_bf_notes %}
     <option {% if entry == items.o_bf_notes_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_notes_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							 <td></td>
+						  </tr>
 
-
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_city">City</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_city_id }}">
+<tr>
+							<td>City</td>
+							  <td>
+								 <select  class="selectpicker" name="{{ items.o_bf_city_id }}">
     {% for entry in items.o_bf_city %}
     <option {% if entry == items.o_bf_city_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_city_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+						  </tr>
 
-
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_state">State</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_state_id }}">
+        <tr>
+							<td>State</td>
+							  <td>
+								 <select  class="selectpicker" name="{{ items.o_bf_state_id }}">
     {% for entry in items.o_bf_state %}
     <option {% if entry == items.o_bf_state_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_state_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+	     </tr>
 
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_zipList">Zip</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_zip_id }}">
+
+        <tr>
+							<td>Zip</td>
+							  <td>
+								<select  class="selectpicker" name="{{ items.o_bf_zip_id }}">
     {% for entry in items.o_bf_zipList %}
     <option {% if entry == items.o_bf_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_zip_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+	 </tr>
 
-
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_country">Country</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_country_id }}">
+        <tr>
+							<td>Country</td>
+							  <td>
+							<select  class="selectpicker" name="{{ items.o_bf_country_id }}">
     {% for entry in items.o_bf_country %}
     <option {% if entry == items.o_bf_country_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_country_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+		 </tr>
 
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_captcha">Captcha</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_captcha_id }}">
+        <tr>
+							<td>Captcha</td>
+							  <td>
+								<select name="{{ items.o_bf_captcha_id }}">
     {% for entry in items.o_bf_captcha %}
     <option {% if entry == items.o_bf_captcha_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_captcha_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+						  </tr>
 
-    <div class="form-group">
-    <label class="col-sm-6 control-label " for="o_bf_terms">Tearms</label>
-    <div class="col-sm-6">
-    <select name="{{ items.o_bf_terms_id }}">
+        <tr>
+							<td>Terms</td>
+							  <td>
+								 <select name="{{ items.o_bf_terms_id }}">
     {% for entry in items.o_bf_terms %}
     <option {% if entry == items.o_bf_terms_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
     </option>
     {% endfor %}
     </select>
-    </div>{% if entry == items.o_bf_terms_selected  %} selected {% endif %}
-    </div>
+							 </td>
+							<td></td>
+						  </tr>
 
-
- <div class="form-group">
- <div class="col-md-offset-6 col-sm-6">
- <button class="btn btn-submit" type="submit">
- <i class="ace-icon fa fa-check"></i>
- Save
- </button>
- </div>
- </div>
-</form>
-
+    </table>
+<div class="text-center">
+							<button type="submit">Save</button>
+</div>
+    </form>
 </div>
 
+</div>
  {% endblock %}

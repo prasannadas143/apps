@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -8,53 +8,68 @@
 {% endblock %}
 {% block content %}
 
-                        <div id="payments">
-                            <h2>Booking options</h2>
-                            <form class="form-horizontal" role="form" method="POST" action="{% url 'appointmentschduler:PaymentOptions' %}" onsubmit="updateform()">
-                                <div class="form-group">
-                                    <label class="col-sm-6 control-label no-padding-right" for="o_disable_payments">Check if you want to disable payments and only collect reservation details</label>
 
-                                    <div class="col-sm-6">
-                                        <input class="form-control" id="o_disable_paymentsCB" type="checkbox" name='{{ items.o_disable_payments_id }}' ' {% if items.o_disable_payments_selected == 1 %} checked {% endif %} '  value="{{items.o_disable_payments_selected}}" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-6 control-label no-padding-right" for="o_deposit">Set deposit amount to be collected for each appointment</label>
 
-                                    <div class="col-sm-6">
-                                        <input class="form-control" type="text" name='{{ items.o_deposit_id }}'  value="{{items.o_deposit}}"/>
-                                        <select name="{{ items.o_deposit_type_id }}">
+<!-- Start Payments -->
+
+			<div class="Payments">
+
+<div class="table1">
+<form role="form" method="POST" action="{% url 'appointmentschduler:PaymentOptions' %}" onsubmit="updateform()">
+<table>
+  <tr>
+							<th>Option</th>
+							<th class="value">Value</th>
+  </tr>
+
+     <tr>
+							<td>Check if you want to disable payments and only collect reservation details</td>
+							<td>
+                                  <input id="o_disable_paymentsCB" type="checkbox" name={{ items.o_disable_payments_id }}  {% if items.o_disable_payments_selected == 1 %} checked {% endif %}   value="{{items.o_disable_payments_selected}}" />
+							</td>
+	</tr>
+
+
+
+
+     <tr>
+							<td>Set deposit amount to be collected for each appointment</td>
+							  <td>
+                                 <span> <input  style="width: 15%;" type="text" name='{{ items.o_deposit_id }}'  value="{{items.o_deposit}}"/></span>
+                                <select  class="selectpicker percent" name="{{ items.o_deposit_type_id }}">
                                         {% for entry in items.o_deposit_typeList %}
-
                                           <option {% if entry == items.o_deposit_type_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
                                         {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-6 control-label no-padding-right" for="o_tax">Tax amount to be collected for each appointment in %</label>
+                                </select>
+							  </td>
+						  </tr>
 
-                                    <div class="col-sm-6">
-                                        <input class="form-control" type="number" name='{{ items.o_tax_id }}' value="{{items.o_tax}}" />
-                                    </div>
-                                </div>
-                             
-                                {% csrf_token %}
+<tr>
+							<td>Tax amount to be collected for each appointment</td>
+							 <td>
+								<div class="input-group">
+								  <span class="input-group-addon" id="basic-addon3"><i class="fa fa-percent" aria-hidden="true"></i></span>
+                                     <input class="form-control paypal" type="number" aria-describedby="basic-addon3" placeholder="{{items.o_tax}}" name='{{ items.o_tax_id }}' value="{{items.o_tax}}" />
+								</div>
+							</td>
+						  </tr>
 
-                                <div class="form-group">
-                                    <div class="col-md-offset-6 col-sm-6">
-                                        <button class="btn btn-submit" type="submit">
-                                            <i class="ace-icon fa fa-check"></i>
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+
+</table>
+                        <div class="text-center">
+							<button type="submit">Save</button>
+						</div>
+
+</form>
+
+</div>
+
+            </div>
+
+
 
 
 <script type="text/javascript">
-
-
 
     $(document).ready(function() {
     //set initial state.
@@ -71,12 +86,9 @@
 
     //set initial state.
     function updateform() {
-
         $('#o_disable_paymentsCB').val();
-        alert($('#o_disable_paymentsCB').val());
      return true ;
   }
 </script>
 
-
-                            {% endblock %}
+{% endblock %}

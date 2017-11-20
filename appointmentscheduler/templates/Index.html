@@ -6,6 +6,10 @@
 
 <head lang="en">
 
+	<script
+  src="https://code.jquery.com/jquery-1.12.4.min.js"
+  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+  crossorigin="anonymous"></script>
 
 	<!-- Metas -->
 	<meta charset="utf-8">
@@ -29,6 +33,7 @@
     <script src="JS/respond.min.js"></script>
 	<! [endif]-->
 
+
 	 <!-- <script src='./js/angular.min.js' ></script> -->
     <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js'></script>
     <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.js'></script>
@@ -37,8 +42,15 @@
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-messages.js"></script>
 
 
-	<script  src="https://code.jquery.com/jquery-1.12.4.min.js"  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-  crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+
+    <!-- Markdown libs -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/showdown/1.4.3/showdown.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.8/angular-sanitize.js'></script>
+
+
 </head>
 
 <body>
@@ -465,6 +477,7 @@
 				<button type="button" class="btn btn-default">  <a class="navLinkMenu" href="{% url 'appointmentschduler:SMSConfig' %}">SMS Config</a>   </button>
 				
 				<button type="button" class="btn btn-default">  <a class="navLinkMenu" href="{% url 'appointmentschduler:SendMail' %}">Send Mail</a>   </button>
+				<button type="button" class="btn btn-default">  <a class="navLinkMenu" href="{% url 'appointmentschduler:PaymentOptions' %}">Payment Options</a>   </button>
 
 				<button type="button" class="btn btn-default">  <a class="navLinkMenu" href="{% url 'appointmentschduler:listphones' %}">List Phones</a>   </button>
 
