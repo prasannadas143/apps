@@ -3,7 +3,7 @@ from appointmentscheduler.models import AppschedulerOptions
 import pdb,os
 from django.views.decorators.csrf import requires_csrf_token
 from django.core.files.storage import FileSystemStorage
-from appsplatform import settings
+from appsplatform.settings.local import BASE_DIR
 from PIL import Image
 
 tab_id = 100;
@@ -36,7 +36,7 @@ def Company(request):
 		companylogoname = item[11].value;
 		uploaded_file_url = fs.url(companylogoname)
 		if uploaded_file_url:
-			oldimagepath=  os.path.join( settings.BASE_DIR, uploaded_file_url.lstrip('/') )
+			oldimagepath=  os.path.join( BASE_DIR, uploaded_file_url.lstrip('/') )
 			if os.path.exists( oldimagepath ):
 				os.remove(oldimagepath)
 

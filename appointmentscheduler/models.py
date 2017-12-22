@@ -97,7 +97,6 @@ class AppschedulerBookings(models.Model):
 
         # Calculate the correct time to send this reminder
         # appointment_time = arrow.get(self.service_start_time, self.time_zone.zone)
-        pdb.set_trace()
         appointment_time = arrow.get(self.service_start_time)
 
         reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)

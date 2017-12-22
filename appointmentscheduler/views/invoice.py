@@ -17,7 +17,8 @@ from appointmentscheduler.views.Options.Editor import ckEditor
 @requires_csrf_token
 def list_invoices(request):
 	user_timezone = request.session['visitor_timezone'] 
-
+	# import pdb
+	# pdb.set_trace()
 	invoice_lists = AppschedulerInvoice.objects.order_by('-id').select_related('booking').values("booking__id", "invoiceid",\
 	 "booking__created",	"booking__date",  "booking__booking_status", "booking__booking_total")
 	invoices = []
