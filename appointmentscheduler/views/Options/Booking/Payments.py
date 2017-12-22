@@ -12,7 +12,7 @@ def update_value(field_id, tab_id, newstep):
       item.value = "{0}::{1}".format(getsteps[0], newstep )
    else :
       item.value = newstep ;
-   #item.save()
+   item.save()
 
 @csrf_exempt
 def PaymentOptions(request):
