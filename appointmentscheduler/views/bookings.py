@@ -19,7 +19,7 @@ def show_bookings(request):
     template_name = "bookings.html"
     bookingdata = dict()
     user_timezone = request.session['visitor_timezone']
-    bookings = AppschedulerBookings.objects.selected_related('service').values('id', 'c_name', 'c_email'\
+    bookings = AppschedulerBookings.objects.select_related('service').values('id', 'c_name', 'c_email'\
         ,"c_phone", "booking_status", "booking_total", 'service__service_name', "service_start_time" ).order_by('-id')
     bookingslist = []
     for booking in  bookings.iterator():
