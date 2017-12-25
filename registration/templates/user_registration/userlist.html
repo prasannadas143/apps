@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}Welcome to Django store{% endblock %}
+{% block head %}Welcome to Django store{% endblock %}
+{% block content %}
+  <p>{% trans "Account" %} <a href="{% url 'useraccount' %}">{% trans "Account" %}</a>.</p>
+
+  <p>{% trans "Not a member?" %} <a href="{% url 'createuser' %}">{% trans "Create User" %}</a>.</p>
+
+
+	{% for customer in customers %} 
+         <a href="{% url 'customerdetails' customer.id %}">{{ customer.username }}</a></li></br>
+
+    {% endfor %}
+
+{% endblock %}

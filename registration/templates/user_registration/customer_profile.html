@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}Welcome to Django store{% endblock %}
+{% block head %}Welcome to Django store{% endblock %}
+{% block content %}
+ <p>{% trans "Change Password" %} <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>.</p>
+	
+  {% if request.user.is_authenticated %}
+    <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+  {% endif %}
+	{% if user.username %}
+		<p>Welcome {{ user.username }}!Here your page content</p>
+	{% else %}
+		<p>Welcome anonymous user!
+		You need to login</p><br/>
+	{% endif %}
+	   <p>{% trans "appointmentschduler" %} <a href="{% url 'appointmentschduler:bookings' %}">{% trans "appointmentschduler" %}</a>.</p>
+
+
+{% endblock %}

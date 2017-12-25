@@ -14,6 +14,14 @@ ALLOWED_HOSTS = [ '127.0.0.1', 'localhost',]
 ########## EMAIL CONFIGURATION
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'daspython@gmail.com'
+EMAIL_HOST_PASSWORD = ""
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'daspython@gmail.com'
+
+
 ########## END EMAIL CONFIGURATION
 ########## MANAGER CONFIGURATION
 # Admin and managers for this project. These people receive private site
@@ -126,127 +134,132 @@ DEBUG_TOOLBAR_CONFIG = {
 
 
 ########## LOGGING CONFIGURATION
+LOG_DIR = os.path.join( BASE_DIR, 'log')
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse',
-#         },
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         },
-#     },
-#     'formatters': {
-#         'short': {
-#             'format': '%(asctime)s %(levelname)-7s %(thread)-5d %(message)s',
-#             'datefmt': '%H:%M:%S',
-#         },
-#         'verbose': {
-#             'format': '%(levelname)s|%(asctime)s|%(module)s|%(funcName)s|%(lineno)s|%(process)d|%(thread)d|%(message)s',
-#             'datefmt' : "%d/%b/%Y %H:%M:%S"
-#         },
-#         'simple': {
-#             'format': '%(levelname)s|%(message)s'
-#         },
+# Internationalization
+# https://docs.djangoproject.com/en/1.10/topics/i18n/
+########## LOGGING CONFIGURATION
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'short': {
+            'format': '%(asctime)s %(levelname)-7s %(thread)-5d %(message)s',
+            'datefmt': '%H:%M:%S',
+        },
+        'verbose': {
+            'format': '%(levelname)s|%(asctime)s|%(module)s|%(funcName)s|%(lineno)s|%(process)d|%(thread)d|%(message)s',
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s|%(message)s'
+        },
     
-#     },
-#     'handlers': {
-#         'mail_admins': {
-#             'level': 'ERROR',
-#             'filters': ['require_debug_true'],
-#             'email_backend': 'django.core.mail.backends.smtp.EmailBackend',
-#             'class': 'django.utils.log.AdminEmailHandler'
-#         },
-#         'null': {
-#             'level':'DEBUG',
-#             'class': 'logging.NullHandler',
-#         },
-#         'console': {  # Log to stdout
-#             'level':'DEBUG',
-#             'class':'logging.StreamHandler',
-#             'formatter': 'short'
-#         },
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'email_backend': 'django.core.mail.backends.smtp.EmailBackend',
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'null': {
+            'level':'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {  # Log to stdout
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+            'formatter': 'short'
+        },
         
-#         'default': {
-#             'level':'DEBUG',
-#             'filters': ['require_debug_true'],
-#             'class':'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.join(LOG_DIR, 'app.log'),
-#             'maxBytes': 1024*1024*10, # 5 MB
-#             'backupCount': 0,
-#             'formatter':'simple',
+        'default': {
+            'level':'DEBUG',
+            'filters': ['require_debug_true'],
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'app.log'),
+            'maxBytes': 1024*1024*10, # 5 MB
+            'backupCount': 0,
+            'formatter':'simple',
 
-#         },
-#         'logfile': {  # Rotate log file daily, only keep 1 backup
-#             'level':'DEBUG',
-#             'filters': ['require_debug_true'],
-#             'class':'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.join(LOG_DIR, 'django.log'),
-#             'maxBytes': 1024*1024*10, # 5MB
-#             'backupCount': 0,
-#             'formatter': 'verbose',
-#         },
+        },
+        'logfile': {  # Rotate log file daily, only keep 1 backup
+            'level':'DEBUG',
+            'filters': ['require_debug_true'],
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'django.log'),
+            'maxBytes': 1024*1024*10, # 5MB
+            'backupCount': 0,
+            'formatter': 'verbose',
+        },
 
-#         'celery': {
-#             'level': 'DEBUG',
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': 'celery.log',
-#             'formatter': 'simple',
-#             'maxBytes': 1024 * 1024 * 100,  # 100 mb
-#         },
-#     },
-#     # EMAIL all errors (might not want this, but let's try it)
-#     'root': {  # For dev, show errors + some info in the console
-#         'handlers': ['console'],
-#         'level': 'INFO',
-#     },
-#     'loggers': {
-#        'django.template': {
-#             'handlers': ['console'],
-#             'level': 'INFO',
-#             'propagate': False,
-#         },
-#         'django.request': {
-#             'handlers': ['logfile'],
-#             'level': 'INFO',
-#             'propagate': False,
-#         },
-#         'django': {
-#             'handlers': ['logfile'],
-#         },
+        'celery': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'celery.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
+    },
+    # EMAIL all errors (might not want this, but let's try it)
+    'root': {  # For dev, show errors + some info in the console
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+       'django.template': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['logfile'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['logfile'],
+        },
        
-#         'django.security': {
-#             'handlers': ['mail_admins'],
-#             'level': 'ERROR',
-#             'propagate': True,
-#         },   
-#         'django.security.DisallowedHost': {
-#             'handlers': [],
-#             'propagate': False,
-#         },
+        'django.security': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },   
+        'django.security.DisallowedHost': {
+            'handlers': [],
+            'propagate': False,
+        },
        
     
-#         'py.warnings': {
-#             'handlers': ['console'],
-#         },
-#         'django.db': {
-#             'handlers': ['default'],
-#             'level': 'DEBUG', # Set this to ERROR on production hosts since the database logs are very verbose
-#             'propagate': False, 
-#         },
+        'py.warnings': {
+            'handlers': ['console'],
+        },
+        'django.db': {
+            'handlers': ['default'],
+            'level': 'DEBUG', # Set this to ERROR on production hosts since the database logs are very verbose
+            'propagate': False, 
+        },
 
-#         'celery': {
-#             'handlers': ['default','console'],
-#             'level': 'DEBUG',
-#             'propagate': True
-#         },
+        'celery': {
+            'handlers': ['default','console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
        
-#     },
+    },
 
 
-# }
+}
 
 ########## END LOGGING CONFIGURATIONs
 
@@ -255,10 +268,6 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 SECRET_KEY = get_random_string(50, chars)
-# Address of Redis instance, our Celery broker
-CELERY_BROKER_URL = 'amqp://localhost'
-CELERYD_TASK_SOFT_TIME_LIMIT = 60
-CELERYD_TASK_TIME_LIMIT = 60
 
 # Reminder time: how early text messages are sent in advance of appointments
 REMINDER_TIME = 30 # minutes
