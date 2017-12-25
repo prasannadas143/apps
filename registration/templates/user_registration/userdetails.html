@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load i18n static %}
+{% load static from staticfiles %}
+{% block content %} 
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+   <p>{% trans "Account" %} <a href="{% url 'useraccount' %}">{% trans "Account" %}</a></p>
+
+   <form    name="userappsform" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'save_userapp'  %}"  method="post"    onsubmit="getSelectedOptions()" >{% csrf_token %}
+
+
+    <label class="title">
+        User Name</label>
+    <span>
+            <input id="id_username" name="username" type="text" value="{{ userobj.username }}"/>
+     </span>      
+    <label class="title">
+        User Email</label>
+    <span>
+                  <input id="id_useremail" name="useremail" type="text" value="{{ userobj.email }}"/>
+     </span>
+
+
+	<h2>Available groups </h2>
+
+	<select name="available_apps[]" id="id_available_apps" data-is-stacked="0" multiple > 
+	 {% for item in available_apps %}
+
+			<option value="{{ item.id }}" >{{ item.name }}</option>
+		{% endfor %}
+	</select>
+
+	<a title="Click to choose all groups at once." href="#" id="id_apps_add_all_link" class="selector-chooseall" onclick="selectall_available_apps()">Choose all apps</a>
+
+  </div><ul class="selector-chooser"><li><a title="Choose" href="#" id="id_apps_add_link" class="selector-add" >Choose</a></li>
+  	<li><a title="Remove" href="#" id="id_apps_remove_link" class="selector-remove">Remove</a></li>
+  </ul></div>
+
+  	
+	<select id="id_apps_to" multiple="multiple" size="0" name="groups" >
+		{% for item in assigned_apps %}
+
+			<option value="{{ item.id }}" >{{ item.name }}</option>
+		{% endfor %}
+	</select>
+	
+	<a title="Click to remove all chosen apps at once." href="#" id="id_apps_remove_all_link" class="selector-clearall active" onclick="selectall_added_apps()">Choose all apps</a>
+         
+    <input type="hidden" name="apps_available"  id="apps_available"/>
+               
+    <input type="submit" name="submit" value="Save" />
+</form>
+<script>
+// arguments: reference to select list, callback function (optional)
+function getSelectedOptions() {
+
+	sel = document.getElementById("id_apps_to");
+    var opts = [], opt;
+    var display = document.getElementById('apps_available');
+    str = ""
+    // loop through options in select list
+    for (var i=0, len=sel.options.length; i<len; i++) {
+        opt = sel.options[i];	
+        // check if selected
+            // add to array of option elements to return from this function
+            str += opt.value + ":" 
+            // invoke optional callback function if provided
+              // display in textarea for this example
+		    
+    }
+    display.value = str ;
+	return true;    
+    // return array containing references to selected option elements
+}
+
+
+ $('#id_apps_add_link').click(function() {  
+    return !$('#id_available_apps option:selected')
+.remove().appendTo('#id_apps_to');  
+   });  
+
+  $('#id_apps_remove_link').click(function() {  
+    return !$('#id_apps_to option:selected')
+.remove().appendTo('#id_available_apps');  
+   });  
+
+  function selectall_available_apps()  {  
+$('#id_available_apps').find('option').each(function() {  
+   $(this).attr('selected', 'selected');  
+  });  
+}  
+
+
+function selectall_added_apps()  {  
+$('#id_apps_to').find('option').each(function() {  
+   $(this).attr('selected', 'selected');  
+  });  
+}  
+
+</script>	
+
+{% endblock %}

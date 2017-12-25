@@ -1,0 +1,9 @@
+{% extends "user_registration/registration_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Logged out" %}{% endblock %}
+
+{% block content %}
+<li><a href="{% url 'auth_login' %}">Login</a></li>
+<p>{% trans "Successfully loggeed out" %}.</p>
+{% endblock %}

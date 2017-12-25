@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
-import os, sys
-from os.path import  basename, dirname, join
-
+import os,sys
 from decouple import Config, RepositoryEnv
-
+from os.path import  basename, dirname, join
+from django.contrib.messages import constants as messages
+from django.utils.crypto import get_random_string
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -31,6 +30,10 @@ SITE_ROOT = dirname(BASE_DIR)
 
 DOTENV_FILE =  join(SITE_ROOT, "deploy", ".env") 
 config = Config(RepositoryEnv(DOTENV_FILE))
+
+# SECURITY WARNING: keep the secret key used in production secret!
+chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+SECRET_KEY = get_random_string(50, chars)
 ########## PATH CONFIGURATION
 # Absolute filesystem path to this Django project directory.
 # Quick-start development settings - unsuitable for production
@@ -70,7 +73,8 @@ BUILTIN_APPS = [
     'phonenumber_field',
     'djng',
     'bootstrap3',
-    
+    'registration',
+
 ]
 
 USER_APPS = [
@@ -84,6 +88,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -93,7 +98,11 @@ MIDDLEWARE_CLASSES = [
 
 ]
 
+INCLUDE_REGISTER_URL = True
+INCLUDE_AUTH_URLS = True
 X_FRAME_OPTIONS = 'DENY'
+ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -103,10 +112,13 @@ ROOT_URLCONF = 'appsplatform.urls'
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [os.path.join("appointmentscheduler", 'templates'),
-
+    'DIRS': [
+                os.path.join("appointmentscheduler", 'templates'),
                 os.path.join("appointmentscheduler", 'templates',"Options"),
-                os.path.join("appointmentscheduler", 'templates',"Options","Booking") ],
+                os.path.join("appointmentscheduler", 'templates',"Options","Booking") ,
+                os.path.join( 'registration', 'templates'),
+                os.path.join( 'registration', 'auth','templates'),
+            ],
 
     'APP_DIRS': True,  
     'OPTIONS': {
@@ -128,7 +140,60 @@ TEMPLATES = [{
 WSGI_APPLICATION = 'appsplatform.wsgi.application'
 
 
+LOGIN_REDIRECT_URL = '/home/'
+LOGIN_URL = '/accounts/login/'
 
+LOGIN_EXEMPT_URLS = (
+'/admin/',
+'/accounts/login/',
+'/accounts/password/reset/',
+'/accounts/password/reset/complete/',
+'/accounts/password/reset/done/',
+'/accounts/register/',
+'/accounts/register/closed/',
+'/accounts/activate/complete/'
+'/accounts/activate/resend/',
+'/accounts/register/complete/',
+'/accounts/register/closed/',
+
+ # allow any URL under /legal/*
+) 
+
+# Database
+# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'), 
+        'DISABLE_SERVER_SIDE_CURSORS': True,
+
+    },
+
+    
+}
+
+# Password validation
+# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 
 # Password validation
@@ -140,10 +205,9 @@ WSGI_APPLICATION = 'appsplatform.wsgi.application'
 
 LANGUAGE_CODE = 'en-us'
 
-LOG_DIR = os.path.join( BASE_DIR, 'log')
+TIME_ZONE = 'UTC'
 
-
-USE_I18N = False
+USE_I18N = True
 
 USE_L10N = True
 
@@ -151,9 +215,7 @@ USE_TZ = True
 
 ########## EMAIL CONFIGURATION
 
-EMAIL_USE_TLS = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 ########## END EMAIL CONFIGURATION
 
@@ -171,6 +233,21 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+STATIC_URL = '/static/'
+####### End  Static files Config
+
+########## Message  CONFIGURATION
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
+
+########## END Message CONFIGURATION
+
 
 # Application definition
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
@@ -184,8 +261,11 @@ CELERY_ENABLE_UTC = True
 CELERY_TIMEZONE = 'UTC'
 CELERY_ALWAYS_EAGER = False
 
+# Address of Redis instance, our Celery broker
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERYD_TASK_TIME_LIMIT = 60
 
-STATIC_URL = '/static/'
 
 
 # SECURE_SSL_REDIRECT = True
@@ -202,3 +282,7 @@ djcelery.setup_loader()
     # ROOT_URLCONF = '%s.urls' % SITE_NAME
 ########## END URL CONFIGURATION
 
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_SAVE_EVERY_REQUEST = True
+# SESSION_COOKIE_AGE = 60
