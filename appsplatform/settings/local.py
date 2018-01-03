@@ -12,14 +12,13 @@ ALLOWED_HOSTS = [ '127.0.0.1', 'localhost',]
 
 
 ########## EMAIL CONFIGURATION
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'daspython@gmail.com'
-EMAIL_HOST_PASSWORD = ""
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'daspython@gmail.com'
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 
 
 ########## END EMAIL CONFIGURATION
@@ -139,7 +138,7 @@ LOG_DIR = os.path.join( BASE_DIR, 'log')
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 ########## LOGGING CONFIGURATION
-
+DJANGO_LOG_LEVEL=DEBUG 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -172,10 +171,7 @@ LOGGING = {
             'email_backend': 'django.core.mail.backends.smtp.EmailBackend',
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'null': {
-            'level':'DEBUG',
-            'class': 'logging.NullHandler',
-        },
+        
         'console': {  # Log to stdout
             'level':'DEBUG',
             'class':'logging.StreamHandler',
@@ -192,6 +188,14 @@ LOGGING = {
             'formatter':'simple',
 
         },
+
+        'celery': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename':  os.path.join(LOG_DIR, 'celery.log'),
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        },
         'logfile': {  # Rotate log file daily, only keep 1 backup
             'level':'DEBUG',
             'filters': ['require_debug_true'],
@@ -201,14 +205,11 @@ LOGGING = {
             'backupCount': 0,
             'formatter': 'verbose',
         },
-
-        'celery': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'celery.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        'null': {
+            'level':'DEBUG',
+            'class': 'logging.NullHandler',
         },
+
     },
     # EMAIL all errors (might not want this, but let's try it)
     'root': {  # For dev, show errors + some info in the console
@@ -249,18 +250,27 @@ LOGGING = {
             'level': 'DEBUG', # Set this to ERROR on production hosts since the database logs are very verbose
             'propagate': False, 
         },
-
         'celery': {
-            'handlers': ['default','console'],
+            'handlers': ['celery'],
             'level': 'DEBUG',
-            'propagate': True
+            'propagate': False
+        },
+        'appointmentscheduler.tasks': {
+            'handlers': ['celery'],
+            'level': 'DEBUG',
+            'propagate': False
         },
        
     },
 
 
 }
-
+CELERY_BROKER_URL = 'amqp://localhost'
+# CELERY_RDB_HOST ='127.0.0.1'
+# CELERY_RDB_PORT = 6899
+default_port = 6899
+CELERY_RDB_HOST = os.environ.get('CELERY_RDB_HOST') or '127.0.0.1'
+CELERY_RDB_PORT = int(os.environ.get('CELERY_RDB_PORT') or default_port)
 ########## END LOGGING CONFIGURATIONs
 
 DEBUG_TOOLBAR_CONFIG = {

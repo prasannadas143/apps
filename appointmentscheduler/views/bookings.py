@@ -229,7 +229,7 @@ def editbooking(request, id=None):
                 bookingobj.country = countryobj
             message = "Booking data is saved" 
             bookingobj.save()
-            # bookingobj.send_email_sms("edit")
+            bookingobj.send_email_sms("edit")
           
             return HttpResponseRedirect('/appointmentschduler/bookings/')
                
