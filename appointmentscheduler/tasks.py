@@ -1,22 +1,59 @@
 from __future__ import absolute_import
 from celery.decorators import task
-import smtplib
+from celery import shared_task
+import celery
+from .models import SmsSentStatus
+import smtplib,  pdb
 from twilio.rest import Client
 from celery.utils.log import get_task_logger
-
+from celery.contrib import rdb
+from datetime import datetime, date, time
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.models import AppschedulerBookings, AppschedulerOptions
-
+from django.conf import settings
 # Uses credentials from the TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN
 # environment variables
 
 logger = get_task_logger(__name__)
+# @shared_task
+class MyTask(celery.Task):
 
-@task(bind=True, default_retry_delay=2*60)  
-def send_sms(self,bookingid,opertype):
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        # rdb.set_trace()
+        status = "Failed"
+        created_time  = datetime.utcnow()
+        msg_info = self.request.kwargs
+        if 'email' in msg_info :
+            toaddr =  msg_info['email']
+            message = msg_info['emailcontent'] 
+        if 'to_sms' in msg_info :
+            tosms =  msg_info['to_sms']
+            message = msg_info['smscontent'] 
+            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms ,message=message ,status=status)
+            smssentstatus.save()
+        
+        logger.error('{0!r} failed: {1!r}'.format(task_id, exc))
+
+    def on_success(self, retval, task_id, args, kwargs):
+        # rdb.set_trace()
+        status = "Success"
+        created_time  = datetime.utcnow()
+        msg_info = self.request.kwargs
+        if 'email' in msg_info :
+            toaddr =  msg_info['email']
+            message = msg_info['emailcontent'] 
+        if 'to_sms' in msg_info :
+            tosms =  msg_info['to_sms']
+            message = msg_info['smscontent'] 
+            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms ,message=message ,status=status)
+            smssentstatus.save()
+
+
+@task(bind=True, base=MyTask, default_retry_delay=2)  
+def send_sms(self,bookingid,opertype, *args, **kwargs):
     """Send a reminder to a phone using Twilio SMS"""
     # Get our appointment from the database
     try:
@@ -28,6 +65,8 @@ def send_sms(self,bookingid,opertype):
             smstmpdtls = tmpdtls.DesignedTemplate
             Subject = tmpdtls.subject
         else :
+            Subject = opertype
+
             smstmpdtls =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
        
         customer_name = booking.c_name
@@ -61,6 +100,9 @@ def send_sms(self,bookingid,opertype):
         print(TWILIO_AUTH_TOKEN);
         TWILIO_FROM_NUMBER = item[2].value;
         print(TWILIO_FROM_NUMBER);
+        # rdb.set_trace()  # <- set break-point
+        self.request.kwargs['to_sms'] = toNumber
+        self.request.kwargs['smscontent'] = Message
         client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
         result= client.api.account.messages.create(to=toNumber, from_=TWILIO_FROM_NUMBER,body=Message)
         print(result)
@@ -68,12 +110,17 @@ def send_sms(self,bookingid,opertype):
 
     except Exception as exc:
        # overrides the default delay to retry after 1 minute
-        raise self.retry(exc=exc, countdown=2*60)                 
+        logger.error('Error while doing sending sms', exc_info=True)
+
+        raise self.retry(exc=exc, max_retries=3)                 
 
     return 
 
-@task(bind=True, default_retry_delay=2*60)  
-def send_email(self,bookingid, opertype):
+
+
+# @shared_task
+@task(bind=True, base=MyTask, default_retry_delay=2)  
+def send_email( self,bookingid, opertype, *args, **kwargs):
     try:
         booking = AppschedulerBookings.objects.get(pk=bookingid)
         templateid = 2
@@ -84,7 +131,7 @@ def send_email(self,bookingid, opertype):
             Subject = tmpdtls.subject
         else :
             emailres =" customername {customer_name} bookingid {bookingid} date {service_start_time} day {issued}"
-
+            Subject = opertype
 
 
         tab_id = 5
@@ -110,7 +157,8 @@ def send_email(self,bookingid, opertype):
         booking_deposit = booking.booking_deposit
         booking_status = booking.booking_status
         toaddr = booking.c_email
-        fromaddr = o_FromEmail
+        fromaddr = settings.DEFAULT_FROM_EMAIL
+        o_FromEmailPassword = settings.EMAIL_HOST_PASSWORD
         emailbody = emailres.format(**locals())
 
         msg = MIMEMultipart()
@@ -123,18 +171,24 @@ def send_email(self,bookingid, opertype):
         print(Subject);
         print(emailbody);
         msg.attach(MIMEText(emailbody, "html"))
+        text = msg.as_string()
+        self.request.kwargs['email'] = toaddr
+        self.request.kwargs['emailcontent'] = text
+        # rdb.set_trace()
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
         server.ehlo()
         server.login(fromaddr, o_FromEmailPassword)
-        text = msg.as_string()
         print(fromaddr);
         print(toaddr);
         server.sendmail(fromaddr, toaddr, text)
         server.quit()   
-
+   
     except Exception as exc:
+        import traceback
+
        # overrides the default delay to retry after 1 minute
-        raise self.retry(exc=exc, countdown=2*60)                 
+        logger.info('Error while doing sending email', exc_info=1)
+        raise self.retry(exc=exc,  max_retries=3)                 
     return 

@@ -74,7 +74,9 @@ BUILTIN_APPS = [
     'djng',
     'bootstrap3',
     'registration',
-
+    'django_celery_results',
+    'dbbackup',
+    
 ]
 
 USER_APPS = [
@@ -83,6 +85,8 @@ USER_APPS = [
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + USER_APPS
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': join(SITE_ROOT) }
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -113,11 +117,11 @@ ROOT_URLCONF = 'appsplatform.urls'
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
-                os.path.join("appointmentscheduler", 'templates'),
-                os.path.join("appointmentscheduler", 'templates',"Options"),
-                os.path.join("appointmentscheduler", 'templates',"Options","Booking") ,
-                os.path.join( 'registration', 'templates'),
-                os.path.join( 'registration', 'auth','templates'),
+                os.path.join(BASE_DIR,"appointmentscheduler", 'templates'),
+                os.path.join(BASE_DIR, "appointmentscheduler", 'templates',"Options"),
+                os.path.join(BASE_DIR, "appointmentscheduler", 'templates',"Options","Booking") ,
+                os.path.join(BASE_DIR, 'registration', 'templates'),
+                os.path.join(BASE_DIR, 'registration', 'auth','templates'),
             ],
 
     'APP_DIRS': True,  
@@ -142,6 +146,8 @@ WSGI_APPLICATION = 'appsplatform.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/home/'
 LOGIN_URL = '/accounts/login/'
+LOGOUT_URL = '/accounts/logout/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 LOGIN_EXEMPT_URLS = (
 '/admin/',
@@ -225,7 +231,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "assets")
 STATICFILES_DIRS = (
 os.path.join(BASE_DIR, "static"),
 )
-GEOIP_PATH = os.path.join(BASE_DIR,  'geopath')
+GEOIP_PATH = join(BASE_DIR,  'geopath')
 
 
 STATICFILES_FINDERS = (
@@ -250,23 +256,23 @@ MESSAGE_TAGS = {
 
 
 # Application definition
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 CELERYD_HIJACK_ROOT_LOGGER = False
 CELERY_DEFAULT_QUEUE = 'normal'
 CELERY_DEFAULT_EXCHANGE = 'normal'
 CELERY_DEFAULT_ROUTING_KEY = 'normal'
-CELERY_IGNORE_RESULT = True
+CELERY_REDIRECT_STDOUTS = True
+# CELERY_RESULT_BACKEND = 'django-db'
+
 
 CELERY_ENABLE_UTC = True
 CELERY_TIMEZONE = 'UTC'
 CELERY_ALWAYS_EAGER = False
 
 # Address of Redis instance, our Celery broker
-CELERY_BROKER_URL = 'amqp://localhost'
-CELERYD_TASK_SOFT_TIME_LIMIT = 60
-CELERYD_TASK_TIME_LIMIT = 60
 
 
+########## Security CONFIGURATION
 
 # SECURE_SSL_REDIRECT = True
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -274,15 +280,20 @@ CELERYD_TASK_TIME_LIMIT = 60
 # CSRF_COOKIE_SECURE = True
 # SESSION_COOKIE_SECURE = True
 
-import djcelery
-djcelery.setup_loader()
+########## End CONFIGURATION
+
+# import djcelery
+# djcelery.setup_loader()
 # BROKER_URL="django:// "
 
 ########## URL CONFIGURATION
     # ROOT_URLCONF = '%s.urls' % SITE_NAME
 ########## END URL CONFIGURATION
 
+########## Session CONFIGURATION
 
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_COOKIE_AGE = 60
+########## End CONFIGURATION
+

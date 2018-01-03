@@ -13,4 +13,9 @@ app = Celery('Appsplatform', broker='amqp://localhost//',
 			     backend='amqp://')
 
 app.config_from_object('django.conf:settings')
+app.conf.update(
+	result_backend='django-db',
+    task_serializer='json',
+    accept_content=['json'],  # Ignore other content
+    result_serializer='json', )
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

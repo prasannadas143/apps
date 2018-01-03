@@ -100,18 +100,18 @@ class AppschedulerBookings(models.Model):
         appointment_time = arrow.get(self.service_start_time)
 
         reminder_time = appointment_time.replace(minutes=-settings.REMINDER_TIME)
-        # pdb.set_trace()
         # Schedule the Celery task
         from .tasks import send_email,send_sms
+
         if self.subscribed_email:
-            send_email.apply_async((self.id,opertype,))
+            self.task_id_instant_email = send_email.apply_async((self.id,opertype,))
         if self.reminder_email:
             self.task_id_email = send_email.apply_async((self.id,opertype,), eta=reminder_time)
         if self.subscribed_sms:
-            send_sms.apply_async((self.id,opertype,))
+            self.task_id_instant_sms = send_sms.apply_async((self.id,opertype,))
         if self.reminder_sms:
             self.task_id_sms = send_sms.apply_async((self.id,opertype,), eta=reminder_time)
-        # send_sms(self.id,opertype, reminder_time)
+        # # # send_sms(self.id,opertype, reminder_time)
         # send_email(self.id,opertype, reminder_time)
 
         return 
@@ -413,3 +413,10 @@ class DjangoMigrations(models.Model):
     class Meta:
         managed = False
         db_table = 'django_migrations'
+
+class SmsSentStatus(models.Model):
+    sms_sent_time = models.DateTimeField(blank=True, null=True)
+    phone_no = models.CharField(max_length=255, blank=True, null=True)
+    message = models.CharField(max_length=1012, blank=True, null=True)
+    status = models.CharField(max_length=100, blank=True, null=True)
+    
