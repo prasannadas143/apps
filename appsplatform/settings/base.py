@@ -26,7 +26,8 @@ SITE_ROOT = dirname(BASE_DIR)
 
 # Absolute filesystem path to the secret file which holds this project's
 # SECRET_KEY. Will be auto-generated the first time this file is interpreted.
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 DOTENV_FILE =  join(SITE_ROOT, "deploy", ".env") 
 config = Config(RepositoryEnv(DOTENV_FILE))
@@ -43,6 +44,7 @@ SECRET_KEY = get_random_string(50, chars)
 sys.path.append(SITE_ROOT)
 sys.path.append(SITE_NAME)
 sys.path.append(BASE_DIR)
+
     
 ########## END PATH CONFIGURATION
 
@@ -86,7 +88,7 @@ USER_APPS = [
 
 INSTALLED_APPS = BUILTIN_APPS + USER_APPS
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': join(SITE_ROOT) }
+DBBACKUP_STORAGE_OPTIONS = {'location': join(MEDIA_ROOT,"backup")  }
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -109,8 +111,8 @@ ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, us
 REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
 
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+
+
 
 ROOT_URLCONF = 'appsplatform.urls'
 

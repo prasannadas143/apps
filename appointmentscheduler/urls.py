@@ -9,6 +9,7 @@ from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
 from .views.Options.Editor import ckEditor
+from .views.Options.Backup import backup
 from django.views.generic import TemplateView
 from .views.Options.SMS import SMS
 
@@ -117,7 +118,14 @@ urlpatterns = [
     url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
     url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
     url(r'^sendemail/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
+    url(r'^backup/$', backup.create_backup, name="backup"),
+    url(r'^listbackups/$', backup.listbackups, name="listbackups"),
+    url(r'^deletebackup/(?P<id>\d+)/$', backup.deletebackup, name="deletebackup"),
+    url(r'^deletebackups/$', backup.deletebackups, name="deletebackups"),
+    url(r'^downloadbackup/(?P<id>\d+)/$', backup.downloadbackup, name="downloadbackup"),
+
     
+
     url(r'^latest/', BookingsFeed()),
 
 
