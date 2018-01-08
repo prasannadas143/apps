@@ -415,8 +415,14 @@ class DjangoMigrations(models.Model):
         db_table = 'django_migrations'
 
 class SmsSentStatus(models.Model):
-    sms_sent_time = models.DateTimeField(blank=True, null=True)
-    phone_no = models.CharField(max_length=255, blank=True, null=True)
-    message = models.CharField(max_length=1012, blank=True, null=True)
-    status = models.CharField(max_length=100, blank=True, null=True)
+    sms_sent_time = models.DateTimeField(blank=False, null=False)
+    phone_no = models.CharField(max_length=255, blank=False, null=False)
+    message = models.CharField(max_length=1012, blank=False, null=False)
+    status = models.CharField(max_length=100, blank=False, null=False)
+
+class BackupDetails(models.Model):
+    backup_time = models.DateTimeField(blank=False, null=False)
+    filetype = models.CharField(max_length=100, blank=False, null=False)
+    size = models.CharField(max_length=100, blank=False, null=False)
+    backupfile = models.FileField(max_length=255)
     
