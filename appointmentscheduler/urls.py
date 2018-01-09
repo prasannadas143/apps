@@ -4,7 +4,7 @@ from .views.exportbookings import BookingsFeed
 
 from .views import service,employees,invoice,exportbookings,report
 from .views.Options import General
-from .views.Options.Booking import Options,Payments,BookingFormOptions,EmailNotification
+from .views.Options.Booking import Options,Payments,BookingFormOptions,EmailNotification,terms
 from .views.Options.WorkingTime import Default, DefaultTime
 from .views.Options.Countries import Countries
 from .views.Options.Invoice import Invoice
@@ -90,7 +90,6 @@ urlpatterns = [
     url(r'^dashboard/$', dashboard.dashboard, name="dashboard"),
     url(r'^getdashboarddetails/$', dashboard.getdashboarddetails, name="getdashboarddetails"),
     url(r'^printdashboard/$', dashboard.printdashboard),
-
     url(r'^exportbookings/$', exportbookings.exportbookings, name="exportbookings"),
 
     url(r'^employee_report/$', report.employee_report, name="employee_report"),
@@ -118,13 +117,15 @@ urlpatterns = [
     url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
     url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
     url(r'^sendemail/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
+
     url(r'^backup/$', backup.create_backup, name="backup"),
     url(r'^listbackups/$', backup.listbackups, name="listbackups"),
     url(r'^deletebackup/(?P<id>\d+)/$', backup.deletebackup, name="deletebackup"),
     url(r'^deletebackups/$', backup.deletebackups, name="deletebackups"),
     url(r'^downloadbackup/(?P<id>\d+)/$', backup.downloadbackup, name="downloadbackup"),
 
-    
+    url(r'^terms/$', terms.terms, name="terms"),
+
 
     url(r'^latest/', BookingsFeed()),
 

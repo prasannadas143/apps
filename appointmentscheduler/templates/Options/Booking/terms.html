@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<div class="pj-multilang-wrap" data-index="1" style="display: ">
+	 <form class="form-horizontal" role="form" method="POST"  action="{% url 'appointmentschduler:terms' %}" enctype="multipart/form-data"> {% csrf_token %}
+			<div class="t10">
+				<span class="inline_block pt5">Booking terms URL</span>
+			</div>
+			<span class="block t5">
+				<span class="pj-form-field-custom pj-form-field-custom-before">
+					<span class="pj-form-field-before"><abbr class="pj-form-field-icon-url"></abbr></span>
+					<input name="o_terms_url" type="text" value='{{ terms.o_terms_url }}' class="pj-form-field w500">
+				</span>
+							</span>
+			<div class="t10">
+				<span class="inline_block pt5">Booking terms content</span>
+			</div>
+			<span class="block t5">
+				<textarea name="o_terms_content" class="pj-form-field w700 h300">{{ terms.o_terms_content }}</textarea>
+							</span>
+	<button class="btn btn-submit" type="submit"> <i class="ace-icon fa fa-check"></i> Save </button>
+
+</div>
+
+{% endblock %}

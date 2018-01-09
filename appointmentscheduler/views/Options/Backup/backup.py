@@ -87,7 +87,6 @@ def create_backup(request):
 		backupdetail['filesize'] = backupinstance.size
 		backupdetail['filetype'] = backupinstance.filetype
 		backuplist.append( backupdetail )
-	pdb.set_trace()
 	template_name="backup.html"
 	templatename=  os.path.join('Options','Backup',template_name)
 	return render(request,templatename,{ "backuplist" : backuplist})
