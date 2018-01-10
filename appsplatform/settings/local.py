@@ -12,13 +12,16 @@ ALLOWED_HOSTS = [ '127.0.0.1', 'localhost',]
 
 
 ########## EMAIL CONFIGURATION
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = config.get('DEFAULT','EMAIL_HOST')
+EMAIL_PORT = config.get('DEFAULT','EMAIL_PORT')
+EMAIL_USE_TLS = config.get('DEFAULT','EMAIL_USE_TLS')
+EMAIL_HOST_USER = config.get('DEFAULT','EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config.get('DEFAULT','EMAIL_HOST_PASSWORD')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
+DEFAULT_FROM_EMAIL = config.get('DEFAULT','EMAIL_HOST_USER')
+TWILIO_ACCOUNT_SID = config.get('DEFAULT','TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = config.get('DEFAULT','TWILIO_AUTH_TOKEN')
+TWILIO_FROM_NUMBER = config.get('DEFAULT','TWILIO_FROM_NUMBER')
 
 
 ########## END EMAIL CONFIGURATION
@@ -40,17 +43,19 @@ CONN_MAX_AGE = 600
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'), 
+        'NAME': config.get('DEFAULT','DB_NAME'),
+        'USER': config.get('DEFAULT','DB_USER'),
+        'PASSWORD': config.get('DEFAULT','DB_PASSWORD'),
+        'HOST':  config.get('DEFAULT','DB_HOST'),
+        'PORT': config.get('DEFAULT','DB_PORT'), 
         'DISABLE_SERVER_SIDE_CURSORS': True,
 
     },
 
     
 }
+
+
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 ########## END DATABASE CONFIGURATION
