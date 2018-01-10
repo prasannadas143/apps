@@ -14,7 +14,10 @@ from decouple import Config, RepositoryEnv
 from os.path import  basename, dirname, join
 from django.contrib.messages import constants as messages
 from django.utils.crypto import get_random_string
+import configparser
+from django.conf import settings
 
+config = configparser.ConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = dirname(dirname(dirname(os.path.abspath(__file__))))
@@ -29,8 +32,9 @@ SITE_ROOT = dirname(BASE_DIR)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-DOTENV_FILE =  join(SITE_ROOT, "deploy", ".env") 
-config = Config(RepositoryEnv(DOTENV_FILE))
+DOTENV_FILE =  join(SITE_ROOT, "deploy", "env.ini") 
+# config = Config(RepositoryEnv(DOTENV_FILE))
+config.read(DOTENV_FILE)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -173,11 +177,11 @@ LOGIN_EXEMPT_URLS = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'), 
+        'NAME': config.get('DEFAULT','DB_NAME'),
+        'USER': config.get('DEFAULT','DB_USER'),
+        'PASSWORD': config.get('DEFAULT','DB_PASSWORD'),
+        'HOST': config.get('DEFAULT','DB_HOST'),
+        'PORT': config.get('DEFAULT','DB_PORT'), 
         'DISABLE_SERVER_SIDE_CURSORS': True,
 
     },

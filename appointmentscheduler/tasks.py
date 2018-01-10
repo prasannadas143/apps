@@ -92,13 +92,11 @@ def send_sms(self,bookingid,opertype, *args, **kwargs):
         toNumber = str(booking.c_phone)
         print(toNumber);
       
-        tab_id = 101;
-        item = AppschedulerOptions.objects.filter(tab_id=tab_id)
-        TWILIO_ACCOUNT_SID = item[0].value;
+        TWILIO_ACCOUNT_SID = settings.TWILIO_ACCOUNT_SID
         print(TWILIO_ACCOUNT_SID);
-        TWILIO_AUTH_TOKEN = item[1].value;
+        TWILIO_AUTH_TOKEN = settings.TWILIO_AUTH_TOKEN
         print(TWILIO_AUTH_TOKEN);
-        TWILIO_FROM_NUMBER = item[2].value;
+        TWILIO_FROM_NUMBER = settings.TWILIO_FROM_NUMBER
         print(TWILIO_FROM_NUMBER);
         # rdb.set_trace()  # <- set break-point
         self.request.kwargs['to_sms'] = toNumber

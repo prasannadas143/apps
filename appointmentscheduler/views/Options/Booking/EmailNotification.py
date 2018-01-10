@@ -10,7 +10,11 @@ import pdb,os
 from django.http import HttpResponse
 from appointmentscheduler.views.Options.Editor import ckEditor
 from appointmentscheduler.models import AppschedulerBookings
+import configparser
+from django.conf import settings
 
+config = configparser.ConfigParser()
+config.read(settings.DOTENV_FILE)
 
 @csrf_exempt
 def SendMail(request):
@@ -56,8 +60,8 @@ def SendMail(request):
 		return render(request,templatename, EmailConfigdata)
 
 
-def update_value(field_id, tab_id, newstep):
-   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), id = int(field_id) )
+def update_value(tab_id, field, newstep):
+   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
    item.value = newstep;
    item.save()
 
@@ -69,22 +73,34 @@ def SaveMailSettings(request):
 	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
 	# you can remove the preview assignment (form =request.POST)
 	EmailConfigdata = dict()
+
 	if request.method == 'POST':
 		for field in request.POST.keys():
 			newstep = request.POST[field.strip()]
-			update_value(field, tab_id , newstep.strip() )
+			update_value(tab_id , field.strip() , newstep.strip())
 
 	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
-
+	flag = None
 	o_FromEmail = items_dict['o_FromEmail']['value']
 	o_FromEmailPassword = items_dict['o_FromEmailPassword']['value']
+	if config['DEFAULT']['EMAIL_HOST_USER'] != o_FromEmail :
+		config.set('DEFAULT','EMAIL_HOST_USER',o_FromEmail)
+		flag = 1
+	if config['DEFAULT']['EMAIL_HOST_PASSWORD'] != o_FromEmailPassword :
+		config.set('DEFAULT','EMAIL_HOST_PASSWORD',o_FromEmailPassword)
+		flag = 1
+	# Writing our configuration file to 'example.cfg'
+	if flag :
+		with open(settings.DOTENV_FILE, 'w') as configfile:
+		    config.write(configfile)
 	items = {
 	"o_FromEmail":o_FromEmail,
 	"o_FromEmailPassword":o_FromEmailPassword
 	}
+
 	EmailConfigdata['items'] = items
 
 	# Then, do a redirect for example
