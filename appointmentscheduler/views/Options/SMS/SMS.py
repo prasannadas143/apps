@@ -19,6 +19,11 @@ from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.forms.models import model_to_dict
+import configparser
+from django.conf import settings
+
+config = configparser.ConfigParser()
+config.read(settings.DOTENV_FILE)
 
 def update_value(field_id, tab_id, newstep):
    item = get_object_or_404(AppschedulerOptions,tab_id=int(tab_id), key = field_id)
@@ -77,6 +82,8 @@ def SendSMS(request):
 def SMSConfig(request):
 	tab_id = 101;
 	message=None
+	pdb.set_trace()
+
 	Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
 	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
 	# you can remove the preview assignment (form =request.POST)
@@ -102,6 +109,20 @@ def SMSConfig(request):
 	"o_TWILIO_AUTH_TOKEN": TWILIO_AUTH_TOKEN,
     "o_TWILIO_FROM_NUMBER": TWILIO_FROM_NUMBER
 	}
+	flag = None
+	if config['DEFAULT']['TWILIO_ACCOUNT_SID'] != TWILIO_ACCOUNT_SID :
+		config.set('DEFAULT','TWILIO_ACCOUNT_SID',TWILIO_ACCOUNT_SID)
+		flag = 1
+	if config['DEFAULT']['TWILIO_AUTH_TOKEN'] != TWILIO_AUTH_TOKEN :
+		config.set('DEFAULT','TWILIO_AUTH_TOKEN',TWILIO_AUTH_TOKEN)
+		flag = 1
+	if config['DEFAULT']['TWILIO_FROM_NUMBER'] != TWILIO_FROM_NUMBER :
+		config.set('DEFAULT','TWILIO_FROM_NUMBER',TWILIO_FROM_NUMBER)
+		flag = 1	
+	# Writing our configuration file to 'example.cfg'
+	if flag :
+		with open(settings.DOTENV_FILE, 'w') as configfile:
+		    config.write(configfile)
 	SMSConfigdata['items'] = items
 	# Then, do a redirect for example
 	template_name="SMSConfig.html"

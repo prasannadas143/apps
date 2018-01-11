@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-import os,sys
+import sys,pdb
 from decouple import Config, RepositoryEnv
-from os.path import  basename, dirname, join
+from os.path import  basename, dirname, join, abspath
 from django.contrib.messages import constants as messages
 from django.utils.crypto import get_random_string
 import configparser
@@ -20,7 +20,7 @@ from django.conf import settings
 config = configparser.ConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = dirname(dirname(dirname(os.path.abspath(__file__))))
+BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
 # Site name.
 SITE_NAME = basename(BASE_DIR)
 
@@ -29,7 +29,7 @@ SITE_ROOT = dirname(BASE_DIR)
 
 # Absolute filesystem path to the secret file which holds this project's
 # SECRET_KEY. Will be auto-generated the first time this file is interpreted.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DOTENV_FILE =  join(SITE_ROOT, "deploy", "env.ini") 
@@ -79,15 +79,16 @@ BUILTIN_APPS = [
     'phonenumber_field',
     'djng',
     'bootstrap3',
-    'registration',
     'django_celery_results',
     'dbbackup',
     
 ]
 
 USER_APPS = [
+    'registration',
     'appointmentscheduler',
     'appointmentscheduler.templatetags',
+
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + USER_APPS
@@ -104,15 +105,16 @@ MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'appointmentscheduler.middleware.LoginRequiredMiddleware',
     'appointmentscheduler.middleware.VisitorDetails',
 
 ]
 
-INCLUDE_REGISTER_URL = True
-INCLUDE_AUTH_URLS = True
+# INCLUDE_REGISTER_URL = True
+# INCLUDE_AUTH_URLS = True
 X_FRAME_OPTIONS = 'DENY'
-ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
-REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
+# ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+# REGISTRATION_AUTO_LOGIN = True # Automatically log the user in.
 
 
 
@@ -123,11 +125,11 @@ ROOT_URLCONF = 'appsplatform.urls'
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
-                os.path.join(BASE_DIR,"appointmentscheduler", 'templates'),
-                os.path.join(BASE_DIR, "appointmentscheduler", 'templates',"Options"),
-                os.path.join(BASE_DIR, "appointmentscheduler", 'templates',"Options","Booking") ,
-                os.path.join(BASE_DIR, 'registration', 'templates'),
-                os.path.join(BASE_DIR, 'registration', 'auth','templates'),
+                join(BASE_DIR,"appointmentscheduler", 'templates'),
+                join(BASE_DIR, "appointmentscheduler", 'templates',"Options"),
+                join(BASE_DIR, "appointmentscheduler", 'templates',"Options","Booking") ,
+                # join(BASE_DIR, 'registration', 'templates'),
+                # join(BASE_DIR, 'registration', 'auth','templates'),
             ],
 
     'APP_DIRS': True,  
@@ -150,44 +152,31 @@ TEMPLATES = [{
 WSGI_APPLICATION = 'appsplatform.wsgi.application'
 
 
-LOGIN_REDIRECT_URL = '/home/'
-LOGIN_URL = '/accounts/login/'
-LOGOUT_URL = '/accounts/logout/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+# LOGIN_REDIRECT_URL = '/home/'
+# LOGIN_URL = '/accounts/login/'
+# LOGOUT_URL = '/accounts/logout/'
+# LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-LOGIN_EXEMPT_URLS = (
-'/admin/',
-'/accounts/login/',
-'/accounts/password/reset/',
-'/accounts/password/reset/complete/',
-'/accounts/password/reset/done/',
-'/accounts/register/',
-'/accounts/register/closed/',
-'/accounts/activate/complete/'
-'/accounts/activate/resend/',
-'/accounts/register/complete/',
-'/accounts/register/closed/',
+# LOGIN_EXEMPT_URLS = (
+# '/admin/',
+# '/accounts/login/',
+# '/accounts/password/reset/',
+# '/accounts/password/reset/complete/',
+# '/accounts/password/reset/done/',
+# '/accounts/register/',
+# '/accounts/register/closed/',
+# '/accounts/activate/complete/'
+# '/accounts/activate/resend/',
+# '/accounts/register/complete/',
+# '/accounts/register/closed/',
 
- # allow any URL under /legal/*
-) 
+#  # allow any URL under /legal/*
+# ) 
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config.get('DEFAULT','DB_NAME'),
-        'USER': config.get('DEFAULT','DB_USER'),
-        'PASSWORD': config.get('DEFAULT','DB_PASSWORD'),
-        'HOST': config.get('DEFAULT','DB_HOST'),
-        'PORT': config.get('DEFAULT','DB_PORT'), 
-        'DISABLE_SERVER_SIDE_CURSORS': True,
 
-    },
-
-    
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -233,9 +222,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, "assets")
+STATIC_ROOT = join(BASE_DIR, "assets")
 STATICFILES_DIRS = (
-os.path.join(BASE_DIR, "static"),
+join(BASE_DIR, "static"),
 )
 GEOIP_PATH = join(BASE_DIR,  'geopath')
 
@@ -302,4 +291,15 @@ CELERY_ALWAYS_EAGER = False
 # SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_COOKIE_AGE = 60
 ########## End CONFIGURATION
+# Import Applicaton-specific Settings
+for app in USER_APPS:
+    if app:
+        try:
+            app_module = __import__(app, globals(), locals(), ["settings"])
+            app_settings = getattr(app_module, "settings", None)
+            for setting in dir(app_settings):
+                if setting == setting.upper():
+                    locals()[setting] = getattr(app_settings, setting)
+        except ImportError:
+            pass
 

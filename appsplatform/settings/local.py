@@ -3,7 +3,8 @@
 
 from .base import *
 from django.utils.crypto import get_random_string
-
+from os.path import  basename, dirname, join, abspath
+import os
 
 ########## DEBUG CONFIGURATION
 DEBUG = True
@@ -79,7 +80,7 @@ CACHES = {
 #     'debug_toolbar.middleware.DebugToolbarMiddleware',
 # ]
 
-USER_APPS += [
+BUILTIN_APPS += [
     'debug_toolbar',
     'debug_panel',
 
@@ -138,7 +139,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 
 ########## LOGGING CONFIGURATION
-LOG_DIR = os.path.join( BASE_DIR, 'log')
+LOG_DIR = join( BASE_DIR, 'log')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -187,7 +188,7 @@ LOGGING = {
             'level':'DEBUG',
             'filters': ['require_debug_true'],
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'app.log'),
+            'filename': join(LOG_DIR, 'app.log'),
             'maxBytes': 1024*1024*10, # 5 MB
             'backupCount': 0,
             'formatter':'simple',
@@ -197,7 +198,7 @@ LOGGING = {
         'celery': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  os.path.join(LOG_DIR, 'celery.log'),
+            'filename':  join(LOG_DIR, 'celery.log'),
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
         },
@@ -205,7 +206,7 @@ LOGGING = {
             'level':'DEBUG',
             'filters': ['require_debug_true'],
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'django.log'),
+            'filename': join(LOG_DIR, 'django.log'),
             'maxBytes': 1024*1024*10, # 5MB
             'backupCount': 0,
             'formatter': 'verbose',
