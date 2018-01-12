@@ -88,6 +88,8 @@ USER_APPS = [
     'registration',
     'appointmentscheduler',
     'appointmentscheduler.templatetags',
+    'shoppingcart',
+   
 
 ]
 

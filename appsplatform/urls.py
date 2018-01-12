@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^appointmentschduler/', include('appointmentscheduler.urls', namespace="appointmentschduler") ),
     url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^shoppingcart/', include('shoppingcart.urls', namespace="shoppingcart") ),
+
     url(r'^home/$',   home,  name='user_home'),
 ]
 
