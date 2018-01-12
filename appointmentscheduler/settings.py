@@ -1,1 +1,1 @@
-from appsplatform.settings.base import *
+from appsplatform.settings.base import BASE_DIR, TEMPLATES
