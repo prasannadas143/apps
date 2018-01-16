@@ -56,6 +56,16 @@ DATABASES = {
     
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'shoppingcart',
+#         'USER': 'root',
+#         'PASSWORD': 'root',
+#         'HOST': '',
+#         'PORT': '',
+#     }
+# }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
