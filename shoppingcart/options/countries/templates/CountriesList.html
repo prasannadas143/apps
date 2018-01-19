@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %} 
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+<input type="button" class="btn-topGrid" value="Active"   id="active"  />
+<input type="button" class="btn-topGrid" value="Inactive"   id="inactive"  />
+<input type="button" class="btn-topGrid" value="All"   id="all"  />
+
+<input type="button" class="btn-topGrid" onclick="location.href='{% url 'shoppingcart:addCountry' %}'"  value="Add Country" />{% csrf_token %}
+
+<table id="datatables" class="table table-hover">
+        <thead>
+        <tr>
+         <th><input name="select_all" value="1" id="select-all-records" type="checkbox" /></th> 
+            <th>Country Name</th>
+            <th>Alpha 2</th>
+            <th>Alpha 3</th>
+            <th>Status</th>
+            <th> action</th>
+        </tr>
+        </thead>
+</table>
+
+  
+<button type="button" id="multicheckbox"  >Delete </button>
+<div class="modal fade" id="confirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure want to delete this country?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+var getfilter = "all";
+ 
+  var rows_selected = [];
+  draw_datatable();
+
+$("#active").click(function(){
+   getfilter = "active";
+   draw_datatable();
+
+});
+
+$("#inactive").click(function(){
+   getfilter = "inactive";
+   draw_datatable();
+});
+$("#all").click(function(){
+   getfilter = "all";
+   draw_datatable();
+});
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+ 
+
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+
+var table ;
+function draw_datatable() {
+  if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
+     table.destroy();
+  }
+
+   table = $('#datatables').DataTable({
+        "processing": true,
+        "ajax": {
+            "url": "{% url 'shoppingcart:CountryList' %}",
+            "data": function(d) {
+              d.querydata = getfilter
+            },
+            "type": "GET"
+        },        
+
+        "createdRow": function( row, data, dataIndex ) {
+                        $(row).attr('id', data.id);
+           
+          },
+       
+        "columnDefs": [ 
+
+            {
+              'targets': 0,
+              'searchable': true,
+              'orderable': false,
+              'className': 'dt-body-center',
+              "data": null,
+              render: function ( data, type, row ) {
+                return  '<input type="checkbox" name="id[]" value="">' 
+               }
+            },
+            {
+             'targets':1,
+              "data": "CountryName"
+            },
+            {
+             'targets':2,
+              "data": "Alpha2"
+            },
+            {
+             'targets':3,
+              "data": "Alpha3"
+            },
+            {
+              'targets':4,
+              "data": "status",
+              render: function ( d, t, r ) {
+
+
+                    var $select = $("<select></select>", {
+                      "id": "status",
+                        "value": d
+                    });
+                      var $option = $("<option></option>", {
+                          "text": "active",
+                            "value": "True"
+                        });
+                        if(d == "True"){
+                          hiddenvalue = true
+                          $option.attr("selected", "selected")
+                        }
+                    $select.append($option);
+
+                    var $option = $("<option></option>", {
+                          "text": "inactive",
+                            "value": "False"
+                        });
+                        if(d == "False" ){
+                          hiddenvalue = true
+                          $option.attr("selected", "selected")
+                        }
+
+                      $select.append($option);
+                       var $selecthtml = $select.prop("outerHTML");
+                    return $selecthtml;
+                }
+              },
+            
+            {
+              'targets':5,
+              "data": null,
+              "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
+              '<button type="button" class="btn btn-danger">Delete</button>'
+            }
+            
+        
+        ],
+            'rowCallback': function(row, data, dataIndex){
+             // Get row ID
+             var rowId = data[0];
+            
+             // If row ID is in the list of selected row IDs
+               if($.inArray(rowId, rows_selected) !== -1){
+                  $(row).find('input[type="checkbox"]').prop('checked', true);
+                  $(row).addClass('<select id="is_active" value="True"><option value="True" selected="selected">active</option><option value="False">inactive</option></select>');
+               }
+            }
+      });
+}
+    let id = 0;
+
+   // Handle click on "Select all" control
+   $('#select-all-records').on('click', function(){
+      // Check/uncheck all checkboxes in the table
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      $('input[type="checkbox"]', rows).prop('checked', this.checked);
+   });
+
+
+
+function updateDataTableSelectAllCtrl(table){
+   var $table             = table.table().node();
+   var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
+   var $chkbox_checked    = $('tbody input[type="checkbox"]:checked', $table);
+   var chkbox_select_all  = $('thead input[name="select_all"]', $table).get(0);
+ 
+   // If none of the checkboxes are checked
+   if($chkbox_checked.length === 0){
+      chkbox_select_all.checked = false;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+ 
+   // If all of the checkboxes are checked
+   } else if ($chkbox_checked.length === $chkbox_all.length){
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+ 
+   // If some of the checkboxes are checked
+   } else {
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = true;
+      }
+   }
+}
+
+
+  // Handle click on checkbox
+$('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
+      var $row = $(this).closest('tr');
+ 
+      // Get row data
+      var data = table.row($row).data();
+ 
+      // Get row ID
+      var rowId = data.id;
+ 
+      // Determine whether row ID is in the list of selected row IDs 
+      var index = $.inArray(rowId, rows_selected);
+ 
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1){
+         rows_selected.push(rowId);
+ 
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1){
+         rows_selected.splice(index, 1);
+      }
+ 
+      if(this.checked){
+         $row.addClass('selected');
+      } else {
+         $row.removeClass('selected');
+      }
+ 
+       // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+ 
+   // Handle click on table cells with checkboxes
+   $('#datatables').on('click', 'tbody td, thead th:first-child', function(e){
+      $(this).parent().find('input[type="checkbox"]').trigger('click');
+   });
+ 
+   // Handle click on "Select all" control
+   $('thead input[name="select_all-records"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatables tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatables tbody input[type="checkbox"]:checked').trigger('click');
+      }
+ 
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+ 
+  // Handle table draw event
+   table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+   });
+ 
+   $("#multicheckbox").on('click',function(){
+      var ids = $.map(table.rows('.selected').data(), function (item) {
+            return item.id;
+        });
+      if(ids!=""){
+        rowids = ids.join(",");
+      }
+      else {
+          alert("no rows selected");
+     }
+       $.ajax({
+                url: "{% url 'appointmentschduler:delete_services' %}",
+                method: 'POST',
+                data : {
+                        "rowids":rowids,
+                      },
+          }).success(function (data, textStatus, jqXHR) {
+                $.each(ids, function( index, value ) {
+                  table.row( '#' + value ).remove().draw();
+                });
+            }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });    
+   
+   });
+ 
+
+
+      // FOR TESTING ONLY
+      
+      // // Output form data to a console
+      // $('#example-console').text($(form).serialize()); 
+      // console.log("Form submission", $(form).serialize()); 
+       
+      // Prevent actual form submission
+    
+    
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    if (class_name == 'btn btn-info') {
+       
+          location.href = '/shoppingcart/options/CountryTemplate/editCountry/' + data['id'] + "/" ;
+
+
+    } else if( class_name == 'btn btn-danger') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    id = data['id'];
+
+});
+
+    $('#confirm').on('click', '#delete', function (e) {
+
+        $.ajax({
+            headers: { "X-CSRFToken": $.cookie("csrftoken") },
+
+              url: "/shoppingcart/options/CountryTemplate/deleteCountry/" + id + "/",
+              method: 'GET'
+          }).success(function (data, textStatus, jqXHR) {
+               table
+        .row( '#' + id )
+        .remove()
+        .draw();
+          }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });         
+  });
+
+</script>
+
+{% endblock %}
+

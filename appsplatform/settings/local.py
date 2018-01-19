@@ -10,7 +10,7 @@ import os
 DEBUG = True
 ########## END DEBUG CONFIGURATION
 ALLOWED_HOSTS = [ '127.0.0.1', 'localhost',]
-
+# CSRF_COOKIE_DOMAIN = '.localhost.com'
 
 ########## EMAIL CONFIGURATION
 EMAIL_HOST = config.get('DEFAULT','EMAIL_HOST')

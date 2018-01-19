@@ -10,6 +10,7 @@ USER_APPS += [
 	'shoppingcart.vouchers',
 	'shoppingcart.report',
 	'shoppingcart.options',
+	'shoppingcart.options.countries',
 
 ]
 

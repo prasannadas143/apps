@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message }}
+  </div>
+{% endfor %}
+{% for field in countryform %}
+    <div class="fieldWrapper">
+        {{ field.errors }}
+  
+    </div>
+{% endfor %}
+<div id="CountryFormOptions">
+	<h2 align="center">Edit Country</h2>
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return ValidateForm();" 
+ action= "/shoppingcart/options/CountryTemplate/editCountry/{{Country.id}}/">{% csrf_token %}
+
+
+
+ <div class="form-group">
+	<div class="row">
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label" for="CountryName">Country Name</label>
+    <div class="col-sm-2">
+    <input id="CountryName" name="CountryName" class="CountryName   form-control" type="text"  value="{{Country.CountryName}}"  />
+     <div class="CountryName-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha2">Alpha 2</label>
+    <div class="col-sm-2">
+	<input id="Alpha2" maxlength="6" name="Alpha2"  class="Alpha2   form-control"  type="text"  value="{{Country.Alpha2}}" />
+     <div class="Alpha2-msg red"></div>
+    </div>
+    </div>
+
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="Alpha3">Alpha 3</label>
+    <div class="col-sm-2">
+	<input id="Alpha3" maxlength="6" name="Alpha3"  class="Alpha3   form-control"   type="text"    value="{{Country.Alpha3}}"/>
+     <div class="Alpha3-msg red"></div>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label class="col-sm-6 control-label " for="status">Status</label>
+    <div class="col-sm-2">
+     <input id="status" maxlength="6" name="status"  type="checkbox" {% if Country.status  %} checked {% endif %} />
+    </div>
+    </div>
+   
+<br>
+
+
+         <div class="text-center">
+             <input type="submit" class="btn-Save" name="Save" value="Update">
+	         <input type="button" class="btn-BackToMyList"  name="countrylist"  value="Back to country list" onclick="ShowCountryLsit();">
+
+        </div>
+
+
+    </div>
+    </div>
+</form>
+</div>
+
+
+<script type="text/javascript">
+
+function ValidateForm(){
+ 
+ $('.CountryName-msg').html('');
+ $('.Alpha2-msg').html('');
+ $('.Alpha3-msg').html('');
+ var isValidForm=true;
+
+if($('.CountryName').val().trim()=="")
+{
+    isValidForm=false;
+    $('.CountryName-msg').html("Please enter Country Name")
+}
+
+if($('.Alpha2').val().trim()=="")
+{
+    isValidForm=false;
+    $('.Alpha2-msg').html("Please enter Alpha 2")
+}
+
+if($('.Alpha3').val().trim()=="")
+{
+    isValidForm=false;
+    $('.Alpha3-msg').html("Please enter Alpha 3")
+}
+
+if(isValidForm)
+{
+     return true;
+}
+else
+{
+     return false;
+}
+
+}
+
+function ShowCountryLsit(){
+
+    window.location.href="{% url 'shoppingcart:CountryTemplate' %}";
+}
+
+//alert({{ appscheduleCountry.status }});
+
+</script>
+
+<style type="text/css">
+    .red{
+        color: Red;
+    }
+</style>
+
+{% endblock %}
