@@ -4,4 +4,6 @@ from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
+    url(r'^CountryTemplate/',  include('shoppingcart.options.countries.urls') )
+
 ]
