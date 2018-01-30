@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message }}
+  </div>
+{% endfor %}
+
+{% for field in countryform %}
+    <div class="fieldWrapper">
+        {{ field.errors }}
+      
+    </div>
+{% endfor %}
+<form class="form pj-form"   name="addClientForm" id="addClientForm" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'shoppingcart:addClient' %}" method="post"    > {% csrf_token %}
+</b><h1> Clients </h1>
+
+{{ clientsform.as_p }}
+</b><h1> Address </h1>
+<div class="boxaddresses" id="address">
+	<div class="boxaddress" >
+
+		<p><label for="id_country_1">Country:</label><select name="country_1" id="id_country_1">
+		{% for country in countries  %}
+		    <option value="{{ country.id  }}">{{ country.CountryName }}</option>
+		{% endfor %}
+		</select></p>
+		<p><label for="id_state">State:</label> <input type="text" name="state_1" placeholder="state" maxlength="255" required="" id="state_1"></p>
+		<p><label for="id_city">City:</label> <input type="text" name="city_1" maxlength="255" placeholder="city" required="" id="city_1"></p>
+		<p><label for="id_client_zip">Client zip:</label> <input type="text" name="client_zip_1" placeholder="client zip" maxlength="255" required="" id="client_zip_1"></p>
+		<p><label for="id_address_1">Address 1:</label> <input type="text" name="address_1" maxlength="2000" placeholder="Address 1" required="" id="address_1"></p>
+		<p><label for="id_address_2">Address 2:</label> <input type="text" name="address_2" maxlength="2000" placeholder="Address 2" id="address_2"></p>
+		<p><label for="id_is_default_shipping">Is default shipping:</label> <input type="checkbox" name="is_default_shipping" id="is_default_shipping_1" ></p>
+		<p><label for="id_is_default_billing">Is default billing:</label> <input type="checkbox" name="is_default_billing" id="is_default_billing_1"></p>
+<!-- 		{{ addressesform.as_p }}
+ -->	
+	</div>
+
+</div>
+<button type="button" name="addaddress" onclick="addnewaddress()">Add new address</button>
+<input type="submit" value="Submit">
+
+</form>
+
+<script type="text/javascript">
+i = 1
+function addnewaddress() {
+	var h = document.createElement("H1")
+	var t = document.createTextNode("Address");     // Create a text node
+	h.appendChild(t);   
+	i += 1
+  	var addform = document.getElementById("address");
+    addform.appendChild(h);  
+    var para = document.createElement("p");
+	var r = document.createElement('span');
+	var countrylabel = document.createElement("label");
+	countrylabel.innerHTML = "Country: ";
+	var sel = document.createElement('select');
+	sel.setAttribute('name', 'id_country_' + i);
+	sel.setAttribute('id', 'id_country_' + i);
+	var last = document.getElementById('id_country_' + (i-1));
+	var options = last.innerHTML;
+	var options = sel.innerHTML + options;
+	sel.innerHTML = options;
+	r.appendChild(countrylabel);
+	r.appendChild(sel);
+	para.appendChild(r);
+	addform.appendChild(para);   
+    label = "State:";
+	placeholder = "state";
+	id = "state_";
+	addtext(label, placeholder,id);
+	label = "City:";
+	placeholder = "city";
+	id = "city_";
+	addtext(label, placeholder,id);
+	label = "Client Zip:";
+	placeholder = "client zip";
+	id = "client_zip_";
+	addtext(label, placeholder,id);
+	label = "Address 1:";
+	placeholder = "address 1";
+	id = "address_1";
+	addtext(label, placeholder,id);
+	label = "Address 2:";
+	placeholder = "address 2";
+	id = "address_2";
+	addtext(label, placeholder,id);
+	label = "Default Shipping:";
+	id = "default_Shipping";
+	addcheckbox(label, id);
+	label = "Default Billing:";
+	id = "default_Billing"
+	addcheckbox(label, id);
+	
+
+}
+
+function addtext(label, placeholder,id) {
+    var para = document.createElement("p");
+	var addform = document.getElementById("address");
+	var r = document.createElement('span');
+	var statelabel = document.createElement("label");
+	statelabel.innerHTML = label;
+	var y = document.createElement("INPUT");
+	y.setAttribute("type", "text");
+	y.setAttribute("placeholder", placeholder);
+	y.setAttribute("id", id + i);
+	r.appendChild(statelabel);
+	r.appendChild(y);
+	para.appendChild(r);
+	addform.appendChild(para);
+}
+
+function addcheckbox(label, id) {
+    var para = document.createElement("p");
+	var addform = document.getElementById("address");
+	var r = document.createElement('span');
+	var checkboxlabel = document.createElement("label");
+	checkboxlabel.innerHTML = label;
+	var checkbox = document.createElement("INPUT");
+	checkbox.type = "checkbox";
+	checkbox.name = id + i;
+	checkbox.id = id + i;
+	r.appendChild(checkboxlabel);
+	r.appendChild(checkbox);
+	para.appendChild(r);
+	addform.appendChild(para);
+}
+</script>
+{% endblock %}
