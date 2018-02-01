@@ -16,21 +16,75 @@
   </div>
 {% endfor %}
 
-{% for field in countryform %}
+{% for field in clientsform %}
     <div class="fieldWrapper">
-        {{ field.errors }}
-      
+ 		{% if field.errors %}
+	    <span><p> 	{{ field.html_name }}   {{ field.errors }}</p></span>
+		{% endif %}
+	   
     </div>
 {% endfor %}
-<form class="form pj-form"   name="addClientForm" id="addClientForm" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'shoppingcart:addClient' %}" method="post"    > {% csrf_token %}
+{% for field in addressesform %}
+    <div class="fieldWrapper">
+    {% if field.errors %}
+	    <span><p> 	{{ field.html_name }}   {{ field.errors }}</p></span>
+	{% endif %}
+
+    </div>
+{% endfor %}
+<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'shoppingcart:addClient' %}" method="post"     > {% csrf_token %}
 </b><h1> Clients </h1>
 
-{{ clientsform.as_p }}
+  <p>
+  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"  required />
+		
+	<span ng-messages="addClientForm.email.$error" style="color:maroon" role="alert">
+		  <span ng-message="email">Your email  is invalid</span>
+  		  <span ng-message="pattern">Your email is invalid </span>
+	</span>
+
+	
+  </p>
+
+  <p>
+  	<label for="id_password">Password:</label> <input type="password" name="password" maxlength="50" required="" id="id_password" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACIUlEQVQ4EX2TOYhTURSG87IMihDsjGghBhFBmHFDHLWwSqcikk4RRKJgk0KL7C8bMpWpZtIqNkEUl1ZCgs0wOo0SxiLMDApWlgOPrH7/5b2QkYwX7jvn/uc//zl3edZ4PPbNGvF4fC4ajR5VrNvt/mo0Gr1ZPOtfgWw2e9Lv9+chX7cs64CS4Oxg3o9GI7tUKv0Q5o1dAiTfCgQCLwnOkfQOu+oSLyJ2A783HA7vIPLGxX0TgVwud4HKn0nc7Pf7N6vV6oZHkkX8FPG3uMfgXC0Wi2vCg/poUKGGcagQI3k7k8mcp5slcGswGDwpl8tfwGJg3xB6Dvey8vz6oH4C3iXcFYjbwiDeo1KafafkC3NjK7iL5ESFGQEUF7Sg+ifZdDp9GnMF/KGmfBdT2HCwZ7TwtrBPC7rQaav6Iv48rqZwg+F+p8hOMBj0IbxfMdMBrW5pAVGV/ztINByENkU0t5BIJEKRSOQ3Aj+Z57iFs1R5NK3EQS6HQqF1zmQdzpFWq3W42WwOTAf1er1PF2USFlC+qxMvFAr3HcexWX+QX6lUvsKpkTyPSEXJkw6MQ4S38Ljdbi8rmM/nY+CvgNcQqdH6U/xrYK9t244jZv6ByUOSiDdIfgBZ12U6dHEHu9TpdIr8F0OP692CtzaW/a6y3y0Wx5kbFHvGuXzkgf0xhKnPzA4UTyaTB8Ph8AvcHi3fnsrZ7Wore02YViqVOrRXXPhfqP8j6MYlawoAAAAASUVORK5CYII=&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;" ng-model="password" ng-minlength=6 required />
+		<span ng-messages="addClientForm.password.$error"  style="color:maroon" role="alert">
+            <span ng-message="minlength">Your field is too short </span>
+		</span>
+	
+  <p>
+  	<label for="id_client_name">Client name:</label> <input type="text"  maxlength="255" id="id_client_name" 	 name="client_name" ng-model="client_name" ng-minlength="3" ng-maxlength="100" type="text" required />
+      	</span>
+      	<span ng-messages="addClientForm.client_name.$error" style="color:maroon" role="alert">
+				</span>
+        <div ng-messages="addClientForm.client_name.$error"  ng-show="addClientForm.client_name.$invalid && !addClientForm.client_name.$pristine " style="color:maroon" role="alert" >
+                <div ng-message="minlength">Your field is too short   </div>
+                <div ng-message="maxlength">Your field is too long</div>
+                <div ng-message="pattern">Must be a valid client name</div>
+         </div>
+   </p>
+  <p>
+  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone"   ng-model="phone"   ng-pattern="/^\+[0-9]{3,}$/"  	 	 required>
+  	<span ng-messages="addClientForm.phone.$error"   style="color:maroon" role="alert">
+	  <span ng-message="pattern">Must be a valid phone number</span>
+	</span>
+  </p>  
+  <p>
+  	<label for="id_website">Website:</label> <input type="url" name="website" maxlength="200" id="website"  ng-model="website" required>
+	<span style="color:maroon" ng-show="addClientForm.website.$error.required">
+
+        This field is required</span>
+
+        <span style="color:maroon" ng-show="addClientForm.website.$error.url">
+
+        Sorry Not a Valid URL, Don't Forget to Use http://</span>
+  </p>
+  <p><label for="id_status">Status:</label> <input type="checkbox" name="status" id="id_status"></p>
 </b><h1> Address </h1>
 <div class="boxaddresses" id="address">
 	<div class="boxaddress" >
 
-		<p><label for="id_country_1">Country:</label><select name="country_1" id="id_country_1">
+		<p><label for="id_country_1">Country:</label><select name="id_country_1" id="id_country_1">
 		{% for country in countries  %}
 		    <option value="{{ country.id  }}">{{ country.CountryName }}</option>
 		{% endfor %}
@@ -38,22 +92,31 @@
 		<p><label for="id_state">State:</label> <input type="text" name="state_1" placeholder="state" maxlength="255" required="" id="state_1"></p>
 		<p><label for="id_city">City:</label> <input type="text" name="city_1" maxlength="255" placeholder="city" required="" id="city_1"></p>
 		<p><label for="id_client_zip">Client zip:</label> <input type="text" name="client_zip_1" placeholder="client zip" maxlength="255" required="" id="client_zip_1"></p>
-		<p><label for="id_address_1">Address 1:</label> <input type="text" name="address_1" maxlength="2000" placeholder="Address 1" required="" id="address_1"></p>
-		<p><label for="id_address_2">Address 2:</label> <input type="text" name="address_2" maxlength="2000" placeholder="Address 2" id="address_2"></p>
-		<p><label for="id_is_default_shipping">Is default shipping:</label> <input type="checkbox" name="is_default_shipping" id="is_default_shipping_1" ></p>
-		<p><label for="id_is_default_billing">Is default billing:</label> <input type="checkbox" name="is_default_billing" id="is_default_billing_1"></p>
+		<p><label for="id_address_11">Address 1:</label> <input type="text" name="address_11" maxlength="2000" placeholder="Address 1" required="" id="address_1"></p>
+		<p><label for="id_address_21">Address 2:</label> <input type="text" name="address_21" maxlength="2000" placeholder="Address 2" id="address_2"></p>
+		<p><label for="id_is_default_shipping">Is default shipping:</label> <input type="checkbox" name="is_default_shipping_1" id="is_default_shipping_1" ></p>
+		<p><label for="id_is_default_billing">Is default billing:</label> <input type="checkbox" name="is_default_billing_1" id="is_default_billing_1"></p>
 <!-- 		{{ addressesform.as_p }}
  -->	
 	</div>
 
 </div>
 <button type="button" name="addaddress" onclick="addnewaddress()">Add new address</button>
-<input type="submit" value="Submit">
+<input type="submit" value="Add Client">
 
 </form>
 
 <script type="text/javascript">
-i = 1
+
+
+$( "#addClientForm" ).validate({
+  rules: {
+    state_1: {
+      required: true
+    }
+  }
+});
+var i = 1
 function addnewaddress() {
 	var h = document.createElement("H1")
 	var t = document.createTextNode("Address");     // Create a text node
@@ -97,10 +160,10 @@ function addnewaddress() {
 	id = "address_2";
 	addtext(label, placeholder,id);
 	label = "Default Shipping:";
-	id = "default_Shipping";
+	id = "is_default_shipping_";
 	addcheckbox(label, id);
 	label = "Default Billing:";
-	id = "default_Billing"
+	id = "is_default_billing_"
 	addcheckbox(label, id);
 	
 
@@ -116,6 +179,9 @@ function addtext(label, placeholder,id) {
 	y.setAttribute("type", "text");
 	y.setAttribute("placeholder", placeholder);
 	y.setAttribute("id", id + i);
+	y.setAttribute("name", id + i);
+	y.setAttribute("required",true);
+
 	r.appendChild(statelabel);
 	r.appendChild(y);
 	para.appendChild(r);
@@ -137,5 +203,6 @@ function addcheckbox(label, id) {
 	para.appendChild(r);
 	addform.appendChild(para);
 }
+
 </script>
 {% endblock %}
