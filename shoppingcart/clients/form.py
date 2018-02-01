@@ -11,4 +11,4 @@ class ClientsForm(forms.ModelForm):
 class AddressesForm(forms.ModelForm):
     class Meta:
         model = Addresses
-        exclude = ('country','client')
+        exclude = ('country','client','created','last_login')
