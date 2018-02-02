@@ -133,35 +133,36 @@ def editClient(request, id=None):
 @ensure_csrf_cookie
 def deleteClient(request, id=None):
 
-    aClient=get_object_or_404( Clients,pk=id)
-    aClient.delete()
+    # aClient=get_object_or_404( Clients,pk=id)
+    # aClient.delete()
     return HttpResponse(status=204)
-@requires_csrf_token
-def Clients(request):
-        templatename="Clients.html"
-
-        return render(request, templatename ) 
 
 @ensure_csrf_cookie
-def ClientList(request):
-    country_info=[]
+def deleteClients(request):
+    """ Delete list of Clients """
+    # pdb.set_trace()
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
+      # aClient=get_object_or_404( Clients,pk=id)
+      # aClient.delete()
+      pass
 
-    # if 'querydata' in request.GET:
-    #     querydata = request.GET['querydata']
-    #     if querydata == "all":
-    #         listCountry = Countries.objects.all().order_by('-id')
-    #     elif querydata == "active":
-    #         listCountry = Countries.objects.filter(status = 1 ).order_by('-id')
-    #     elif querydata == "inactive":
-    #         listCountry = Countries.objects.filter(status = 0 ).order_by('-id')
-    # else:
-    #     listCountry = Countries.objects.all().order_by('-id')
-    # for Country in listCountry:
-    #     data=dict()
-    #     data['id'] = Country.id
-    #     data['CountryName'] = Country.CountryName
-    #     data['Alpha2'] = Country.Alpha2
-    #     data['Alpha3'] = Country.Alpha3
-    #     data['status'] = str(Country.status)
-    #     country_info.append(data)
-    return  HttpResponse(json.dumps({"data" :country_info }), content_type='application/json')   
+    return HttpResponse(status=204)
+
+@requires_csrf_token
+def getclients(request):
+	templatename="Clients.html"
+	clients = Clients.objects.values('id', 'email','client_name','status')
+	clientsdetails = []   
+	for client in  clients.iterator():
+		clientsdetail = dict()
+		clientsdetail['id'] = client['id']
+		clientsdetail['email'] = client['email']
+		clientsdetail['client_name'] = client['client_name']
+		format = '%Y-%m-%d %H:%M %p'
+		clientsdetail['last_order'] = timezone.now().strftime(format)
+		clientsdetail['order'] = 1
+		clientsdetail['status'] = client['status']
+		clientsdetails.append( clientsdetail )
+	return HttpResponse(json.dumps({"data" :clientsdetails }), content_type='application/json') 
+
