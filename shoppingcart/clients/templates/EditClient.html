@@ -2,6 +2,7 @@
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
+{% load debug_tags %}
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
@@ -15,10 +16,239 @@
     {{ message }}
   </div>
 {% endfor %}
-{% for field in countryform %}
+
+{% for field in clientsform %}
     <div class="fieldWrapper">
-        {{ field.errors }}
-      
+ 		{% if field.errors %}
+	    <span><p> 	{{ field.html_name }}   {{ field.errors }}</p></span>
+		{% endif %}
+	   
     </div>
 {% endfor %}
+{% for field in addressesform %}
+    <div class="fieldWrapper">
+    {% if field.errors %}
+	    <span><p> 	{{ field.html_name }}   {{ field.errors }}</p></span>
+	{% endif %}
+
+    </div>
+{% endfor %}
+<form class="form pj-form"   name="editClientForm" id="editClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="" method="post"     > {% csrf_token %}
+</b><h1> Clients </h1>
+
+  <p>
+  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;"   value="{{ clientdetail.email }}" required />
+		
+	</p>
+
+  <p>
+  	<label for="id_password">Password:</label> <input type="password" name="password" maxlength="50" required="" id="id_password" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACIUlEQVQ4EX2TOYhTURSG87IMihDsjGghBhFBmHFDHLWwSqcikk4RRKJgk0KL7C8bMpWpZtIqNkEUl1ZCgs0wOo0SxiLMDApWlgOPrH7/5b2QkYwX7jvn/uc//zl3edZ4PPbNGvF4fC4ajR5VrNvt/mo0Gr1ZPOtfgWw2e9Lv9+chX7cs64CS4Oxg3o9GI7tUKv0Q5o1dAiTfCgQCLwnOkfQOu+oSLyJ2A783HA7vIPLGxX0TgVwud4HKn0nc7Pf7N6vV6oZHkkX8FPG3uMfgXC0Wi2vCg/poUKGGcagQI3k7k8mcp5slcGswGDwpl8tfwGJg3xB6Dvey8vz6oH4C3iXcFYjbwiDeo1KafafkC3NjK7iL5ESFGQEUF7Sg+ifZdDp9GnMF/KGmfBdT2HCwZ7TwtrBPC7rQaav6Iv48rqZwg+F+p8hOMBj0IbxfMdMBrW5pAVGV/ztINByENkU0t5BIJEKRSOQ3Aj+Z57iFs1R5NK3EQS6HQqF1zmQdzpFWq3W42WwOTAf1er1PF2USFlC+qxMvFAr3HcexWX+QX6lUvsKpkTyPSEXJkw6MQ4S38Ljdbi8rmM/nY+CvgNcQqdH6U/xrYK9t244jZv6ByUOSiDdIfgBZ12U6dHEHu9TpdIr8F0OP692CtzaW/a6y3y0Wx5kbFHvGuXzkgf0xhKnPzA4UTyaTB8Ph8AvcHi3fnsrZ7Wore02YViqVOrRXXPhfqP8j6MYlawoAAAAASUVORK5CYII=&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;" value="{{ clientdetail.password }}" required />
+			
+  <p>
+  	<label for="id_client_name">Client name:</label> <input type="text"  maxlength="255" id="id_client_name" 	 name="client_name"  type="text"  value="{{ clientdetail.client_name }}" required />
+      
+   </p>
+  <p>
+  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone" value="{{ clientdetail.phone }}"  	 	 required>
+  	
+  </p>  
+  <p>
+  	<label for="id_website">Website:</label> <input type="datetime"  name="website" maxlength="200" id="website" value="{{ clientdetail.website }}"  required>
+  </p>
+   <p>
+  	<label for="Created:">Last Login::</label> <input type="datetime" name="created" maxlength="200" id="created" value="{{ clientdetail.created }}"  required>
+  </p>
+   <p>
+  	<label for="Last Login:">Last Login::</label> <input type="datetime" name="lastlogin" maxlength="200" id="lastlogin" value="{{ clientdetail.last_login }}"  required>
+  </p>
+
+  <p><label for="id_status">Status:</label> 
+	<select name="status" id="id_status"  >
+	    <option {% if address.status   %} selected {% endif %} value="1">Active</option>
+	     <option {% if not address.status   %} selected {% endif %} value="0">Inactive</option>
+	</select>
+  </p>
+<select name="id_country" id="id_country" style="display:none" >
+	{% for country in countries  %}
+	    <option value="{{ country.id  }}">{{ country.CountryName }}</option>
+	{% endfor %}
+</select>
+
+<div class="boxaddresses" id="address">
+	{% for address in addresses %}
+
+		<div class="boxaddress" id="address{{ forloop.counter }}" >
+			</b><h1> Address </h1>
+			<p><label for="id_country_{{ forloop.counter }}">Country:</label><select name="id_country_{{ forloop.counter }}" id="id_country_{{ forloop.counter }}">
+			{% for country in countries  %}
+			    <option {% if address.country.id == country.id  %} selected {% endif %} value="{{ country.id  }}">{{ country.CountryName }}</option>
+			{% endfor %}
+			</select></p>
+			<p><label for="id_state">State:</label> <input type="text" name="state_{{ forloop.counter }}" placeholder="state" maxlength="255" required="" id="state_{{ forloop.counter }}" value="{{address.state}}"></p>
+			<p><label for="id_city">City:</label> <input type="text" name="city_{{ forloop.counter }}" maxlength="255" placeholder="city" required="" id="city_{{ forloop.counter }}" value="{{address.city}}"></p>
+			<p><label for="id_client_zip">Client zip:</label> <input type="text" name="client_zip_{{ forloop.counter }}" value="{{address.client_zip}}" placeholder="client zip" maxlength="255" required="" id="client_zip_{{ forloop.counter }}"></p>
+			<p><label for="id_address_11">Address 1:</label> <input type="text" name="address_1{{ forloop.counter }}" maxlength="2000" placeholder="Address 1" required="" id="address_1{{ forloop.counter }}" value="{{address.address_1}}"></p>
+			<p><label for="id_address_21">Address 2:</label> <input type="text" name="address_2{{ forloop.counter }}" maxlength="2000" placeholder="Address 2" id="	address_2{{ forloop.counter }}" value="{{address.address_2}}"></p>
+			<button type="button" id="deladdress{{ forloop.counter }}" >Delete</button>
+
+			<p><label for="id_is_default_shipping">Default shipping:</label> <input type="radio" name="default_shipping"  id="default_shipping" {% if address.is_default_shipping   %} checked {% endif %} value="default_shipping{{ forloop.counter }}" ></p>
+			<p><label for="id_is_default_billing">Default billing:</label> <input type="radio" name="default_billing" id="default_billing" {% if address.is_default_billing   %} checked {% endif %} value="default_billing{{ forloop.counter }}" ></p>
+	<!-- 		{{ addressesform.as_p }}
+	 -->	
+		</div>
+	{% endfor %}
+
+</div>
+<button type="button" name="addaddress" id="addaddress" onclick="addnewaddress()">Add new address</button>
+<input type="submit" value="Add Client">
+
+</form>
+<script type="text/javascript">
+
+
+$( "#addClientForm" ).validate({
+  rules: {
+    state_1: {
+      required: true
+    }
+  }
+});
+var i = 1
+function addnewaddress() {
+	var h = document.createElement("H1")
+	var t = document.createTextNode("Address");     // Create a text node
+	h.appendChild(t);   
+	i += 1
+  	var addform = document.getElementById("address");
+    var addressdiv = document.createElement("div");
+	addressdiv.setAttribute("id", "address" + i);
+	addressdiv.setAttribute("name", "address" + i);
+	addressdiv.setAttribute("class", "boxaddress" );
+	addressdiv.appendChild(h);  
+
+    var para = document.createElement("p");
+	var r = document.createElement('span');
+	var countrylabel = document.createElement("label");
+	countrylabel.innerHTML = "Country: ";
+	var sel = document.createElement('select');
+	sel.setAttribute('name', 'id_country_' + i);
+	sel.setAttribute('id', 'id_country_' + i);
+	var last = document.getElementById('id_country');
+	var options = last.innerHTML;
+	var options = sel.innerHTML + options;
+	sel.innerHTML = options;
+	r.appendChild(countrylabel);
+	r.appendChild(sel);
+	para.appendChild(r);
+	addressdiv.appendChild(para);
+	addform.appendChild(addressdiv);   
+    label = "State:";
+	placeholder = "state";
+	id = "state_";
+	addtext(label, placeholder,id);
+	label = "City:";
+	placeholder = "city";
+	id = "city_";
+	addtext(label, placeholder,id);
+	label = "Client Zip:";
+	placeholder = "client zip";
+	id = "client_zip_";
+	addtext(label, placeholder,id);
+	label = "Address 1:";
+	placeholder = "address 1";
+	id = "address_1";
+	addtext(label, placeholder,id);
+	label = "Address 2:";
+	placeholder = "address 2";
+	id = "address_2";
+	addtext(label, placeholder,id);
+	var delbtn = document.createElement('button');
+	delbtn.setAttribute('type', "button");
+	delbtn.setAttribute('name', 'deladdress' + i);
+	delbtn.setAttribute('id', 'deladdress' + i);
+	delbtn.innerHTML = "Delete Address";
+
+	addressdiv.appendChild(delbtn);
+	label = "Default Shipping:";
+	id = "default_shipping";
+	addcheckbox(label, id);
+	label = "Default Billing:";
+	id = "default_billing";
+	addcheckbox(label, id);
+	
+
+}
+
+function addtext(label, placeholder,id) {
+    var para = document.createElement("p");
+	var addform = document.getElementById("address");
+	var addrform = document.getElementById("address" + i);
+
+	var r = document.createElement('span');
+	var statelabel = document.createElement("label");
+	statelabel.innerHTML = label;
+	var y = document.createElement("INPUT");
+	y.setAttribute("type", "text");
+	y.setAttribute("placeholder", placeholder);
+	y.setAttribute("id", id + i);
+	y.setAttribute("name", id + i);
+	y.setAttribute("required",true);
+
+	r.appendChild(statelabel);
+	r.appendChild(y);
+	para.appendChild(r);
+	addrform.appendChild(para);
+}
+
+function addcheckbox(label, id) {
+    var para = document.createElement("p");
+	var addform = document.getElementById("address");
+	var r = document.createElement('span');
+	var addrform = document.getElementById("address" + i);
+
+	var radiobuttonlabel = document.createElement("label");
+	radiobuttonlabel.innerHTML = label;
+	var radiobutton = document.createElement("INPUT");
+	radiobutton.type = "radio";
+	radiobutton.name = id ;
+	radiobutton.id = id ;
+	radiobutton.value = id + i ;
+
+	r.appendChild(radiobuttonlabel);
+	r.appendChild(radiobutton);
+	para.appendChild(r);
+	addrform.appendChild(para);
+}
+
+$(document).ready(function(){
+	$("button").on("click",function(){
+ 		var $button = $(this);
+        var id_attr1 = $button.attr('id');
+        var pattern = /deladdress(\d+)/;
+		var nameList = id_attr1.match(pattern);
+		if(nameList) {
+			addresscnt = nameList[1];
+			$(" #address" + addresscnt).remove()
+		}
+		else {
+			return ;
+		}
+   	});
+
+  	$(document).on("click", "button" , function() {
+        var $button = $(this);
+        var id_attr1 = $button.attr('id');
+        var pattern = /deladdress(\d+)/;
+		var nameList = id_attr1.match(pattern);
+		if(nameList) {
+			addresscnt = nameList[1];
+			$("#address" + addresscnt).remove()
+		}
+		else {
+			return ;
+		}
+    });
+});
+	
+</script>
 {% endblock %}

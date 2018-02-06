@@ -55,16 +55,18 @@ def addClient(request):
 
 		# Get the field data  for fields from formparams to request.POST
 		# Assign it to request.POST
-		address_count = _getaddress_count(formfields)
-		for address_no in range(1,address_count+1):
+		pdb.set_trace()
+		addressids = _getaddress_count(formfields)
+		address_count = len( addressids )
+		for address_no in addressids:
 			state_field = "state_" + str(address_no)
 			country_field = "id_country_" + str(address_no)
 			city_field = "city_" +  str(address_no)
 			client_zip= "client_zip_" +  str(address_no)
 			address_1 = "address_1" +  str(address_no)
 			address_2 = "address_2" +  str(address_no)
-			is_default_shipping = "is_default_shipping_" + str(address_no)
-			is_default_billing = "is_default_billing_" + str(address_no)
+			is_default_shipping = "default_shipping" 
+			is_default_billing = "default_billing"
 			request.POST.clear()
 			request.POST["state"] = formparams[state_field]
 			country_value = formparams[country_field]
@@ -72,22 +74,21 @@ def addClient(request):
 			request.POST["client_zip"] = formparams[client_zip]
 			request.POST["address_1"] = formparams[address_1]
 			request.POST["address_2"] = formparams[address_2]
-			flag_shipping, flag_billing = None, None
-			for formfield in  formparams.keys():
-		 		if 'is_default_shipping'  in formfield :
-		 			flag_shipping = 1
-			 	if 'is_default_billing'  in formfield :
-			 		flag_billing = 1
-			if flag_shipping :
-				request.POST["is_default_shipping"] = formparams[is_default_shipping]
-			else :
-				request.POST["is_default_shipping"] = False
-
-			if flag_billing:
-				request.POST["is_default_billing"] = formparams[is_default_billing]
+			billingvalue = formparams["default_billing"]
+			billingno = int(re.search('(\d+)',billingvalue).group())
+			if int(address_no) == billingno :
+				request.POST["is_default_billing"] = True
 			else :
 				request.POST["is_default_billing"] = False
+			
+			shippingvalue = formparams["default_shipping"]
+			shippingno = int(re.search('(\d+)',shippingvalue).group())
 
+			if int(address_no) == shippingno :
+				request.POST["is_default_shipping"] = True
+			else :
+				request.POST["is_default_shipping"] = False
+			
 			# Submit the form and get the object
 			addressesform = AddressesForm(request.POST or None )
 			if addressesform.is_valid():
@@ -99,18 +100,11 @@ def addClient(request):
 			else :
 				return render(request,templatename, {'clientsform': clientsform, \
 				'addressesform' : addressesform, "countries" : listCountry } )
-			address_no += 1
 
 			# Get country object and client object 
 			# Assign it to the foreign key for the model 
 			# clear the request.POST and again assign from formparams to request.POST
-		return render(request,templatename, {'clientsform': clientsform, \
-		'addressesform' : addressesform, "countries" : listCountry } )
-
-		
-		
-
-
+		return HttpResponseRedirect(clientobj.get_success_url())
 
 	return render(request,templatename, {'clientsform': clientsform, \
 		'addressesform' : addressesform, "countries" : listCountry } )
@@ -122,13 +116,20 @@ def _getaddress_count(formfields):
 		searchObj = re.search( r'state_(\d+)', elm, re.M|re.I)
 		if searchObj:
 			address_num.append( int(searchObj.group(1)) )
-	return sorted(address_num)[-1] 
+	return sorted(address_num)
 
 @requires_csrf_token
 def editClient(request, id=None):
-        templatename="EditClient.html"
-
-        return render(request, templatename ) 
+    """ Edit booking """
+    user_timezone = request.session['visitor_timezone']
+    client = get_object_or_404( Clients,  pk=int(id) ) 
+    errors =""
+    addresses = client.address_client.all()
+    listCountry = Countries.objects.values('id', 'CountryName')
+    # pdb.set_trace()
+    data = { "clientdetail" : client, "addresses" : addresses,"countries": listCountry }
+    templatename = "EditClient.html"
+    return render(request, templatename, data  ) 
 
 @ensure_csrf_cookie
 def deleteClient(request, id=None):
@@ -140,7 +141,7 @@ def deleteClient(request, id=None):
 @ensure_csrf_cookie
 def deleteClients(request):
     """ Delete list of Clients """
-    # pdb.set_trace()
+    # pdb.set_trace()	
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
       # aClient=get_object_or_404( Clients,pk=id)
