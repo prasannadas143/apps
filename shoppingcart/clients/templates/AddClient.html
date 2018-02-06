@@ -78,10 +78,14 @@
         Sorry Not a Valid URL, Don't Forget to Use http://</span>
   </p>
   <p><label for="id_status">Status:</label> <input type="checkbox" name="status" id="id_status"></p>
-</b><h1> Address </h1>
+<select name="id_country" id="id_country" style="display:none" >
+	{% for country in countries  %}
+	    <option value="{{ country.id  }}">{{ country.CountryName }}</option>
+	{% endfor %}
+</select>
 <div class="boxaddresses" id="address">
-	<div class="boxaddress" >
-
+	<div class="boxaddress" id="address1" >
+		</b><h1> Address </h1>
 		<p><label for="id_country_1">Country:</label><select name="id_country_1" id="id_country_1">
 		{% for country in countries  %}
 		    <option value="{{ country.id  }}">{{ country.CountryName }}</option>
@@ -91,15 +95,17 @@
 		<p><label for="id_city">City:</label> <input type="text" name="city_1" maxlength="255" placeholder="city" required="" id="city_1"></p>
 		<p><label for="id_client_zip">Client zip:</label> <input type="text" name="client_zip_1" placeholder="client zip" maxlength="255" required="" id="client_zip_1"></p>
 		<p><label for="id_address_11">Address 1:</label> <input type="text" name="address_11" maxlength="2000" placeholder="Address 1" required="" id="address_1"></p>
-		<p><label for="id_address_21">Address 2:</label> <input type="text" name="address_21" maxlength="2000" placeholder="Address 2" id="address_2"></p>
-		<p><label for="id_is_default_shipping">Is default shipping:</label> <input type="checkbox" name="is_default_shipping_1" id="is_default_shipping_1" ></p>
-		<p><label for="id_is_default_billing">Is default billing:</label> <input type="checkbox" name="is_default_billing_1" id="is_default_billing_1"></p>
+		<p><label for="id_address_21">Address 2:</label> <input type="text" name="address_21" maxlength="2000" placeholder="Address 2" id="	address_2"></p>
+		<button type="button" id="deladdress1" >Delete</button>
+
+		<p><label for="id_is_default_shipping">Default shipping:</label> <input type="radio" name="default_shipping"  id="default_shipping" value="default_shipping1" checked></p>
+		<p><label for="id_is_default_billing">Default billing:</label> <input type="radio" name="default_billing" id="default_billing" value="default_billing1" checked></p>
 <!-- 		{{ addressesform.as_p }}
  -->	
 	</div>
 
 </div>
-<button type="button" name="addaddress" onclick="addnewaddress()">Add new address</button>
+<button type="button" name="addaddress" id="addaddress" onclick="addnewaddress()">Add new address</button>
 <input type="submit" value="Add Client">
 
 </form>
@@ -121,7 +127,12 @@ function addnewaddress() {
 	h.appendChild(t);   
 	i += 1
   	var addform = document.getElementById("address");
-    addform.appendChild(h);  
+    var addressdiv = document.createElement("div");
+	addressdiv.setAttribute("id", "address" + i);
+	addressdiv.setAttribute("name", "address" + i);
+	addressdiv.setAttribute("class", "boxaddress" );
+	addressdiv.appendChild(h);  
+
     var para = document.createElement("p");
 	var r = document.createElement('span');
 	var countrylabel = document.createElement("label");
@@ -129,14 +140,15 @@ function addnewaddress() {
 	var sel = document.createElement('select');
 	sel.setAttribute('name', 'id_country_' + i);
 	sel.setAttribute('id', 'id_country_' + i);
-	var last = document.getElementById('id_country_' + (i-1));
+	var last = document.getElementById('id_country');
 	var options = last.innerHTML;
 	var options = sel.innerHTML + options;
 	sel.innerHTML = options;
 	r.appendChild(countrylabel);
 	r.appendChild(sel);
 	para.appendChild(r);
-	addform.appendChild(para);   
+	addressdiv.appendChild(para);
+	addform.appendChild(addressdiv);   
     label = "State:";
 	placeholder = "state";
 	id = "state_";
@@ -157,11 +169,18 @@ function addnewaddress() {
 	placeholder = "address 2";
 	id = "address_2";
 	addtext(label, placeholder,id);
+	var delbtn = document.createElement('button');
+	delbtn.setAttribute('type', "button");
+	delbtn.setAttribute('name', 'deladdress' + i);
+	delbtn.setAttribute('id', 'deladdress' + i);
+	delbtn.innerHTML = "Delete Address";
+
+	addressdiv.appendChild(delbtn);
 	label = "Default Shipping:";
-	id = "is_default_shipping_";
+	id = "default_shipping";
 	addcheckbox(label, id);
 	label = "Default Billing:";
-	id = "is_default_billing_"
+	id = "default_billing";
 	addcheckbox(label, id);
 	
 
@@ -170,6 +189,8 @@ function addnewaddress() {
 function addtext(label, placeholder,id) {
     var para = document.createElement("p");
 	var addform = document.getElementById("address");
+	var addrform = document.getElementById("address" + i);
+
 	var r = document.createElement('span');
 	var statelabel = document.createElement("label");
 	statelabel.innerHTML = label;
@@ -183,24 +204,58 @@ function addtext(label, placeholder,id) {
 	r.appendChild(statelabel);
 	r.appendChild(y);
 	para.appendChild(r);
-	addform.appendChild(para);
+	addrform.appendChild(para);
 }
 
 function addcheckbox(label, id) {
     var para = document.createElement("p");
 	var addform = document.getElementById("address");
 	var r = document.createElement('span');
-	var checkboxlabel = document.createElement("label");
-	checkboxlabel.innerHTML = label;
-	var checkbox = document.createElement("INPUT");
-	checkbox.type = "checkbox";
-	checkbox.name = id + i;
-	checkbox.id = id + i;
-	r.appendChild(checkboxlabel);
-	r.appendChild(checkbox);
+	var addrform = document.getElementById("address" + i);
+
+	var radiobuttonlabel = document.createElement("label");
+	radiobuttonlabel.innerHTML = label;
+	var radiobutton = document.createElement("INPUT");
+	radiobutton.type = "radio";
+	radiobutton.name = id ;
+	radiobutton.id = id ;
+	radiobutton.value = id + i ;
+
+	r.appendChild(radiobuttonlabel);
+	r.appendChild(radiobutton);
 	para.appendChild(r);
-	addform.appendChild(para);
+	addrform.appendChild(para);
 }
 
+$(document).ready(function(){
+	$("button").on("click",function(){
+ 		var $button = $(this);
+        var id_attr1 = $button.attr('id');
+        var pattern = /deladdress(\d+)/;
+		var nameList = id_attr1.match(pattern);
+		if(nameList) {
+			addresscnt = nameList[1];
+			$(" #address" + addresscnt).remove()
+		}
+		else {
+			return ;
+		}
+   	});
+
+  	$(document).on("click", "button" , function() {
+        var $button = $(this);
+        var id_attr1 = $button.attr('id');
+        var pattern = /deladdress(\d+)/;
+		var nameList = id_attr1.match(pattern);
+		if(nameList) {
+			addresscnt = nameList[1];
+			$("#address" + addresscnt).remove()
+		}
+		else {
+			return ;
+		}
+    });
+});
+	
 </script>
 {% endblock %}

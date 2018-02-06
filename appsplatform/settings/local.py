@@ -93,11 +93,11 @@ CACHES = {
 BUILTIN_APPS += [
     'debug_toolbar',
     'debug_panel',
-
+    'template_debug'
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + USER_APPS
-
+TEMPLATE_DEBUG = True
 
 
 # IPs allowed to see django-debug-toolbar output.

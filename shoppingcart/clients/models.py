@@ -22,11 +22,11 @@ class Clients(models.Model):
         return self.client_name
 
     def get_absolute_url(self):
-        return reverse('shoppingcart:client', kwargs={'pk': self.id})
+        return '/shoppingcart/clients/editClient/' + self.id + '/'
 
 
     def get_success_url(self):
-        return reverse('shoppingcart:clients')
+        return '/shoppingcart/clients/listClients/'
 
     class Meta:
         db_table = 'shoppingcart_clients'
@@ -61,11 +61,5 @@ class Addresses(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return self.address_client.client_name
+        return self.client.client_name
 
-    def get_absolute_url(self):
-        return reverse('shoppingcart:address', kwargs={'pk': self.id})
-
-
-    def get_success_url(self):
-        return reverse('shoppingcart:addresses')
