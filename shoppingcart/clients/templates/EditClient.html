@@ -33,11 +33,11 @@
 
     </div>
 {% endfor %}
-<form class="form pj-form"   name="editClientForm" id="editClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="" method="post"     > {% csrf_token %}
+<form class="form pj-form"   name="editClientForm" id="editClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
 </b><h1> Clients </h1>
 
   <p>
-  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;"   value="{{ clientdetail.email }}" required />
+  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;"   value="{{ clientdetail.email }}" required  onblur="check_duplicated_email()"/>
 		
 	</p>
 
@@ -49,7 +49,7 @@
       
    </p>
   <p>
-  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone" value="{{ clientdetail.phone }}"  	 	 required>
+  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone" value="{{ clientdetail.phone }}"   onblur="check_duplicated_phoneno()"	 	 required>
   	
   </p>  
   <p>
@@ -91,8 +91,8 @@
 			<p><label for="id_address_21">Address 2:</label> <input type="text" name="address_2{{ forloop.counter }}" maxlength="2000" placeholder="Address 2" id="	address_2{{ forloop.counter }}" value="{{address.address_2}}"></p>
 			<button type="button" id="deladdress{{ forloop.counter }}" >Delete</button>
 
-			<p><label for="id_is_default_shipping">Default shipping:</label> <input type="radio" name="default_shipping"  id="default_shipping" {% if address.is_default_shipping   %} checked {% endif %} value="default_shipping{{ forloop.counter }}" ></p>
-			<p><label for="id_is_default_billing">Default billing:</label> <input type="radio" name="default_billing" id="default_billing" {% if address.is_default_billing   %} checked {% endif %} value="default_billing{{ forloop.counter }}" ></p>
+			<p><label for="id_is_default_shipping">Default shipping:</label> <input type="radio" name="default_shipping"  id="default_shipping{{ forloop.counter }}" {% if address.is_default_shipping   %} checked {% endif %} value="default_shipping{{ forloop.counter }}" ></p>
+			<p><label for="id_is_default_billing">Default billing:</label> <input type="radio" name="default_billing" id="default_billing{{ forloop.counter }}" {% if address.is_default_billing   %} checked {% endif %} value="default_billing{{ forloop.counter }}" ></p>
 	<!-- 		{{ addressesform.as_p }}
 	 -->	
 		</div>
@@ -100,7 +100,7 @@
 
 </div>
 <button type="button" name="addaddress" id="addaddress" onclick="addnewaddress()">Add new address</button>
-<input type="submit" value="Add Client">
+<input type="submit" value="Edit Client">
 
 </form>
 <script type="text/javascript">
@@ -211,7 +211,7 @@ function addcheckbox(label, id) {
 	var radiobutton = document.createElement("INPUT");
 	radiobutton.type = "radio";
 	radiobutton.name = id ;
-	radiobutton.id = id ;
+	radiobutton.id = id + i  ;
 	radiobutton.value = id + i ;
 
 	r.appendChild(radiobuttonlabel);
@@ -233,22 +233,117 @@ $(document).ready(function(){
 		else {
 			return ;
 		}
+		var options  = document.getElementsByName('default_billing');
+		for (i = 0; i < options.length; i++) { 
+			billingvalue = options[i].value;
+			var pattern = /default_billing(\d+)/;
+			var billinglist = billingvalue.match(pattern);
+				
+			if(billinglist) {
+				addno = billinglist[1];
+				billingvalue = document.getElementById("default_billing" + addno)
+				billingvalue.checked = true ;
+				billingvalue.value = "default_billing" + addno ;
+				break;			
+			}
+		}
+
+		var options_shipping  = document.getElementsByName('default_shipping');
+		for (i = 0; i < options_shipping.length; i++) { 
+			shippingvalue = options_shipping[i].value;
+			var pattern = /default_shipping(\d+)/;
+			var shippinglist = shippingvalue.match(pattern);
+				
+			if(shippinglist) {
+				shippingno = shippinglist[1];
+				shippingval = document.getElementById("default_shipping" + shippingno);
+				shippingval.checked = true ;
+				shippingval.value = "default_shipping" + shippingno ;
+				break;
+			}
+		}
    	});
 
-  	$(document).on("click", "button" , function() {
-        var $button = $(this);
-        var id_attr1 = $button.attr('id');
-        var pattern = /deladdress(\d+)/;
-		var nameList = id_attr1.match(pattern);
-		if(nameList) {
-			addresscnt = nameList[1];
-			$("#address" + addresscnt).remove()
-		}
-		else {
-			return ;
-		}
-    });
+  	
 });
-	
+
+var invalid_phone = true;	
+       
+function check_duplicated_phoneno() {
+
+    $.ajax({
+            method:'get',
+            url:"/shoppingcart/clients/listphones/",
+          
+            success:function(response){
+                // console.log(response);
+                listphones =eval(response);
+                var x = document.getElementById("id_phone");
+                textvalue = x.value.trim();
+                if (listphones != null &&  listphones.length > 0  ){
+                      for (var i = 0; i <  listphones.length; i++)
+                      {
+                          phoneno= listphones[i].phone.trim(); 
+                          if (phoneno == textvalue) {
+                             alert("phone numer already exist");
+                             invalid_phone = false;
+                             return false;
+                          }
+                         invalid_phone = true;
+
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+var invalid_email = true;
+
+function check_duplicated_email() {
+
+    $.ajax({
+            method:'get',
+            url:"/shoppingcart/clients/listemails/",
+          
+            success:function(response){
+                // console.log(response);
+                listemails =eval(response);
+                var servicename ="";
+                var x = document.getElementById("id_email");
+                textvalue = x.value.trim();
+                if (listemails != null &&  listemails.length > 0  ){
+                      for (var i = 0; i <  listemails.length; i++)
+                      {
+                          email= listemails[i].email.trim(); 
+                          if (email == textvalue) {
+                             alert("Email already exist");
+							 invalid_email = false;
+                             return false;
+                          }
+						  invalid_email = true;
+
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+function validateclientform() {
+
+	if( ! invalid_email ) {
+	 	alert("Email already exist");
+	 	return false;	
+	 }
+	 if( ! invalid_phone ) {
+	 	alert("Phone no already exist");
+	 	return false;	
+	 }
+
+	 return true;
+}	
 </script>
 {% endblock %}
