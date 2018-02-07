@@ -32,11 +32,11 @@
 
     </div>
 {% endfor %}
-<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'shoppingcart:addClient' %}" method="post"     > {% csrf_token %}
+<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="{% url 'shoppingcart:addClient' %}" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
 </b><h1> Clients </h1>
 
   <p>
-  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"  required />
+  	<label for="id_email">Email:</label> <input type="email" name="email" maxlength="254" required="" id="id_email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: pointer;" ng-model="email"  ng-maxlength="254"   ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"  required  onblur="check_duplicated_email()"/>
 		
 	<span ng-messages="addClientForm.email.$error" style="color:maroon" role="alert">
 		  <span ng-message="email">Your email  is invalid</span>
@@ -64,7 +64,7 @@
          </div>
    </p>
   <p>
-  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone"   ng-model="phone"   ng-pattern="/^\+[0-9]{3,}$/"  	 	 required>
+  	<label for="id_phone">Phone:</label> <input type="tel" name="phone" required="" id="id_phone"   ng-model="phone"   ng-pattern="/^\+[0-9]{3,}$/"  	 	 required   onblur="check_duplicated_phoneno()" >
   	<span ng-messages="addClientForm.phone.$error"   style="color:maroon" role="alert">
 	  <span ng-message="pattern">Must be a valid phone number</span>
 	</span>
@@ -256,6 +256,84 @@ $(document).ready(function(){
 		}
     });
 });
-	
+ var invalid_phone = true;	
+       
+function check_duplicated_phoneno() {
+
+    $.ajax({
+            method:'get',
+            url:"/shoppingcart/clients/listphones/",
+          
+            success:function(response){
+                // console.log(response);
+                listphones =eval(response);
+                var x = document.getElementById("id_phone");
+                textvalue = x.value.trim();
+                if (listphones != null &&  listphones.length > 0  ){
+                      for (var i = 0; i <  listphones.length; i++)
+                      {
+                          phoneno= listphones[i].phone.trim(); 
+                          if (phoneno == textvalue) {
+                             alert("phone numer already exist");
+                             invalid_phone = false;
+                             return false;
+                          }
+                         invalid_phone = true;
+
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+var invalid_email = true;
+
+function check_duplicated_email() {
+
+    $.ajax({
+            method:'get',
+            url:"/shoppingcart/clients/listemails/",
+          
+            success:function(response){
+                // console.log(response);
+                listemails =eval(response);
+                var servicename ="";
+                var x = document.getElementById("id_email");
+                textvalue = x.value.trim();
+                if (listemails != null &&  listemails.length > 0  ){
+                      for (var i = 0; i <  listemails.length; i++)
+                      {
+                          email= listemails[i].email.trim(); 
+                          if (email == textvalue) {
+                             alert("Email already exist");
+							 invalid_email = false;
+                             return false;
+                          }
+						  invalid_email = true;
+
+                      }
+
+                }
+
+            }
+      });
+  }  
+
+
+
+function validateclientform() {
+	if( ! invalid_email ) {
+     	alert("Email already exist");
+     	return false;	
+    }
+    if( ! invalid_phone ) {
+     	alert("Phone no already exist");
+     	return false;	
+    }
+
+    return true;
+}	
 </script>
 {% endblock %}

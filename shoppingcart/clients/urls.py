@@ -10,5 +10,7 @@ urlpatterns = [
     url(r'^editClient/(?P<id>\d+)/$', clients.editClient, name="editClient"),
     url(r'^deleteClient/(?P<id>\d+)/$', clients.deleteClient, name="deleteClient"),
     url(r'^deleteClients/$', clients.deleteClients, name="deleteClients"),
+    url(r'^listphones/$', clients.list_phones, name="listphones"),
+    url(r'^listemails/$', clients.list_emails, name="listemails"),
 
 ]

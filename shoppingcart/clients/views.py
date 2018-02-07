@@ -120,16 +120,129 @@ def _getaddress_count(formfields):
 
 @requires_csrf_token
 def editClient(request, id=None):
-    """ Edit booking """
-    user_timezone = request.session['visitor_timezone']
-    client = get_object_or_404( Clients,  pk=int(id) ) 
-    errors =""
-    addresses = client.address_client.all()
-    listCountry = Countries.objects.values('id', 'CountryName')
-    # pdb.set_trace()
-    data = { "clientdetail" : client, "addresses" : addresses,"countries": listCountry }
-    templatename = "EditClient.html"
-    return render(request, templatename, data  ) 
+	""" Edit booking """
+	templatename = "EditClient.html"
+	user_timezone = request.session['visitor_timezone']
+	clientsform = ClientsForm()
+	addressesform = AddressesForm()
+	client = get_object_or_404( Clients,  pk=int(id) ) 
+	errors =""
+	addresses = client.address_client.all()
+	listCountry = Countries.objects.values('id', 'CountryName')
+	if request.method == 'POST':
+		formparams= request.POST.dict()
+		formfields =  list(request.POST.keys())
+		request.POST._mutable = True
+		request.POST.clear()
+		request.POST["email"] = formparams['email']
+		request.POST["client_name"] = formparams['client_name']
+		request.POST["password"] = formparams['password']
+		request.POST["phone"] = formparams['phone']
+		request.POST["website"] = formparams['website']
+		# user_timezone = request.session['visitor_timezone'][0]
+		lastlogin_time  = timezone.now()
+		# format = '%Y-%m-%d %H:%M %p'
+		# created_time = created_time.astimezone(pytz.timezone(user_timezone)).strftime(format)
+		request.POST["created"] = client.created
+		request.POST["last_login"] = lastlogin_time
+		if 'status' not in formparams.keys():
+			request.POST["status"] = False
+		else :
+			request.POST["status"] = formparams['status']
+
+		clientsform = ClientsForm(request.POST or None,instance=client )
+		if clientsform.is_valid():
+
+			clientobj = clientsform.save(commit=False)
+			clientobj.save()
+		else :
+			return render(request,templatename, {'clientsform': clientsform, \
+			'addressesform' : addressesform, "countries" : listCountry } )
+		request.POST.clear()
+
+		# Get the field data  for fields from formparams to request.POST
+		# Assign it to request.POST
+		pdb.set_trace()
+		
+		addressids = _getaddress_count(formfields)
+		address_count = len( addressids )
+		for address_no in addressids:
+			state_field = "state_" + str(address_no)
+			country_field = "id_country_" + str(address_no)
+			city_field = "city_" +  str(address_no)
+			client_zip= "client_zip_" +  str(address_no)
+			address_1 = "address_1" +  str(address_no)
+			address_2 = "address_2" +  str(address_no)
+			is_default_shipping = "default_shipping" 
+			is_default_billing = "default_billing"
+			request.POST.clear()
+			request.POST["state"] = formparams[state_field]
+			country_value = formparams[country_field]
+			request.POST["city"] = formparams[city_field]
+			request.POST["client_zip"] = formparams[client_zip]
+			request.POST["address_1"] = formparams[address_1]
+			request.POST["address_2"] = formparams[address_2]
+			billingvalue = formparams["default_billing"]
+			billingno = int(re.search('(\d+)',billingvalue).group())
+			if int(address_no) == billingno :
+				request.POST["is_default_billing"] = True
+			else :
+				request.POST["is_default_billing"] = False
+			
+			shippingvalue = formparams["default_shipping"]
+			shippingno = int(re.search('(\d+)',shippingvalue).group())
+
+			if int(address_no) == shippingno :
+				request.POST["is_default_shipping"] = True
+			else :
+				request.POST["is_default_shipping"] = False
+			
+			# Submit the form and get the object
+			addressesform = AddressesForm(request.POST or None )
+			if addressesform.is_valid():
+				addressesobj = addressesform.save(commit=False)
+				addressesobj.client  = clientobj
+				Countryobj = get_object_or_404( Countries,  pk=int(country_value) ) 
+				addressesobj.country  = Countryobj
+				addressesobj.save()
+			else :
+				return render(request,templatename, {'clientsform': clientsform, \
+				'addressesform' : addressesform, "countries" : listCountry } )
+
+			# Get country object and client object 
+			# Assign it to the foreign key for the model 
+			# clear the request.POST and again assign from formparams to request.POST
+		addresspks = client.address_client.values('id')
+		for addresspk in addresspks:
+			addressobj = get_object_or_404( Addresses,  pk=int(addresspk['id']) ) 
+			addressobj.delete()
+		return HttpResponseRedirect(clientobj.get_success_url())	
+   
+   
+	# pdb.set_trace()
+	data = { "clientdetail" : client, "addresses" : addresses,"countries": listCountry }
+	templatename = "EditClient.html"
+	return render(request, templatename, data  ) 
+
+@ensure_csrf_cookie
+def list_phones(request):
+    """ Displays phone no of each employee """
+
+    clientemails = Clients.objects.values('id', 'phone')
+    # DON'T USE
+    listphones= [dict([("phone",str(clientemail['phone'])), ("id",clientemail['id'])]) for clientemail in clientemails ]
+
+    return HttpResponse(json.dumps(listphones), content_type='application/json')
+
+@ensure_csrf_cookie
+def list_emails(request):
+    """ Displays email  of each employee """
+
+    clientemails = Clients.objects.values('id', 'email')
+    # DON'T USE
+    listemails = [dict([("email",str(clientemail['email'])), ("id",clientemail['id'])]) for clientemail in clientemails ]
+
+    return HttpResponse(json.dumps(listemails), content_type='application/json')
 
 @ensure_csrf_cookie
 def deleteClient(request, id=None):
