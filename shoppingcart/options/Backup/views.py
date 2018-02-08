@@ -16,8 +16,8 @@ from os.path import basename
 from datetime import datetime
 from io import StringIO
 from datetime import datetime, date, time
-import arrow, mimetypes, urllib
-from appointmentscheduler.models import  *
+import arrow, mimetypes, urllib,os
+from shoppingcart.options.Backup.models import  BackupDetails
 import logging
 
 logger = logging.getLogger(__name__)
@@ -91,8 +91,7 @@ def create_backup(request):
 		backupdetail['filesize'] = backupinstance.size
 		backupdetail['filetype'] = backupinstance.filetype
 		backuplist.append( backupdetail )
-	template_name="backup.html"
-	templatename=  os.path.join('Options','Backup',template_name)
+	templatename="backup.html"
 	return render(request,templatename,{ "backuplist" : backuplist})
 
 def listbackups(request):

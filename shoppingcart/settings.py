@@ -11,6 +11,7 @@ USER_APPS += [
 	'shoppingcart.report',
 	'shoppingcart.options',
 	'shoppingcart.options.countries',
+	'shoppingcart.options.Backup',
 
 ]
 
