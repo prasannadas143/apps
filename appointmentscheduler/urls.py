@@ -106,7 +106,7 @@ urlpatterns = [
     url(r'^Templates/$', ckEditor.Templates, name="Templates"),
     url(r'^TemplateList/$', ckEditor.TemplateList, name="TemplateList"),
     url(r'^deleteTemplate/$', ckEditor.deleteTemplate, name="deleteTemplate"),
-    url(r'^editTemplate/(?P<id>\d+)/$', ckEditor.editTemplate, name="editTemplate"),
+    url(r'^EditorTemplatemplate/(?P<id>\d+)/$', ckEditor.editTemplate, name="editTemplate"),
     url(r'^GetTemplateDetails/$', ckEditor.GetTemplateDetails, name="GetTemplateDetails"),
     url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
@@ -116,7 +116,6 @@ urlpatterns = [
     url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
     url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
     url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
-    url(r'^sendemail/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
 
     url(r'^backup/$', backup.create_backup, name="backup"),
     url(r'^listbackups/$', backup.listbackups, name="listbackups"),

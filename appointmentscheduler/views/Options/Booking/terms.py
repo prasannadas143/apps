@@ -22,5 +22,5 @@ def terms(request):
 	for item in items:
 		value = '' if item['value'] is None else item['value']
 		items_dict[item['key']] = value
-	template_name = "Options/Booking/terms.html"
-	return render(request, template_name, {"terms" : items_dict})
+	templatename=  os.path.join('Options','Booking','terms.html')
+	return render(request, templatename, {"terms" : items_dict})

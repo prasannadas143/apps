@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+<div id="CountryFormOptions">
+	<h2 align="center">SMS Twilio Configuration</h2>
+ <form class="form-horizontal" role="form" method="POST" onsubmit="return SMSConfigValidation();" action="/shoppingcart/options/SmsEmailSettings/SmsConfig/">
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_TWILIO_ACCOUNT_SID">TWILIO ACCOUNT SID</label>
+    <div class="col-sm-6">
+       <input id="o_TWILIO_ACCOUNT_SID" class="TWILIO_ACCOUNT_SID text-width" maxlength="250" name="o_TWILIO_ACCOUNT_SID" type="text"  value="{{items.o_TWILIO_ACCOUNT_SID}}"   />
+       <div class="TWILIO_ACCOUNT_SID-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_TWILIO_AUTH_TOKEN"> TWILIO AUTH TOKEN</label>
+    <div class="col-sm-6">
+       <input id="o_TWILIO_AUTH_TOKEN" class="TWILIO_AUTH_TOKEN text-width" maxlength="250" name="o_TWILIO_AUTH_TOKEN" type="text"  value="{{items.o_TWILIO_AUTH_TOKEN}}"   />
+       <div class="TWILIO_AUTH_TOKEN-msg red"></div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="o_TWILIO_FROM_NUMBER"> TWILIO FROM NUMBER</label>
+    <div class="col-sm-6">
+       <input id="o_TWILIO_FROM_NUMBER" class="TWILIO_FROM_NUMBER text-width" maxlength="250" name="o_TWILIO_FROM_NUMBER" type="text"  value="{{items.o_TWILIO_FROM_NUMBER}}"   />
+       <div class="TWILIO_FROM_NUMBER-msg red"></div>
+    </div>
+</div>
+
+ <div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="submit"> <i class="ace-icon fa fa-check"></i> Save </button>
+ </div>
+ </div>
+</form>
+
+
+<div id="CountryFormOptions">
+	<h2 align="center">Send SMS Using Twilio</h2>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="MobileNumber">Mobile Number with Country Code</label>
+    <div class="col-sm-6">
+       <input id="MobileNumber" class="MobileNumber text-width" maxlength="250" name="MobileNumber" type="text"  value="{{items.MobileNumber}}"   />
+       <div class="MobileNumber-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-6 control-label " for="Message">Message</label>
+    <div class="col-sm-6">
+       <input id="Message" class="Message text-width" maxlength="250" name="Message" type="text"  value="{{items.Message}}"   />
+       <div class="Message-msg red"></div>
+    </div>
+</div>
+
+
+<div class="form-group">
+ <div class="col-md-offset-6 col-sm-6">
+ <button class="btn btn-submit" type="button" onclick="return SendMessage();"> <i class="ace-icon fa fa-check"></i> Send Message </button>
+ </div>
+ </div>
+
+</div>
+
+</div>
+
+
+<div class="modal fade" id="messageStatus" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;">
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="Ok">Ok</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+function SMSConfigValidation()
+{
+	$('.TWILIO_ACCOUNT_SID-msg').html('');
+ 	$('.TWILIO_AUTH_TOKEN-msg').html('');
+ 	$('.TWILIO_FROM_NUMBER-msg').html('');
+
+var isValidForm=true;
+if($('.TWILIO_ACCOUNT_SID').val().trim()==""){
+	isValidForm=false;
+	$('.TWILIO_ACCOUNT_SID-msg').html("Please enter TWILIO ACCOUNT SID")
+}
+
+if($('.TWILIO_AUTH_TOKEN').val().trim()==""){
+	isValidForm=false;
+	$('.TWILIO_AUTH_TOKEN-msg').html("Please enter TWILIO AUTH TOKEN")
+}
+
+if($('.TWILIO_FROM_NUMBER').val().trim()==""){
+	isValidForm=false;
+	$('.TWILIO_FROM_NUMBER-msg').html("Please enter TWILIO FROM NUMBER")
+}
+
+if(isValidForm)
+{
+	return true;
+}
+else
+{
+	return false;
+}
+
+}
+
+
+function SendMessage()
+{
+
+ $('.MobileNumber-msg').html('');
+ $('.Message-msg').html('');
+
+var isValidForm=true;
+if($('.MobileNumber').val().trim()==""){
+	isValidForm=false;
+	$('.MobileNumber-msg').html("Please enter Mobile Number with country Code")
+}
+
+if($('.Message').val().trim()==""){
+	isValidForm=false;
+	$('.Message-msg').html("Please enter Message")
+}
+
+if(isValidForm)
+{
+  
+  $.ajax({
+  url: "/shoppingcart/options/SmsEmailSettings/SendSMS/",
+  method: 'POST',
+  data : {
+          "MobileNumber":$('.MobileNumber').val(),
+          "Message":$('.Message').val(),
+         },
+  }).success(function (data, jqXHR) 
+  {
+        $('.modal-title').text('Messgae sent successfully');
+        $("#messageStatus").modal();
+
+  }).error(function (jqXHR, errorThrown) {
+     $('.modal-title').text('Messgae not sent');
+        $("#messageStatus").modal();
+    }); 
+}
+
+
+}
+	
+</script>
+
+<style type="text/css">
+	
+.text-width{
+width: 50%;
+}
+.red{
+        color: Red;
+    }
+</style>
+
+{% endblock %}

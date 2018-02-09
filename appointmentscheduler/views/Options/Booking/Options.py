@@ -77,7 +77,9 @@ def BookingOptions(request):
    "hide_prices_id": hide_prices_id, "accept_booking_id" : accept_booking_id, "accept_booking_ahead_id" : accept_booking_ahead_id
    }
       # Then, do a redirect for example
-   return render(request,'Options.html', {'items':items ,"message":message })
+   templatename=  os.path.join('Options','Booking','Options.html')
+
+   return render(request,templatename, {'items':items ,"message":message })
 
 def getbookingOptions():
 

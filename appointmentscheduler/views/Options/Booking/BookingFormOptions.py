@@ -123,7 +123,9 @@ def BookingFormOptions(request):
    "showlabels": showlabels}
 
    BookingFormdata['items'] = items
-   return render(request,'BookingForm.html', BookingFormdata)
+   templatename=  os.path.join('Options','Booking','BookingForm.html')
+
+   return render(request,templatename, BookingFormdata)
 
 
 
