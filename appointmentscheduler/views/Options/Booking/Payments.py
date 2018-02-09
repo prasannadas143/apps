@@ -65,7 +65,9 @@ def PaymentOptions(request):
    }
    paymentdata['items'] = items
    # Then, do a redirect for example
-   return render(request,'Payments.html', paymentdata)
+   templatename=  os.path.join('Options','Booking','Payments.html')
+
+   return render(request,templatename, paymentdata)
 
 def getPaymentOptions():
 

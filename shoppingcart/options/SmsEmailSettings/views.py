@@ -1,0 +1,199 @@
+import os
+import smtplib
+# Import the email modules we'll need
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from django.shortcuts import render, get_object_or_404
+from appointmentscheduler.models import AppschedulerOptions
+from django.views.decorators.csrf import  csrf_exempt
+import pdb,os
+from django.http import HttpResponse
+from appointmentscheduler.views.Options.Editor import ckEditor
+from appointmentscheduler.models import AppschedulerBookings
+import configparser
+from django.conf import settings
+from twilio.rest import Client
+from django.http import HttpResponse
+from django.shortcuts import render, render_to_response, HttpResponseRedirect,get_object_or_404
+from appointmentscheduler.models import AppschedulerOptions
+from django.http import JsonResponse
+import datetime, pdb
+from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
+from django.core import serializers
+from PIL import Image
+import io
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.core.files import File
+from base64 import decodestring
+from django.http import JsonResponse
+import datetime,pdb,os,json,re
+from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
+from django.forms.models import model_to_dict
+from django.db.models.fields import DateField, TimeField
+from django.db.models.fields.related import ForeignKey, OneToOneField
+from django.forms.models import model_to_dict
+import configparser
+from django.conf import settings
+
+config = configparser.ConfigParser()
+config.read(settings.DOTENV_FILE)
+config = configparser.ConfigParser()
+config.read(settings.DOTENV_FILE)
+
+@csrf_exempt
+def SendMail(request):
+	tab_id = 5;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+
+	o_FromEmail = items_dict['o_FromEmail']['value']
+	o_FromEmailPassword = items_dict['o_FromEmailPassword']['value']
+	if request.method == 'POST':
+
+		fromaddr = o_FromEmail
+		toaddr = request.POST['EmailAddress']
+		msg = MIMEMultipart()
+		msg['From'] = fromaddr
+		msg['To'] = toaddr
+		msg['Subject']  = request.POST['Subject']
+		body =  request.POST['Body']
+		# msg['EMAIL_USE_TLS'] = True
+		msg.attach(MIMEText(body, 'plain'))
+		server = smtplib.SMTP('smtp.gmail.com', 587)
+		server.starttls()
+		server.login(fromaddr, o_FromEmailPassword)
+		text = msg.as_string()
+		print(fromaddr);
+		print(toaddr);
+		print(text);
+		server.sendmail(fromaddr, toaddr, text)
+		server.quit()						
+		return HttpResponse(status=200)
+	else :
+
+		items = {
+		"o_FromEmail":o_FromEmail,
+		"o_FromEmailPassword":o_FromEmailPassword
+		}
+		EmailConfigdata = dict()
+		EmailConfigdata['items'] = items
+		template_name="EmailNotification.html"
+		templatename=  os.path.join('Options','Booking',template_name)
+		return render(request,templatename, EmailConfigdata)
+
+def update_value(tab_id, field, newstep):
+   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
+   item.value = newstep;
+   item.save()
+
+@csrf_exempt
+def EmailConfig(request):
+	tab_id = 5;
+	message=None
+	# use filter() when you have sth to filter ;)
+	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
+	# you can remove the preview assignment (form =request.POST)
+	EmailConfigdata = dict()
+
+	if request.method == 'POST':
+		for field in request.POST.keys():
+			newstep = request.POST[field.strip()]
+			update_value(tab_id , field.strip() , newstep.strip())
+
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+	flag = None
+	o_FromEmail = items_dict['o_FromEmail']['value']
+	o_FromEmailPassword = items_dict['o_FromEmailPassword']['value']
+	if config['DEFAULT']['EMAIL_HOST_USER'] != o_FromEmail :
+		config.set('DEFAULT','EMAIL_HOST_USER',o_FromEmail)
+		flag = 1
+	if config['DEFAULT']['EMAIL_HOST_PASSWORD'] != o_FromEmailPassword :
+		config.set('DEFAULT','EMAIL_HOST_PASSWORD',o_FromEmailPassword)
+		flag = 1
+	# Writing our configuration file to 'example.cfg'
+	if flag :
+		with open(settings.DOTENV_FILE, 'w') as configfile:
+		    config.write(configfile)
+	items = {
+	"o_FromEmail":o_FromEmail,
+	"o_FromEmailPassword":o_FromEmailPassword
+	}
+
+	EmailConfigdata['items'] = items
+
+	# Then, do a redirect for example
+	templatename="EmailNotification.html"
+	return render(request,templatename, EmailConfigdata)
+
+
+@csrf_exempt
+def SmsConfig(request):
+	tab_id = 101;
+	message=None
+	SMSConfigdata = dict()
+	
+	if request.method == 'POST':
+		for field in request.POST.keys():
+			newstep = request.POST[field.strip()]
+			update_value( tab_id, field, newstep.strip() )
+
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
+	print(TWILIO_ACCOUNT_SID);
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
+	print(TWILIO_AUTH_TOKEN);
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
+	items = {
+	"o_TWILIO_ACCOUNT_SID": TWILIO_ACCOUNT_SID,
+	"o_TWILIO_AUTH_TOKEN": TWILIO_AUTH_TOKEN,
+    "o_TWILIO_FROM_NUMBER": TWILIO_FROM_NUMBER
+	}
+	flag = None
+	if config['DEFAULT']['TWILIO_ACCOUNT_SID'] != TWILIO_ACCOUNT_SID :
+		config.set('DEFAULT','TWILIO_ACCOUNT_SID',TWILIO_ACCOUNT_SID)
+		flag = 1
+	if config['DEFAULT']['TWILIO_AUTH_TOKEN'] != TWILIO_AUTH_TOKEN :
+		config.set('DEFAULT','TWILIO_AUTH_TOKEN',TWILIO_AUTH_TOKEN)
+		flag = 1
+	if config['DEFAULT']['TWILIO_FROM_NUMBER'] != TWILIO_FROM_NUMBER :
+		config.set('DEFAULT','TWILIO_FROM_NUMBER',TWILIO_FROM_NUMBER)
+		flag = 1	
+	# Writing our configuration file to 'example.cfg'
+	if flag :
+		with open(settings.DOTENV_FILE, 'w') as configfile:
+		    config.write(configfile)
+	SMSConfigdata['items'] = items
+	# Then, do a redirect for example
+	templatename="SMSConfig.html"
+	return render(request,templatename, SMSConfigdata)
+
+@csrf_exempt
+def SendSMS(request):
+	toNumber = request.POST['MobileNumber']
+	print(toNumber);
+	Message = request.POST['Message']
+	print(Message);
+	tab_id = 101;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
+	print(TWILIO_ACCOUNT_SID);
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
+	print(TWILIO_AUTH_TOKEN);
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
+	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
+	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
+	print(result);
+	return HttpResponse(status=200)

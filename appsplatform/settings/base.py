@@ -128,8 +128,8 @@ TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [
                 join(BASE_DIR,"appointmentscheduler", 'templates'),
-                join(BASE_DIR, "appointmentscheduler", 'templates',"Options"),
-                join(BASE_DIR, "appointmentscheduler", 'templates',"Options","Booking") ,
+                # join(BASE_DIR, "appointmentscheduler", 'templates',"Options"),
+                # join(BASE_DIR, "appointmentscheduler", 'templates',"Options","Booking") ,
                 # join(BASE_DIR, 'registration', 'templates'),
                 # join(BASE_DIR, 'registration', 'auth','templates'),
             ],
