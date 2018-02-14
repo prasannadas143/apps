@@ -1,21 +1,6 @@
-import os
-import smtplib
-# Import the email modules we'll need
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from django.shortcuts import render, get_object_or_404
-from appointmentscheduler.models import AppschedulerOptions
-from django.views.decorators.csrf import  csrf_exempt
-import pdb,os
-from django.http import HttpResponse
-from appointmentscheduler.views.Options.Editor import ckEditor
-from appointmentscheduler.models import AppschedulerBookings
-import configparser
-from django.conf import settings
 from twilio.rest import Client
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, HttpResponseRedirect,get_object_or_404
-from appointmentscheduler.models import AppschedulerOptions
 from django.http import JsonResponse
 import datetime, pdb
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
@@ -27,19 +12,27 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from base64 import decodestring
 from django.http import JsonResponse
-import datetime,pdb,os,json,re
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect,csrf_exempt
+import datetime,pdb,os,json,re,pytz
+from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie,csrf_exempt
 from django.forms.models import model_to_dict
 from django.db.models.fields import DateField, TimeField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.forms.models import model_to_dict
 import configparser
 from django.conf import settings
+import smtplib
+# Import the email modules we'll need
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from appointmentscheduler.models import AppschedulerOptions, SmsSentStatus
 
 config = configparser.ConfigParser()
 config.read(settings.DOTENV_FILE)
-config = configparser.ConfigParser()
-config.read(settings.DOTENV_FILE)
+
+def update_value(tab_id, field, newstep):
+   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
+   item.value = newstep;
+   item.save()
 
 @csrf_exempt
 def SendMail(request):
@@ -84,10 +77,7 @@ def SendMail(request):
 		templatename=  os.path.join('Options','Booking',template_name)
 		return render(request,templatename, EmailConfigdata)
 
-def update_value(tab_id, field, newstep):
-   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
-   item.value = newstep;
-   item.save()
+
 
 @csrf_exempt
 def EmailConfig(request):
@@ -132,16 +122,45 @@ def EmailConfig(request):
 	return render(request,templatename, EmailConfigdata)
 
 
-@csrf_exempt
-def SmsConfig(request):
+
+
+
+@ensure_csrf_cookie
+def SendSMS(request):
+	toNumber = request.POST['MobileNumber']
+	print(toNumber);
+	Message = request.POST['Message']
+	print(Message);
+	tab_id = 101;
+	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items_dict = dict()
+	for item in items:
+		items_dict[item['key']] = item
+
+	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
+	print(TWILIO_ACCOUNT_SID);
+	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
+	print(TWILIO_AUTH_TOKEN);
+	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
+	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
+	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
+	print(result);
+	return HttpResponse(status=200)
+
+@requires_csrf_token
+def SMSConfig(request):
 	tab_id = 101;
 	message=None
+	Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
+	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
+	# you can remove the preview assignment (form =request.POST)
 	SMSConfigdata = dict()
 	
 	if request.method == 'POST':
 		for field in request.POST.keys():
 			newstep = request.POST[field.strip()]
-			update_value( tab_id, field, newstep.strip() )
+			if field.strip()!= "csrfmiddlewaretoken":
+				update_value(field, tab_id , newstep.strip() )
 
 	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
@@ -173,27 +192,49 @@ def SmsConfig(request):
 		with open(settings.DOTENV_FILE, 'w') as configfile:
 		    config.write(configfile)
 	SMSConfigdata['items'] = items
-	# Then, do a redirect for example
+	
+	# # Then, do a redirect for example
+	# SMSConfigdata['smsdetails'] = smsinstances
+
 	templatename="SMSConfig.html"
 	return render(request,templatename, SMSConfigdata)
 
-@csrf_exempt
-def SendSMS(request):
-	toNumber = request.POST['MobileNumber']
-	print(toNumber);
-	Message = request.POST['Message']
-	print(Message);
-	tab_id = 101;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
-	items_dict = dict()
-	for item in items:
-		items_dict[item['key']] = item
-	TWILIO_ACCOUNT_SID =  items_dict['o_TWILIO_ACCOUNT_SID']['value']
-	print(TWILIO_ACCOUNT_SID);
-	TWILIO_AUTH_TOKEN =  items_dict['o_TWILIO_AUTH_TOKEN']['value']
-	print(TWILIO_AUTH_TOKEN);
-	TWILIO_FROM_NUMBER =  items_dict['o_TWILIO_FROM_NUMBER']['value']
-	client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
-	result=	client.api.account.messages.create(to=toNumber,	from_=TWILIO_FROM_NUMBER,body=Message)
-	print(result);
-	return HttpResponse(status=200)
+@ensure_csrf_cookie
+def listsms(request):
+	#Display the Sms details
+	user_timezone = request.session['visitor_timezone']
+	smsinstances = SmsSentStatus.objects.filter(appname="appointmentscheduler")
+	listsms=[]
+	for smsinstance in smsinstances:
+		data=dict()
+		data['id'] = smsinstance.pk
+		smsdatetime = smsinstance.sms_sent_time.astimezone(pytz.timezone(user_timezone[0]))
+		format = '%Y-%m-%d %H:%M %p'
+		data['sms_sent_time'] = smsdatetime.strftime(format)
+		data['phone_no'] = smsinstance.phone_no
+		data['message'] = smsinstance.message
+		data['status'] = smsinstance.status
+		listsms.append(data)
+
+	return  HttpResponse(json.dumps({"data" :listsms }), content_type='application/json')   
+
+@ensure_csrf_cookie
+def deletesms(request,id=None):
+    """ Delete booking """
+
+    # smsobj = get_object_or_404( SmsSentStatus,  pk=int(id) )
+    # smsobj.delete()
+    # pdb.set_trace()
+    return  HttpResponse(status=204)   
+
+@ensure_csrf_cookie
+def deletemultiplesms(request):
+    """ Delete list of booking """
+
+    # deleteids= request.POST['rowids']	
+    # for id in deleteids.split(",") :
+    #     smsobj=get_object_or_404( SmsSentStatus,  pk=int(id) )
+    #     smsobj.delete()
+
+    return  HttpResponse(status=204)   
+
