@@ -286,7 +286,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
    });
  
    // Handle click on "Select all" control
-   $('thead input[name="select_all-records"]', table.table().container()).on('click', function(e){
+   $('thead input[name="select-all-records"]', table.table().container()).on('click', function(e){
       if(this.checked){
          $('#datatables tbody input[type="checkbox"]:not(:checked)').trigger('click');
       } else {

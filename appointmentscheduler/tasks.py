@@ -32,7 +32,9 @@ class MyTask(celery.Task):
         if 'to_sms' in msg_info :
             tosms =  msg_info['to_sms']
             message = msg_info['smscontent'] 
-            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms ,message=message ,status=status)
+            appname =  msg_info['appname']
+            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms \
+                ,message=message ,status=status,task_id=task_id, appname=appname)
             smssentstatus.save()
         
         logger.error('{0!r} failed: {1!r}'.format(task_id, exc))
@@ -47,8 +49,10 @@ class MyTask(celery.Task):
             message = msg_info['emailcontent'] 
         if 'to_sms' in msg_info :
             tosms =  msg_info['to_sms']
-            message = msg_info['smscontent'] 
-            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms ,message=message ,status=status)
+            message = msg_info['smscontent']
+            appname =  msg_info['appname']
+            smssentstatus = SmsSentStatus(sms_sent_time=created_time ,phone_no=tosms \
+                ,message=message ,status=status, task_id=task_id, appname=appname)
             smssentstatus.save()
 
 
@@ -101,6 +105,8 @@ def send_sms(self,bookingid,opertype, *args, **kwargs):
         # rdb.set_trace()  # <- set break-point
         self.request.kwargs['to_sms'] = toNumber
         self.request.kwargs['smscontent'] = Message
+        self.request.kwargs['appname'] = "appointmentscheduler"
+
         client=Client(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN)
         result= client.api.account.messages.create(to=toNumber, from_=TWILIO_FROM_NUMBER,body=Message)
         print(result)

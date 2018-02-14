@@ -113,7 +113,7 @@ class AppschedulerBookings(models.Model):
             self.task_id_sms = send_sms.apply_async((self.id,opertype,), eta=reminder_time)
         # # # send_sms(self.id,opertype, reminder_time)
         # send_email(self.id,opertype, reminder_time)
-
+        self.save()
         return 
 
     def send_email_sms(self, opertype):
@@ -419,6 +419,8 @@ class SmsSentStatus(models.Model):
     phone_no = models.CharField(max_length=255, blank=False, null=False)
     message = models.CharField(max_length=1012, blank=False, null=False)
     status = models.CharField(max_length=100, blank=False, null=False)
+    task_id= models.CharField(max_length=50, blank=True, editable=False)
+    appname = models.CharField(max_length=50, blank=True, editable=False)
 
 class BackupDetails(models.Model):
     backup_time = models.DateTimeField(blank=False, null=False)

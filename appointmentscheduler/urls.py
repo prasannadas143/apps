@@ -116,6 +116,9 @@ urlpatterns = [
     url(r'^SendSMS/$', SMS.SendSMS, name="SendSMS"),
     url(r'^SendMail/$', EmailNotification.SendMail, name="SendMail"),
     url(r'^SaveMailSettings/$', EmailNotification.SaveMailSettings, name="SaveMailSettings"),
+    url(r'^listsms/$', SMS.listsms, name="listsms"),
+    url(r'^deletesms/(?P<id>\d+)/$', SMS.deletesms, name="deletesms"),
+    url(r'^deletemultiplesms/$', SMS.deletemultiplesms, name="deletemultiplesms"),
 
     url(r'^backup/$', backup.create_backup, name="backup"),
     url(r'^listbackups/$', backup.listbackups, name="listbackups"),
