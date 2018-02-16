@@ -14,7 +14,7 @@
 <input type="button" value="All"   class="btn-topGrid"  id="all"  />
 
 <input type="button"  class="btn-topGrid" onclick="location.href='{% url 'appointmentschduler:Template' %}'"  value="Add Template" />{% csrf_token %}
-
+<input type="button"  class="btn-topGrid" onclick="location.href='/appointmentschduler/EditorTemplate/'"  value="Template Subject" />
 <table id="datatables" class="table table-hover">
         <thead>
         <tr>
@@ -49,21 +49,7 @@ var getfilter = "all";
   var rows_selected = [];
   draw_datatable();
 
-$("#active").click(function(){
-   getfilter = "active";
-   draw_datatable();
 
-});
-
-$("#inactive").click(function(){
-   getfilter = "inactive";
-   draw_datatable();
-});
-
-$("#all").click(function(){
-   getfilter = "all";
-   draw_datatable();
-});
 
 function getCookie(name) {
     var cookieValue = null;
@@ -174,8 +160,8 @@ function draw_datatable() {
             {
               'targets':3,
               "data": null,
-              "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
-              '<button type="button" class="btn btn-danger">Delete</button>'
+              "defaultContent": '<button type="button" class="btn btn-info" id="edit">Edit</a></button>' + '&nbsp;&nbsp' +
+              '<button type="button" class="btn btn-danger" id="delete">Delete</button>'
             }
         ],
             'rowCallback': function(row, data, dataIndex){
@@ -281,13 +267,48 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       e.stopPropagation();
    });
  
-  // Handle table draw event
-   table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-   });
+// Handle table draw event
+table.on('draw', function(){
+  // Update state of "Select all" control
+  updateDataTableSelectAllCtrl(table);
+});
+
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    let op_id = $(this).attr('id');
+
+   if( op_id == 'delete') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    else if( op_id == 'cancel') {
+        // DELETE button
+        $('#modal_title').text('CANCEL BOOKING');
+        $("#cancelmodal").modal();
+    }
+
+
+    id = data['bookingid'];
+
+});
+$('#confirm').on('click', '#delete', function (e) {
+
+    $.ajax({
+          url: "/appointmentschduler/deleteTemplate/" + id + "/",
+          method: 'POST'
+      }).success(function (data, textStatus, jqXHR) {
+
+           table.row( '#' + id ).remove().draw();
+
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+      });         
+  });
  
-   $("#multicheckbox").on('click',function(){
+$("#multicheckbox").on('click',function(){
       var ids = $.map(table.rows('.selected').data(), function (item) {
             return item.id;
         });
@@ -298,7 +319,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
           alert("no rows selected");
      }
        $.ajax({
-                url: "{% url 'appointmentschduler:deleteTemplate' %}",
+                url: "{% url 'appointmentschduler:deleteTemplates' %}",
                 method: 'POST',
                 data : {
                         "rowids":rowids,
@@ -311,7 +332,7 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
               console.log(jqXHR)
           });    
    
-   });
+   });  
  
 
 

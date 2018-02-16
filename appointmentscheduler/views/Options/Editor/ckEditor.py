@@ -9,33 +9,6 @@ from appointmentscheduler.models import  AppschedulerTemplates, AppschedulerCoun
 
 
 
-@csrf_exempt
-def EditorTemplate(request):
-    template_name="ckEditor.html"
-    templatename=  os.path.join('Options','Editor',template_name)
-    Template_info = []
-    Templates = AppschedulerTemplates.objects.all()
-    for Templ in Templates.iterator():
-        data=dict()
-        data['id'] = Templ.id
-        data['templatename'] = Templ.TemplateName
-        Template_info.append(data)
-    return render(request, templatename, {"data" :  Template_info })
-
-
-@csrf_exempt
-def GetTemplateDetails(request):
-    if request.method == "GET":
-        Templates = AppschedulerTemplatesDetails.objects.filter(TemplateID=request.GET['TemplateID'])
-        data=dict()
-        if Templates.exists() :
-            Template =Templates[0]
-            data['id'] = Template.id
-            data['TemplateID'] = Template.TemplateID
-            data['subject'] = Template.subject
-            data['DesignedTemplate'] = Template.DesignedTemplate
-            data['status'] = Template.status
-    return HttpResponse( json.dumps(data), content_type='application/json')
 
 @csrf_exempt
 def GetTemplateList(request):
@@ -56,14 +29,14 @@ def SaveTemplate(request):
             appscheduleTemplate.save()
     return HttpResponse(status=200)
 
-@csrf_exempt
-def UpdateTemplate(request,id=None):
-    if request.method == 'POST':
-        Templates = AppschedulerTemplatesDetails.objects.filter(id=id)[0]
-        appscheduleTemplate = TemplateDetails(request.POST or None,instance=Templates)
-        if appscheduleTemplate.is_valid():
-            appscheduleTemplate.save()
-        return HttpResponse(status=200)        
+# @csrf_exempt
+# def UpdateTemplate(request,id=None):
+#     if request.method == 'POST':
+#         Templates = AppschedulerTemplatesDetails.objects.filter(id=id)[0]
+#         appscheduleTemplate = TemplateDetails(request.POST or None,instance=Templates)
+#         if appscheduleTemplate.is_valid():
+#             appscheduleTemplate.save()
+#         return HttpResponse(status=200)        
 
 @csrf_exempt
 def Template(request):      
@@ -103,8 +76,17 @@ def Templates(request):
 
 @csrf_exempt
 def deleteTemplate(request,id=None):
-    atemplate=get_object_or_404(AppschedulerTemplates,id=id)
+    atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
     atemplate.delete()
+    return HttpResponse(status=204)       
+
+@csrf_exempt
+def deleteTemplates(request,rowids=None):
+    # pdb.set_trace()
+    deleteids= request.POST['rowids']
+    # for id in deleteids.split(",") :
+    #     atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
+    #     atemplate.delete()
     return HttpResponse(status=204)        
 
 @csrf_exempt
@@ -178,9 +160,22 @@ def TemplateDetailsData(request):
         Template_info.append(data)
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
 
-
-
 @csrf_exempt
+def GetTemplateDetails(request):
+    """ Retrieve all template details with it's subject"""
+    if request.method == "GET":
+        Templates = AppschedulerTemplatesDetails.objects.filter(TemplateID=request.GET['TemplateID'])
+        data=dict()
+        if Templates.exists() :
+            Template =Templates[0]
+            data['id'] = Template.id
+            data['TemplateID'] = Template.TemplateID
+            data['subject'] = Template.subject
+            data['DesignedTemplate'] = Template.DesignedTemplate
+            data['status'] = Template.status
+    return HttpResponse( json.dumps(data), content_type='application/json')
+
+
 def GetTemplateDetailByTemplateID(TemplateName=None):
     Template = None
     try:
@@ -196,3 +191,56 @@ def GetTemplateDetailByTemplateID(TemplateName=None):
         print( '%s (%s)' % (str(e), type(e)) )
     return Template
 
+@csrf_exempt
+def EditorTemplate(request):
+    template_name="ckEditor.html"
+    templatename=  os.path.join('Options','Editor',template_name)
+    Template_info = []
+    Templates = AppschedulerTemplates.objects.all()
+    for Templ in Templates.iterator():
+        data=dict()
+        data['id'] = Templ.id
+        data['templatename'] = Templ.TemplateName
+        Template_info.append(data)
+    return render(request, templatename, {"data" :  Template_info })
+
+@csrf_exempt
+def DeleteEditorTemplate(request, id=None):
+    Template = None
+    # template_instace = get_object_or_404(AppschedulerTemplatesDetails,id=id)
+    # template_instace.delete()
+    return HttpResponse(status=204)    
+
+
+@csrf_exempt
+def EditEditorTemplate(request,id):
+    template_name="EditEditorTemplate.html"
+    editortemplateobj =get_object_or_404(AppschedulerTemplatesDetails,id=id)
+    appscheduleTemplate = addTemplate(request.POST or None ,instance=editortemplateobj)
+    if appscheduleTemplate.is_valid():
+        post = appscheduleTemplate.save()
+        return HttpResponseRedirect('/appointmentschduler/Templates/')
+    list_template = []
+    Templates = AppschedulerTemplates.objects.all()
+    for Templ in Templates.iterator():
+        data=dict()
+        data['id'] = Templ.id
+        data['templatename'] = Templ.TemplateName
+        list_template.append(data)
+    templatename=  os.path.join('Options','Editor',template_name)
+    Templateinfo = model_to_dict(editortemplateobj)
+    # pdb.set_trace()
+    return render(request,templatename, {'data': list_template, "templateinfo" : Templateinfo, "id" : id } )
+
+@csrf_exempt
+def SaveEditorTemplate(request,id):
+    template_name="EditEditorTemplate.html"
+    apptemplatedetail =get_object_or_404(AppschedulerTemplatesDetails,id=int(id) )
+    apptemplatedetailform = addTemplate(request.POST or None ,instance=apptemplatedetail)
+    # pdb.set_trace()
+    if apptemplatedetailform.is_valid():
+        post = apptemplatedetailform.save()
+        return HttpResponseRedirect('/appointmentschduler/EditorTemplate/')
+    templatename=  os.path.join('Options','Editor',template_name)
+    
+    return render(request,templatename, {'appscheduleTemplate': apptemplatedetailform, "id" : id } )
