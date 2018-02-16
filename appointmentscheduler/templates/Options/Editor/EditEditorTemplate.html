@@ -27,7 +27,7 @@
 
                 <option value="">-- Choose --</option>
                 {% for template in data %}
-                    <option value="{{ template.id }}">{{ template.templatename }}</option>
+                    <option value="{{ template.id }}" {% if templateinfo.id == template.id %} selected {% endif %}>{{ template.templatename }}</option>
                 {% endfor %}
     </select>
     </div>
@@ -39,21 +39,22 @@
   <div class="form-group">
     <label class="col-sm-6 control-label title " for="Subject">Subject</label>
     <div class="col-sm-4">
-      <input type="text" name="subject_client" class="subject_client    form-control" value="{{ templateinfo.subject }}"
+      <input type="text" name="subject_client" class="subject_client    form-control" value="{{ templateinfo.subject }}">
     </div>
   </div>
 
  <div class="form-group">
     <label class="col-sm-6 control-label editor1" for="Templateeditor1">Design Template</label>
     <div class="col-sm-12">
-      <textarea name="editor1" class="DesignedTemplate    form-control"></textarea>
+      <textarea name="editor1" class="DesignedTemplate    form-control">{{  templateinfo.DesignedTemplate }} </textarea>
     </div>
   </div>
     
   <div class="form-group">
   <label class="col-sm-6 control-label " for="Status">Status</label>
-  <div class="col-sm-6">.
-  <input type="checkbox" name="Status" class="Status" checked>
+  <div class="col-sm-6">
+  <input type="checkbox" name="Status" class="Status" 
+  {% if templateinfo.status %}  checked {% endif %}>
   <div class="Status-msg red"></div>
   </div>
   </div> 
@@ -101,9 +102,28 @@
          },
   }).success(function (data, jqXHR) 
   {
+    if (data.id) {
        $('#TemplateDetailID').val(data.id);
+    }
+    else {
+      $('#TemplateDetailID').val('');
+
+    }
+    if (data.subject) {
+
        $('.subject_client').val(data.subject);
+    }
+    else {
+       $('.subject_client').val('');
+
+    }
+    if (data.DesignedTemplate) {
         var data = CKEDITOR.instances.editor1.setData(data.DesignedTemplate);
+    }
+     else {
+       var data = CKEDITOR.instances.editor1.setData('');
+
+    }
   }).error(function (jqXHR, errorThrown) {
      $('#TemplateDetailID').val("");
      $('.modal-title').text('error occured, Please try again.');

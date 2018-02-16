@@ -185,8 +185,8 @@ function draw_datatable() {
             {
               'targets':5,
               "data": null,
-              "defaultContent": '<button type="button" class="btn btn-info">Edit</a></button>' + '&nbsp;&nbsp' +
-              '<button type="button" class="btn btn-danger">Delete</button>'
+              "defaultContent": '<button type="button" class="btn btn-info" id="edit">Edit</a></button>' + '&nbsp;&nbsp' +
+              '<button type="button" class="btn btn-danger" id="delete">Delete</button>'
             }
         ],
             'rowCallback': function(row, data, dataIndex){
@@ -297,7 +297,47 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       // Update state of "Select all" control
       updateDataTableSelectAllCtrl(table);
    });
- 
+
+    
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    let op_id = $(this).attr('id');
+
+    if (op_id == 'edit') {
+       
+          location.href = '/appointmentschduler/EditEditorTemplate/' + data.id + '/';
+
+
+    } else if( op_id == 'delete') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    else if( op_id == 'cancel') {
+        // DELETE button
+        $('#modal_title').text('CANCEL BOOKING');
+        $("#cancelmodal").modal();
+    }
+
+
+    id = data['id'];
+
+});
+
+$('#confirm').on('click', '#delete', function (e) {
+        alert(id);
+        $.ajax({
+              url: "/appointmentschduler/DeleteEditorTemplate/" +  id + "/",
+              method: 'POST'
+          }).success(function (data, textStatus, jqXHR) {
+               table.row( '#' + id ).remove().draw();
+          }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });         
+  });
+
    $("#multicheckbox").on('click',function(){
       var ids = $.map(table.rows('.selected').data(), function (item) {
             return item.id;
@@ -308,19 +348,20 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       else {
           alert("no rows selected");
      }
-       $.ajax({
-                url: "{% url 'appointmentschduler:deleteTemplate' %}",
-                method: 'POST',
-                data : {
-                        "rowids":rowids,
-                      },
+    $.ajax({
+            url: "{% url 'appointmentschduler:delete_bookings' %}",
+            method: 'POST',
+            data : {
+                    "rowids":rowids,
+                  },
           }).success(function (data, textStatus, jqXHR) {
                 $.each(ids, function( index, value ) {
                   table.row( '#' + value ).remove().draw();
+
                 });
             }).error(function (jqXHR, textStatus, errorThrown) {
               console.log(jqXHR)
-          });    
+          }); 
    
    });
  
@@ -335,34 +376,6 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       // Prevent actual form submission
     
     
-$('#datatables tbody').on('click', 'button', function () {
-    let data = table.row($(this).parents('tr')).data();
-    let class_name = $(this).attr('class');
-    if (class_name == 'btn btn-info') {
-          location.href = "/appointmentschduler/EditorTemplate/" + data['id'];
-
-    } else if( class_name == 'btn btn-danger') {
-        // DELETE button
-        $('#modal_title').text('DELETE');
-        $("#confirm").modal();
-    }
-
-    id = data['id'];
-
-});
-
-    $('#confirm').on('click', '#delete', function (e) {
-    let data = table.row($(this).parents('tr')).data();
-        alert(data['id']);
-        $.ajax({
-              url: "/appointmentschduler/deleteTemplate/" +  data['id'] + "/",
-              method: 'POST'
-          }).success(function (data, textStatus, jqXHR) {
-               table.row( '#' + id ).remove().draw();
-          }).error(function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR)
-          });         
-  });
 
 </script>
 

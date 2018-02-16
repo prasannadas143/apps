@@ -217,55 +217,57 @@ class AppschedulerEmployeesServices(models.Model):
         unique_together = (('employee_id', 'service_id'),)
 
 
-class AppschedulerFields(models.Model):
-    key = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    type = models.CharField(max_length=8, blank=True, null=True)
-    label = models.CharField(max_length=255, blank=True, null=True)
-    source = models.CharField(max_length=6, blank=True, null=True)
-    modified = models.DateTimeField(blank=True, null=True)
+# class AppschedulerFields(models.Model):
+#     key = models.CharField(unique=True, max_length=100, blank=True, null=True)
+#     type = models.CharField(max_length=8, blank=True, null=True)
+#     label = models.CharField(max_length=255, blank=True, null=True)
+#     source = models.CharField(max_length=6, blank=True, null=True)
+#     modified = models.DateTimeField(blank=True, null=True)
 
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_fields'
+#     class Meta:
+#         # managed = False
+#         db_table = 'appscheduler_fields'
 
 
-class AppschedulerMultiLang(models.Model):
-    foreign_id = models.IntegerField(blank=True, null=True)
-    model = models.CharField(max_length=50, blank=True, null=True)
-    locale = models.IntegerField(blank=True, null=True)
-    field = models.CharField(max_length=50, blank=True, null=True)
-    content = models.TextField(blank=True, null=True)
-    source = models.CharField(max_length=6, blank=True, null=True)
+# class AppschedulerMultiLang(models.Model):
+#     foreign_id = models.IntegerField(blank=True, null=True)
+#     model = models.CharField(max_length=50, blank=True, null=True)
+#     locale = models.IntegerField(blank=True, null=True)
+#     field = models.CharField(max_length=50, blank=True, null=True)
+#     content = models.TextField(blank=True, null=True)
+#     source = models.CharField(max_length=6, blank=True, null=True)
 
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_multi_lang'
-        unique_together = (('foreign_id', 'model', 'locale', 'field'),)
+#     class Meta:
+#         # managed = False
+#         db_table = 'appscheduler_multi_lang'
+#         unique_together = (('foreign_id', 'model', 'locale', 'field'),)
 
 
 class AppschedulerOptions(models.Model):
-    foreign_id = models.IntegerField()
+    # foreign_id = models.IntegerField()
     key = models.CharField(max_length=255)
     tab_id = models.IntegerField(blank=True, null=True)
     value = models.TextField(blank=True, null=True)
-    label = models.TextField(blank=True, null=True)
-    type = models.CharField(max_length=6)
-    order = models.IntegerField(blank=True, null=True)
-    is_visible = models.IntegerField(blank=True, null=True)
-    style = models.CharField(max_length=500, blank=True, null=True)
+    app_name = models.CharField(max_length=255)
+
+    # label = models.TextField(blank=True, null=True)
+    # type = models.CharField(max_length=6)
+    # order = models.IntegerField(blank=True, null=True)
+    # is_visible = models.IntegerField(blank=True, null=True)
+    # style = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         # managed = False
         db_table = 'appscheduler_options'
 
 
-class AppschedulerRoles(models.Model):
-    role = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(max_length=1)
+# class AppschedulerRoles(models.Model):
+#     role = models.CharField(max_length=255, blank=True, null=True)
+#     status = models.CharField(max_length=1)
 
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_roles'
+#     class Meta:
+#         # managed = False
+#         db_table = 'appscheduler_roles'
 
 
 def service_img_location(instance, filename):
@@ -323,48 +325,48 @@ class AppschedulerUsers(models.Model):
         db_table = 'appscheduler_users'
 
 
-class AppschedulerWorkingTimes(models.Model):
-    foreign_id = models.IntegerField(blank=True, null=True)
-    type = models.CharField(max_length=8, blank=True, null=True)
-    monday_from = models.TimeField(blank=True, null=True)
-    monday_to = models.TimeField(blank=True, null=True)
-    monday_lunch_from = models.TimeField(blank=True, null=True)
-    monday_lunch_to = models.TimeField(blank=True, null=True)
-    monday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    tuesday_from = models.TimeField(blank=True, null=True)
-    tuesday_to = models.TimeField(blank=True, null=True)
-    tuesday_lunch_from = models.TimeField(blank=True, null=True)
-    tuesday_lunch_to = models.TimeField(blank=True, null=True)
-    tuesday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    wednesday_from = models.TimeField(blank=True, null=True)
-    wednesday_to = models.TimeField(blank=True, null=True)
-    wednesday_lunch_from = models.TimeField(blank=True, null=True)
-    wednesday_lunch_to = models.TimeField(blank=True, null=True)
-    wednesday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    thursday_from = models.TimeField(blank=True, null=True)
-    thursday_to = models.TimeField(blank=True, null=True)
-    thursday_lunch_from = models.TimeField(blank=True, null=True)
-    thursday_lunch_to = models.TimeField(blank=True, null=True)
-    thursday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    friday_from = models.TimeField(blank=True, null=True)
-    friday_to = models.TimeField(blank=True, null=True)
-    friday_lunch_from = models.TimeField(blank=True, null=True)
-    friday_lunch_to = models.TimeField(blank=True, null=True)
-    friday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    saturday_from = models.TimeField(blank=True, null=True)
-    saturday_to = models.TimeField(blank=True, null=True)
-    saturday_lunch_from = models.TimeField(blank=True, null=True)
-    saturday_lunch_to = models.TimeField(blank=True, null=True)
-    saturday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    sunday_from = models.TimeField(blank=True, null=True)
-    sunday_to = models.TimeField(blank=True, null=True)
-    sunday_lunch_from = models.TimeField(blank=True, null=True)
-    sunday_lunch_to = models.TimeField(blank=True, null=True)
-    sunday_dayoff = models.CharField(max_length=1, blank=True, null=True)
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_working_times'
-        unique_together = (('foreign_id', 'type'),)
+# class AppschedulerWorkingTimes(models.Model):
+#     foreign_id = models.IntegerField(blank=True, null=True)
+#     type = models.CharField(max_length=8, blank=True, null=True)
+#     monday_from = models.TimeField(blank=True, null=True)
+#     monday_to = models.TimeField(blank=True, null=True)
+#     monday_lunch_from = models.TimeField(blank=True, null=True)
+#     monday_lunch_to = models.TimeField(blank=True, null=True)
+#     monday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     tuesday_from = models.TimeField(blank=True, null=True)
+#     tuesday_to = models.TimeField(blank=True, null=True)
+#     tuesday_lunch_from = models.TimeField(blank=True, null=True)
+#     tuesday_lunch_to = models.TimeField(blank=True, null=True)
+#     tuesday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     wednesday_from = models.TimeField(blank=True, null=True)
+#     wednesday_to = models.TimeField(blank=True, null=True)
+#     wednesday_lunch_from = models.TimeField(blank=True, null=True)
+#     wednesday_lunch_to = models.TimeField(blank=True, null=True)
+#     wednesday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     thursday_from = models.TimeField(blank=True, null=True)
+#     thursday_to = models.TimeField(blank=True, null=True)
+#     thursday_lunch_from = models.TimeField(blank=True, null=True)
+#     thursday_lunch_to = models.TimeField(blank=True, null=True)
+#     thursday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     friday_from = models.TimeField(blank=True, null=True)
+#     friday_to = models.TimeField(blank=True, null=True)
+#     friday_lunch_from = models.TimeField(blank=True, null=True)
+#     friday_lunch_to = models.TimeField(blank=True, null=True)
+#     friday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     saturday_from = models.TimeField(blank=True, null=True)
+#     saturday_to = models.TimeField(blank=True, null=True)
+#     saturday_lunch_from = models.TimeField(blank=True, null=True)
+#     saturday_lunch_to = models.TimeField(blank=True, null=True)
+#     saturday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     sunday_from = models.TimeField(blank=True, null=True)
+#     sunday_to = models.TimeField(blank=True, null=True)
+#     sunday_lunch_from = models.TimeField(blank=True, null=True)
+#     sunday_lunch_to = models.TimeField(blank=True, null=True)
+#     sunday_dayoff = models.CharField(max_length=1, blank=True, null=True)
+#     class Meta:
+#         # managed = False
+#         db_table = 'appscheduler_working_times'
+#         unique_together = (('foreign_id', 'type'),)
 
 class AppschedulerCountries(models.Model):
     CountryName = models.CharField(max_length=200, blank=False, null=False,unique=True)
@@ -377,14 +379,7 @@ class AppschedulerCountries(models.Model):
         db_table = 'appscheduler_countries'
         unique_together = (('CountryName'),)
 
-# class DjangoMigrations(models.Model):
-    # app = models.CharField(max_length=255)
-    # name = models.CharField(max_length=255)
-    # applied = models.DateTimeField()
 
-    # class Meta:
-        # # managed = False
-        # db_table = 'django_migrations'
 
 
 class AppschedulerTemplates(models.Model):

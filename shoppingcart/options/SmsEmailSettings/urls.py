@@ -3,6 +3,7 @@ from django.contrib import admin
 from .views import SMSConfig,SendMail,EmailConfig,SendSMS, \
 listsms, deletesms, deletemultiplesms
 
+
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^SmsConfig/$',  SMSConfig, name="SmsConfig" ),
