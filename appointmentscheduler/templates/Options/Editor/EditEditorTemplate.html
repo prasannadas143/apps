@@ -16,17 +16,23 @@
         <script src="{% static 'ckeditor/js/Sample.js' %}" type="text/javascript"></script>
     </head>
     <body>
-
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
      <form class="form-horizontal" role="form" method="POST">
 
-    <input type="hidden" name="TemplateDetailID" id="TemplateDetailID">
+    <input type="hidden" name="TemplateDetailID" id="TemplateDetailID" value="{{ templateinfo.TemplateID }}">
     <div class="form-group">
     <label class="col-sm-6 control-label " for="Templates">Select Templates</label>
     <div class="col-sm-4">
     <select name="template" id="template" class="pj-form-field w180 custom-chosen TemplatesChange    form-control" >
 
                 <option value="">-- Choose --</option>
-                {% for template in data %}
+                {% for template in listtemplates %}
                     <option value="{{ template.id }}" {% if templateinfo.id == template.id %} selected {% endif %}>{{ template.templatename }}</option>
                 {% endfor %}
     </select>
@@ -140,8 +146,7 @@ function Validation()
     var Subject =$('.subject_client').val();
     var TemplateID =$(".TemplatesChange option:selected").val()
     var TemplateDetailID =$('#TemplateDetailID').val().trim();
-    let rowdata = table.row($(this).parents('tr')).data();
-    id = rowdata['id']
+
 var status=1
 if ($('.Status').is(":checked"))
 {
@@ -169,7 +174,7 @@ else{
 if(isValidForm) {
 
 
-triggerurl = '/appointmentschduler/SaveEditorTemplate/' + id + '/'
+triggerurl = '/appointmentschduler/SaveEditorTemplate/' 
 $.ajax({
   url: triggerurl,
   method: 'POST',
