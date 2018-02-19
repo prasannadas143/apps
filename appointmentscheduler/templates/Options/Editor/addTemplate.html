@@ -12,7 +12,13 @@
 
 <div id="AddTemplate">
 <h2 align="center">Add Template</h2>
-
+   {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
    <form class="form-horizontal" role="form">
 
 <div class="form-group">

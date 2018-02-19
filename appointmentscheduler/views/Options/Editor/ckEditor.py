@@ -1,11 +1,13 @@
 from django.http import HttpResponse
+from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 import pdb,os,json
 from django.views.decorators.csrf import csrf_exempt
 from appointmentscheduler.form.Options.Editor.AddTemplate import addTemplate
-from appointmentscheduler.form.Options.Editor.TemplateDetails import TemplateDetails, AppschedulerTemplatesDetails
+from appointmentscheduler.form.Options.Editor.TemplateDetails import TemplateDetails
 from django.forms.models import model_to_dict
-from appointmentscheduler.models import  AppschedulerTemplates, AppschedulerCountries
+from appointmentscheduler.models import  AppschedulerTemplates,\
+ AppschedulerCountries, AppschedulerTemplatesDetails
 
 
 
@@ -24,10 +26,10 @@ def GetTemplateList(request):
 @csrf_exempt
 def SaveTemplate(request):
     if request.method == 'POST': 
-        appscheduleTemplate = TemplateDetails(request.POST or None)
+        appscheduleTemplate = addTemplate(request.POST or None)
         if appscheduleTemplate.is_valid():
             appscheduleTemplate.save()
-    return HttpResponse(status=200)
+            return HttpResponse(status=200)
 
 # @csrf_exempt
 # def UpdateTemplate(request,id=None):
@@ -47,13 +49,15 @@ def Template(request):
 
 @csrf_exempt
 def AddTemplate(request):
-	if request.method == "POST":
-			request.POST._mutable= True
-			request.POST['status'] = bool(int(request.POST['Status']))
-			appscheduleTemplate = addTemplate(request.POST or None)
-			if appscheduleTemplate.is_valid():
-				 	appscheduleTemplate.save()
-	return HttpResponse(status=200)
+    if request.method == "POST":
+        request.POST._mutable= True
+        request.POST['status'] = bool(int(request.POST['Status']))
+        appscheduleTemplate = addTemplate(request.POST or None)
+        if appscheduleTemplate.is_valid():
+            appscheduleTemplate.save()
+            return HttpResponse(status=200)
+        else :
+            return HttpResponse(status=404)
 
 
 @csrf_exempt
@@ -82,11 +86,10 @@ def deleteTemplate(request,id=None):
 
 @csrf_exempt
 def deleteTemplates(request,rowids=None):
-    # pdb.set_trace()
     deleteids= request.POST['rowids']
-    # for id in deleteids.split(",") :
-    #     atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
-    #     atemplate.delete()
+    for id in deleteids.split(",") :
+        atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
+        atemplate.delete()
     return HttpResponse(status=204)        
 
 @csrf_exempt
@@ -94,9 +97,13 @@ def editTemplate(request,id):
     template_name="EditTemplate.html"
     appscheduleobj =get_object_or_404(AppschedulerTemplates,id=id)
     appscheduleTemplate = addTemplate(request.POST or None ,instance=appscheduleobj)
-    if appscheduleTemplate.is_valid():
-        post = appscheduleTemplate.save()
-        return HttpResponseRedirect('/appointmentschduler/Templates/')
+    if request.method == "POST":
+        if appscheduleTemplate.is_valid():
+            post = appscheduleTemplate.save()
+            return HttpResponse(status=204) 
+        else :
+            return HttpResponse(status=404) 
+  
     templatename=  os.path.join('Options','Editor',template_name)
     Templateinfo = model_to_dict(appscheduleobj)
     Templateinfo['status'] = int(Templateinfo['status'])
@@ -207,19 +214,20 @@ def EditorTemplate(request):
 @csrf_exempt
 def DeleteEditorTemplate(request, id=None):
     Template = None
-    # template_instace = get_object_or_404(AppschedulerTemplatesDetails,id=id)
-    # template_instace.delete()
+    template_instace = get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
+    template_instace.delete()
     return HttpResponse(status=204)    
 
 
 @csrf_exempt
 def EditEditorTemplate(request,id):
     template_name="EditEditorTemplate.html"
-    editortemplateobj =get_object_or_404(AppschedulerTemplatesDetails,id=id)
-    appscheduleTemplate = addTemplate(request.POST or None ,instance=editortemplateobj)
-    if appscheduleTemplate.is_valid():
-        post = appscheduleTemplate.save()
-        return HttpResponseRedirect('/appointmentschduler/Templates/')
+    pdb.set_trace()
+    editortemplateobj =get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
+    # appscheduleTemplate = addTemplate(request.POST or None ,instance=editortemplateobj)
+    # if appscheduleTemplate.is_valid():
+    #     post = appscheduleTemplate.save()
+    #     return HttpResponseRedirect('/appointmentschduler/Templates/')
     list_template = []
     Templates = AppschedulerTemplates.objects.all()
     for Templ in Templates.iterator():
@@ -229,18 +237,53 @@ def EditEditorTemplate(request,id):
         list_template.append(data)
     templatename=  os.path.join('Options','Editor',template_name)
     Templateinfo = model_to_dict(editortemplateobj)
-    # pdb.set_trace()
-    return render(request,templatename, {'data': list_template, "templateinfo" : Templateinfo, "id" : id } )
+    return render(request,templatename, {'listtemplates': \
+        list_template, "templateinfo" : Templateinfo, "id" : id } )
 
 @csrf_exempt
-def SaveEditorTemplate(request,id):
+def SaveEditorTemplate(request):
     template_name="EditEditorTemplate.html"
-    apptemplatedetail =get_object_or_404(AppschedulerTemplatesDetails,id=int(id) )
-    apptemplatedetailform = addTemplate(request.POST or None ,instance=apptemplatedetail)
-    # pdb.set_trace()
-    if apptemplatedetailform.is_valid():
-        post = apptemplatedetailform.save()
-        return HttpResponseRedirect('/appointmentschduler/EditorTemplate/')
     templatename=  os.path.join('Options','Editor',template_name)
-    
-    return render(request,templatename, {'appscheduleTemplate': apptemplatedetailform, "id" : id } )
+    template_editor_id,template_id = None,None
+   
+    if 'TemplateID' in request.POST:
+        template_id = request.POST['TemplateID']
+
+    list_template = []
+    Templates = AppschedulerTemplates.objects.all()
+    for Templ in Templates.iterator():
+        data=dict()
+        data['id'] = Templ.id
+        data['templatename'] = Templ.TemplateName
+        list_template.append(data)
+    pdb.set_trace()
+    apptemplatedetail = None
+    if template_id :
+        apptemplatedetail =AppschedulerTemplatesDetails.objects.filter( \
+        TemplateID=int(template_id) )
+    if apptemplatedetail and apptemplatedetail.exists() :
+        #Edit the template
+
+        if request.POST:
+            apptemplatedetailform = TemplateDetails(request.POST or \
+                None ,instance=apptemplatedetail[0])
+    else :
+        # Add the template
+        if request.POST:
+            apptemplatedetailform = TemplateDetails(request.POST or \
+                None )
+
+    if request.POST :
+        if  apptemplatedetailform.is_valid():
+            apptemplatedetailform.save()
+            messages.success(request, 'Template details are updated.')
+            Templateinfo =get_object_or_404(AppschedulerTemplatesDetails,
+        TemplateID=int(template_id) )
+        else :
+            return render(request,templatename, \
+                {'appscheduletemplate': apptemplatedetailform, \
+                "id" : template_id } )
+            
+    # Templateinfo = apptemplatedetail.values()[0]
+    return render(request,templatename, {'templateinfo': \
+        Templateinfo, "id" : template_id ,"listtemplates" : list_template } )
