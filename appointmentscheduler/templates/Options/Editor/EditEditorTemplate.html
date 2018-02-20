@@ -23,9 +23,12 @@
         {% endfor %}
     </ul>
     {% endif %}
+         <input type="button"  class="btn-topGrid"  onclick="location.href='{% url 'appointmentschduler:TemplateDetailsList' %}'"  value=" List Template Details" />
+
      <form class="form-horizontal" role="form" method="POST">
 
-    <input type="hidden" name="TemplateDetailID" id="TemplateDetailID" value="{{ templateinfo.TemplateID }}">
+    <input type="hidden" name="TemplateDetailID" id="TemplateDetailID" value="{% if templateinfo %} {{ templateinfo.TemplateID }} {% endif %}
+">
     <div class="form-group">
     <label class="col-sm-6 control-label " for="Templates">Select Templates</label>
     <div class="col-sm-4">
@@ -33,7 +36,7 @@
 
                 <option value="">-- Choose --</option>
                 {% for template in listtemplates %}
-                    <option value="{{ template.id }}" {% if templateinfo.id == template.id %} selected {% endif %}>{{ template.templatename }}</option>
+                    <option value="{{ template.id }}" {% if templateinfo.TemplateID  == template.id %} selected {% endif %}>{{ template.templatename }}</option>
                 {% endfor %}
     </select>
     </div>
@@ -45,14 +48,14 @@
   <div class="form-group">
     <label class="col-sm-6 control-label title " for="Subject">Subject</label>
     <div class="col-sm-4">
-      <input type="text" name="subject_client" class="subject_client    form-control" value="{{ templateinfo.subject }}">
+      <input type="text" name="subject_client" class="subject_client    form-control" value="{% if templateinfo %} {{ templateinfo.subject }} {% endif %}">
     </div>
   </div>
 
  <div class="form-group">
     <label class="col-sm-6 control-label editor1" for="Templateeditor1">Design Template</label>
     <div class="col-sm-12">
-      <textarea name="editor1" class="DesignedTemplate    form-control">{{  templateinfo.DesignedTemplate }} </textarea>
+      <textarea name="editor1" class="DesignedTemplate    form-control">{% if templateinfo %} {{  templateinfo.DesignedTemplate }} {% endif %} </textarea>
     </div>
   </div>
     
@@ -95,7 +98,41 @@
 </html>
 
 <script type="text/javascript">
-            
+ function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    },
+
+    error: function(xhr, textStatus, error) {
+        console.log(error);
+    }
+});
+           
  $(".TemplatesChange").change(function () {
   $('#TemplateDetailID').val("");
   var TemplateID = this.value;
@@ -182,7 +219,9 @@ $.ajax({
           "TemplateID":TemplateID,
            "DesignedTemplate":data,
            "subject":Subject,
-           "Status": status
+           "Status": status,
+           "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
          },
   }).success(function (data, jqXHR) 
   {
