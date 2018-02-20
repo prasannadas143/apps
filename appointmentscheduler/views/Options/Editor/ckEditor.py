@@ -2,7 +2,8 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 import pdb,os,json
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import requires_csrf_token,\
+csrf_protect,csrf_exempt,ensure_csrf_cookie
 from appointmentscheduler.form.Options.Editor.AddTemplate import addTemplate
 from appointmentscheduler.form.Options.Editor.TemplateDetails import TemplateDetails
 from django.forms.models import model_to_dict
@@ -12,7 +13,7 @@ from appointmentscheduler.models import  AppschedulerTemplates,\
 
 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def GetTemplateList(request):
     Templates = AppschedulerTemplates.objects.all().order_by('-id')
     Template_info = []
@@ -23,7 +24,7 @@ def GetTemplateList(request):
         Template_info.append(data)
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def SaveTemplate(request):
     if request.method == 'POST': 
         appscheduleTemplate = addTemplate(request.POST or None)
@@ -40,14 +41,14 @@ def SaveTemplate(request):
 #             appscheduleTemplate.save()
 #         return HttpResponse(status=200)        
 
-@csrf_exempt
+@requires_csrf_token
 def Template(request):      
 	template_name="addTemplate.html"
 	templatename=  os.path.join('Options','Editor',template_name)
 	return render(request, templatename )
 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def AddTemplate(request):
     if request.method == "POST":
         request.POST._mutable= True
@@ -60,7 +61,7 @@ def AddTemplate(request):
             return HttpResponse(status=404)
 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def CheckDuplicateTemplate(request):
 	if request.method == "GET":
 		Templates = AppschedulerTemplates.objects.filter(TemplateName=request.GET['TemplateName'])
@@ -72,27 +73,35 @@ def CheckDuplicateTemplate(request):
 	return HttpResponse(status, content_type='application/json')
 
 
-@csrf_exempt
+@requires_csrf_token
 def Templates(request):
         template_name="TemplateList.html"
         templatename=  os.path.join('Options','Editor',template_name)
         return render(request, templatename ) 
 
-@csrf_exempt
+@ensure_csrf_cookie
 def deleteTemplate(request,id=None):
     atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
     atemplate.delete()
+    templatedetail = AppschedulerTemplatesDetails.objects.filter(TemplateID=int(id))
+    # DON'T USE
+    if templatedetail.exists():
+        templatedetail.delete()
     return HttpResponse(status=204)       
 
-@csrf_exempt
+@ensure_csrf_cookie
 def deleteTemplates(request,rowids=None):
     deleteids= request.POST['rowids']
     for id in deleteids.split(",") :
         atemplate=get_object_or_404(AppschedulerTemplates,id=int(id))
         atemplate.delete()
+        templatedetail = AppschedulerTemplatesDetails.objects.filter(TemplateID=int(id))
+        # DON'T USE
+        if templatedetail.exists():
+            templatedetail.delete()
     return HttpResponse(status=204)        
 
-@csrf_exempt
+@ensure_csrf_cookie
 def editTemplate(request,id):
     template_name="EditTemplate.html"
     appscheduleobj =get_object_or_404(AppschedulerTemplates,id=id)
@@ -109,7 +118,7 @@ def editTemplate(request,id):
     Templateinfo['status'] = int(Templateinfo['status'])
     return render(request,templatename, {'appscheduleTemplate': Templateinfo, "id" : id } )
 
-@csrf_exempt
+@ensure_csrf_cookie
 def TemplateList(request):
     Template_info=[]
     if 'querydata' in request.GET:
@@ -133,7 +142,7 @@ def TemplateList(request):
 
 
 
-@csrf_exempt
+@requires_csrf_token
 def TemplateDetailsList(request):
         template_name="TemplateDetailsList.html"
         templatename=  os.path.join('Options','Editor',template_name)
@@ -141,7 +150,7 @@ def TemplateDetailsList(request):
 
 
 #Template details List
-@csrf_exempt
+@requires_csrf_token
 def TemplateDetailsData(request):
     Template_info=[]
     if 'querydata' in request.GET:
@@ -167,7 +176,7 @@ def TemplateDetailsData(request):
         Template_info.append(data)
     return  HttpResponse(json.dumps({"data" :Template_info }), content_type='application/json')
 
-@csrf_exempt
+@ensure_csrf_cookie
 def GetTemplateDetails(request):
     """ Retrieve all template details with it's subject"""
     if request.method == "GET":
@@ -198,9 +207,9 @@ def GetTemplateDetailByTemplateID(TemplateName=None):
         print( '%s (%s)' % (str(e), type(e)) )
     return Template
 
-@csrf_exempt
+@requires_csrf_token
 def EditorTemplate(request):
-    template_name="ckEditor.html"
+    template_name="EditEditorTemplate.html"
     templatename=  os.path.join('Options','Editor',template_name)
     Template_info = []
     Templates = AppschedulerTemplates.objects.all()
@@ -209,20 +218,14 @@ def EditorTemplate(request):
         data['id'] = Templ.id
         data['templatename'] = Templ.TemplateName
         Template_info.append(data)
-    return render(request, templatename, {"data" :  Template_info })
+    return render(request, templatename, {"listtemplates" :  Template_info })
 
-@csrf_exempt
-def DeleteEditorTemplate(request, id=None):
-    Template = None
-    template_instace = get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
-    template_instace.delete()
-    return HttpResponse(status=204)    
+  
 
 
-@csrf_exempt
+@requires_csrf_token
 def EditEditorTemplate(request,id):
     template_name="EditEditorTemplate.html"
-    pdb.set_trace()
     editortemplateobj =get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
     # appscheduleTemplate = addTemplate(request.POST or None ,instance=editortemplateobj)
     # if appscheduleTemplate.is_valid():
@@ -237,10 +240,11 @@ def EditEditorTemplate(request,id):
         list_template.append(data)
     templatename=  os.path.join('Options','Editor',template_name)
     Templateinfo = model_to_dict(editortemplateobj)
+    Templateinfo['TemplateID'] =int(Templateinfo['TemplateID'])
     return render(request,templatename, {'listtemplates': \
         list_template, "templateinfo" : Templateinfo, "id" : id } )
 
-@csrf_exempt
+@requires_csrf_token
 def SaveEditorTemplate(request):
     template_name="EditEditorTemplate.html"
     templatename=  os.path.join('Options','Editor',template_name)
@@ -256,7 +260,6 @@ def SaveEditorTemplate(request):
         data['id'] = Templ.id
         data['templatename'] = Templ.TemplateName
         list_template.append(data)
-    pdb.set_trace()
     apptemplatedetail = None
     if template_id :
         apptemplatedetail =AppschedulerTemplatesDetails.objects.filter( \
@@ -283,7 +286,23 @@ def SaveEditorTemplate(request):
             return render(request,templatename, \
                 {'appscheduletemplate': apptemplatedetailform, \
                 "id" : template_id } )
-            
-    # Templateinfo = apptemplatedetail.values()[0]
+    
+    Templateinfo.TemplateID =int(Templateinfo.TemplateID)
+       
     return render(request,templatename, {'templateinfo': \
         Templateinfo, "id" : template_id ,"listtemplates" : list_template } )
+
+@ensure_csrf_cookie
+def DeleteEditorTemplate(request, id=None):
+    Template = None
+    template_instace = get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
+    template_instace.delete()
+    return HttpResponse(status=204)  
+
+@ensure_csrf_cookie
+def DeleteEditorTemplates(request,rowids=None):
+    deleteids= request.POST['rowids']
+    for id in deleteids.split(",") :
+        atemplate=get_object_or_404(AppschedulerTemplatesDetails,id=int(id))
+        atemplate.delete()
+    return HttpResponse(status=204) 

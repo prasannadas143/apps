@@ -113,6 +113,8 @@ urlpatterns = [
     url(r'^TemplateDetailsList/$', ckEditor.TemplateDetailsList, name="TemplateDetailsList"),
     url(r'^TemplateDetailsData/$', ckEditor.TemplateDetailsData, name="TemplateDetailsData"),
     url(r'^DeleteEditorTemplate/(?P<id>\d+)/$', ckEditor.DeleteEditorTemplate, name="DeleteEditorTemplate"),
+    url(r'^DeleteEditorTemplates/$', ckEditor.DeleteEditorTemplates, name="DeleteEditorTemplates"),
+
     url(r'^SaveEditorTemplate/$', ckEditor.SaveEditorTemplate, name="SaveEditorTemplate"),
 
     url(r'^SMSConfig/$', SMS.SMSConfig, name="SMSConfig"),

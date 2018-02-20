@@ -298,7 +298,11 @@ $('#confirm').on('click', '#delete', function (e) {
 
     $.ajax({
           url: "/appointmentschduler/deleteTemplate/" + id + "/",
-          method: 'POST'
+          method: 'POST',
+          data : {
+                "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
+          }
       }).success(function (data, textStatus, jqXHR) {
 
            table.row( '#' + id ).remove().draw();
@@ -323,6 +327,8 @@ $("#multicheckbox").on('click',function(){
                 method: 'POST',
                 data : {
                         "rowids":rowids,
+                        "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
                       },
           }).success(function (data, textStatus, jqXHR) {
                 $.each(ids, function( index, value ) {
@@ -366,7 +372,11 @@ $('#datatables tbody').on('click', 'button', function () {
 
         $.ajax({
               url: "/appointmentschduler/deleteTemplate/" + id + "/",
-              method: 'POST'
+              method: 'POST',
+              data : {
+                  "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
+              }
           }).success(function (data, textStatus, jqXHR) {
                table
         .row( '#' + id )
