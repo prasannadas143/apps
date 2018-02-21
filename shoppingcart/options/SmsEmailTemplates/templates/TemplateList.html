@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -9,31 +9,29 @@
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">  
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+<input type="button" value="Active"  class="btn-topGrid"  id="active"  />
 
-<input type="button" value="Active"  class="btn-topGrid"   id="active"  />{% csrf_token %}
-<input type="button" value="Inactive"   class="btn-topGrid"  id="inactive"  />
-<input type="button" value="All"  class="btn-topGrid"   id="all"  />
-<input type="button"  class="btn-topGrid"  onclick="location.href='{% url 'appointmentschduler:EditorTemplate' %}'"  value="Add Template Details" />
-{% csrf_token %}
+<input type="button" value="Inactive"  class="btn-topGrid"   id="inactive"  />
+<input type="button" value="All"   class="btn-topGrid"  id="all"  />
+
+<input type="button"  class="btn-topGrid" onclick="location.href='/shoppingcart/options/SmsEmailTemplates/Template/'"  value="Add Template" />{% csrf_token %}
+<input type="button"  class="btn-topGrid" onclick="location.href='/shoppingcart/options/SmsEmailTemplates/EditorTemplate/'"  value="Template Details" />
 <table id="datatables" class="table table-hover">
         <thead>
         <tr>
          <th><input name="select_all" value="1" id="select-all-records" type="checkbox" /></th> 
             <th>Template Name</th>
-            <th>Subject</th>
-            <th>Design Template</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th> action</th>
         </tr>
         </thead>
 </table>
-
-
+  
 <button type="button" id="multicheckbox"  >Delete </button>
 <div class="modal fade" id="confirm" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
-        <div class="modal-content">
+        <div class="mod
+        al-content">
             <div class="modal-header">
                 <h4 class="modal-title">Are you sure want to delete this country?</h4>
             </div>
@@ -52,21 +50,7 @@ var getfilter = "all";
   var rows_selected = [];
   draw_datatable();
 
-$("#active").click(function(){
-   getfilter = "active";
-   draw_datatable();
 
-});
-
-$("#inactive").click(function(){
-   getfilter = "inactive";
-   draw_datatable();
-});
-
-$("#all").click(function(){
-   getfilter = "all";
-   draw_datatable();
-});
 
 function getCookie(name) {
     var cookieValue = null;
@@ -112,7 +96,7 @@ function draw_datatable() {
    table = $('#datatables').DataTable({
         "processing": true,
         "ajax": {
-            "url": "/appointmentschduler/TemplateDetailsData/",
+            "url": "/shoppingcart/options/SmsEmailTemplates/TemplateList/",
             "data": function(d) {
               d.querydata = getfilter
             },
@@ -120,7 +104,9 @@ function draw_datatable() {
         },        
 
         "createdRow": function( row, data, dataIndex ) {
-                        $(row).attr('id', data.id); },
+                        $(row).attr('id', data.id);
+           
+          },
        
         "columnDefs": [ 
 
@@ -134,60 +120,18 @@ function draw_datatable() {
                 return  '<input type="checkbox" name="id[]" value="">' 
                }
             },
-
             {
-              'searchable': true,
-              'orderable': true,
-              'className': 'dt-body-center',
              'targets':1,
               "data": "TemplateName"
             },
-            {
-             'targets':2,
-              "data": "subject"
-            },{
-             'targets':3,
-              "data": "DesignedTemplate"
-            },
-            {
-              'targets':4,
-              "data": null,
-              render: function ( d, t, r ) {
-
-                    var $select = $("<select></select>", {
-                      "id": "status",
-                        "value": d
-                    });
-                      var $option = $("<option></option>", {
-                          "text": "active",
-                            "value": "True"
-                        });
-                        if(d == "True"){
-                          hiddenvalue = true
-                          $option.attr("selected", "selected")
-                        }
-                    $select.append($option);
-
-                    var $option = $("<option></option>", {
-                          "text": "inactive",
-                            "value": "False"
-                        });
-                        if(d == "False" ){
-                          hiddenvalue = true
-                          $option.attr("selected", "selected")
-                        }
-
-                      $select.append($option);
-                       var $selecthtml = $select.prop("outerHTML");
-                    return $selecthtml;
-                }
-              },
+           
             
             {
-              'targets':5,
+              'targets':2,
               "data": null,
               "defaultContent": '<button type="button" class="btn btn-info" id="edit">Edit</a></button>' + '&nbsp;&nbsp' +
               '<button type="button" class="btn btn-danger" id="delete">Delete</button>'
+
             }
         ],
             'rowCallback': function(row, data, dataIndex){
@@ -293,24 +237,18 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
       e.stopPropagation();
    });
  
-  // Handle table draw event
-   table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-   });
+// Handle table draw event
+table.on('draw', function(){
+  // Update state of "Select all" control
+  updateDataTableSelectAllCtrl(table);
+});
 
-    
 $('#datatables tbody').on('click', 'button', function () {
     let data = table.row($(this).parents('tr')).data();
     let class_name = $(this).attr('class');
     let op_id = $(this).attr('id');
 
-    if (op_id == 'edit') {
-       
-          location.href = '/appointmentschduler/EditEditorTemplate/' + data.id + '/';
-
-
-    } else if( op_id == 'delete') {
+   if( op_id == 'delete') {
         // DELETE button
         $('#modal_title').text('DELETE');
         $("#confirm").modal();
@@ -326,23 +264,25 @@ $('#datatables tbody').on('click', 'button', function () {
     id = data['id'];
 
 });
-
 $('#confirm').on('click', '#delete', function (e) {
-        $.ajax({
-              url: "/appointmentschduler/DeleteEditorTemplate/" +  id + "/",
-              method: 'POST',
-              data: {
-                    "csrfmiddlewaretoken" : getCookie('csrftoken'),
 
-              }
-          }).success(function (data, textStatus, jqXHR) {
-               table.row( '#' + id ).remove().draw();
-          }).error(function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR)
-          });         
+    $.ajax({
+          url: "/shoppingcart/options/SmsEmailTemplates/deleteTemplate/" + id + "/",
+          method: 'POST',
+          data : {
+                "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
+          }
+      }).success(function (data, textStatus, jqXHR) {
+
+           table.row( '#' + id ).remove().draw();
+
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+      });         
   });
-
-   $("#multicheckbox").on('click',function(){
+ 
+$("#multicheckbox").on('click',function(){
       var ids = $.map(table.rows('.selected').data(), function (item) {
             return item.id;
         });
@@ -352,27 +292,26 @@ $('#confirm').on('click', '#delete', function (e) {
       else {
           alert("no rows selected");
      }
-    $.ajax({
-            url: "{% url 'appointmentschduler:DeleteEditorTemplates' %}",
-            method: 'POST',
-            data : {
-                    "rowids":rowids,
-                    "csrfmiddlewaretoken" : getCookie('csrftoken'),
+       $.ajax({
+                url: "/shoppingcart/options/SmsEmailTemplates/deleteTemplates/'",
+                method: 'POST',
+                data : {
+                        "rowids":rowids,
+                        "csrfmiddlewaretoken" : getCookie('csrftoken'),
 
-                  },
+                      },
           }).success(function (data, textStatus, jqXHR) {
                 $.each(ids, function( index, value ) {
                   table.row( '#' + value ).remove().draw();
-
                 });
             }).error(function (jqXHR, textStatus, errorThrown) {
               console.log(jqXHR)
-          }); 
+          });    
    
-   });
+   });  
  
 
-   
+
       // FOR TESTING ONLY
       
       // // Output form data to a console
@@ -382,11 +321,43 @@ $('#confirm').on('click', '#delete', function (e) {
       // Prevent actual form submission
     
     
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    if (class_name == 'btn btn-info') {
+       
+          location.href = "/shoppingcart/options/SmsEmailTemplates/editTemplate/" + data['id'] + "/";
+
+    } else if( class_name == 'btn btn-danger') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    id = data['id'];
+
+});
+
+    $('#confirm').on('click', '#delete', function (e) {
+
+        $.ajax({
+              url: "/shoppingcart/options/SmsEmailTemplates/deleteTemplate/" + id + "/",
+              method: 'POST',
+              data : {
+                  "csrfmiddlewaretoken" : getCookie('csrftoken'),
+
+              }
+          }).success(function (data, textStatus, jqXHR) {
+               table
+        .row( '#' + id )
+        .remove()
+        .draw();
+          }).error(function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+          });         
+  });
 
 </script>
 
 {% endblock %}
-
-
-
 

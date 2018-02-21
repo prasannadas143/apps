@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -13,7 +13,7 @@
 <input type="button" value="Active"  class="btn-topGrid"   id="active"  />{% csrf_token %}
 <input type="button" value="Inactive"   class="btn-topGrid"  id="inactive"  />
 <input type="button" value="All"  class="btn-topGrid"   id="all"  />
-<input type="button"  class="btn-topGrid"  onclick="location.href='{% url 'appointmentschduler:EditorTemplate' %}'"  value="Add Template Details" />
+<input type="button"  class="btn-topGrid"  onclick="location.href='/shoppingcart/options/SmsEmailTemplates/Template/'"  value="Add Template Details" />
 {% csrf_token %}
 <table id="datatables" class="table table-hover">
         <thead>
@@ -22,7 +22,6 @@
             <th>Template Name</th>
             <th>Subject</th>
             <th>Design Template</th>
-            <th>Status</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -112,7 +111,7 @@ function draw_datatable() {
    table = $('#datatables').DataTable({
         "processing": true,
         "ajax": {
-            "url": "/appointmentschduler/TemplateDetailsData/",
+            "url": "/shoppingcart/options/SmsEmailTemplates/TemplateDetailsData/",
             "data": function(d) {
               d.querydata = getfilter
             },
@@ -149,42 +148,9 @@ function draw_datatable() {
              'targets':3,
               "data": "DesignedTemplate"
             },
+           
             {
               'targets':4,
-              "data": null,
-              render: function ( d, t, r ) {
-
-                    var $select = $("<select></select>", {
-                      "id": "status",
-                        "value": d
-                    });
-                      var $option = $("<option></option>", {
-                          "text": "active",
-                            "value": "True"
-                        });
-                        if(d == "True"){
-                          hiddenvalue = true
-                          $option.attr("selected", "selected")
-                        }
-                    $select.append($option);
-
-                    var $option = $("<option></option>", {
-                          "text": "inactive",
-                            "value": "False"
-                        });
-                        if(d == "False" ){
-                          hiddenvalue = true
-                          $option.attr("selected", "selected")
-                        }
-
-                      $select.append($option);
-                       var $selecthtml = $select.prop("outerHTML");
-                    return $selecthtml;
-                }
-              },
-            
-            {
-              'targets':5,
               "data": null,
               "defaultContent": '<button type="button" class="btn btn-info" id="edit">Edit</a></button>' + '&nbsp;&nbsp' +
               '<button type="button" class="btn btn-danger" id="delete">Delete</button>'
@@ -197,7 +163,7 @@ function draw_datatable() {
              // If row ID is in the list of selected row IDs
                if($.inArray(rowId, rows_selected) !== -1){
                   $(row).find('input[type="checkbox"]').prop('checked', true);
-                  $(row).addClass('<select id="is_active" value="True"><option value="True" selected="selected">active</option><option value="False">inactive</option></select>');
+                
                }
             }
       });
@@ -307,7 +273,7 @@ $('#datatables tbody').on('click', 'button', function () {
 
     if (op_id == 'edit') {
        
-          location.href = '/appointmentschduler/EditEditorTemplate/' + data.id + '/';
+          location.href = '/shoppingcart/options/SmsEmailTemplates/EditEditorTemplate/' + data.id + '/';
 
 
     } else if( op_id == 'delete') {
@@ -329,7 +295,7 @@ $('#datatables tbody').on('click', 'button', function () {
 
 $('#confirm').on('click', '#delete', function (e) {
         $.ajax({
-              url: "/appointmentschduler/DeleteEditorTemplate/" +  id + "/",
+              url: "/shoppingcart/options/SmsEmailTemplates/DeleteEditorTemplate/" +  id + "/",
               method: 'POST',
               data: {
                     "csrfmiddlewaretoken" : getCookie('csrftoken'),
@@ -353,7 +319,7 @@ $('#confirm').on('click', '#delete', function (e) {
           alert("no rows selected");
      }
     $.ajax({
-            url: "{% url 'appointmentschduler:DeleteEditorTemplates' %}",
+            url: "/shoppingcart/options/SmsEmailTemplates/DeleteEditorTemplates/",
             method: 'POST',
             data : {
                     "rowids":rowids,
