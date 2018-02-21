@@ -13,6 +13,7 @@ USER_APPS += [
 	'shoppingcart.options.countries',
 	'shoppingcart.options.Backup',
 	'shoppingcart.options.SmsEmailSettings',
+	'shoppingcart.options.SmsEmailTemplates',
 
 ]
 
