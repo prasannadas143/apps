@@ -4,7 +4,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from django.shortcuts import render, get_object_or_404
-from appointmentscheduler.models import AppschedulerOptions
+from shoppingcart.options.models import  Options
 from django.views.decorators.csrf import  csrf_exempt
 import pdb,os
 from django.http import HttpResponse
@@ -19,7 +19,8 @@ config.read(settings.DOTENV_FILE)
 @csrf_exempt
 def SendMail(request):
 	tab_id = 5;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id,\
+	 app_name="appointmentscheduler").values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -61,7 +62,8 @@ def SendMail(request):
 
 
 def update_value(tab_id, field, newstep):
-   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
+   item = get_object_or_404( Options,  tab_id=int(tab_id), \
+   	key = field,  app_name="appointmentscheduler" )
    item.value = newstep;
    item.save()
 
@@ -79,7 +81,8 @@ def SaveMailSettings(request):
 			newstep = request.POST[field.strip()]
 			update_value(tab_id , field.strip() , newstep.strip())
 
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id, \
+		app_name="appointmentscheduler").values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -116,14 +119,16 @@ def SendMailFromBooking(bookingid):
 	Subject = tmpdtls.subject
 
 	tab_id = 5
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id, \
+		app_name="appointmentscheduler").values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
 
 	o_FromEmail = items_dict['o_FromEmail']['value']
 	o_FromEmailPassword = items_dict['o_FromEmailPassword']['value']
-	booking =  get_object_or_404( AppschedulerBookings, id = bookingid )
+	booking =  get_object_or_404( AppschedulerBookings, \
+		id = bookingid, app_name="appointmentscheduler" )
 	customer_name = booking.c_name
 	bookingid = booking.bookingid
 	date = booking.service_start_time.astimezone(booking.time_zone).strftime( "%I:%M %p" )

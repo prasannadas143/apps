@@ -20,13 +20,16 @@ from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.forms.models import model_to_dict
 import configparser
 from django.conf import settings
-from appointmentscheduler.models import AppschedulerOptions, SmsSentStatus
+from appointmentscheduler.models import  SmsSentStatus
+from shoppingcart.options.models import  Options
+
 
 config = configparser.ConfigParser()
 config.read(settings.DOTENV_FILE)
 
 def update_value(field_id, tab_id, newstep):
-   item = get_object_or_404(AppschedulerOptions,tab_id=int(tab_id), key = field_id)
+   item = get_object_or_404(Options,tab_id=int(tab_id), key = \
+   	field_id, app_name="appointmentscheduler")
    item.value = newstep;
    print(newstep);
    item.save()
@@ -40,7 +43,7 @@ def SendSMSDyncamic(MobileNumber,Message):
 	Message = Message
 	print(Message);
 	tab_id = 101;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -63,7 +66,7 @@ def SendSMS(request):
 	Message = request.POST['Message']
 	print(Message);
 	tab_id = 101;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -82,7 +85,7 @@ def SendSMS(request):
 def SMSConfig(request):
 	tab_id = 101;
 	message=None
-	Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
+	Options  = Options.objects.all() # use filter() when you have sth to filter ;)
 	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
 	# you can remove the preview assignment (form =request.POST)
 	SMSConfigdata = dict()
@@ -93,7 +96,7 @@ def SMSConfig(request):
 			if field.strip()!= "csrfmiddlewaretoken":
 				update_value(field, tab_id , newstep.strip() )
 
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
