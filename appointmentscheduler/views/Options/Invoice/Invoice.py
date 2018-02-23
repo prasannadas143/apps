@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404
-from appointmentscheduler.models import AppschedulerOptions
+from shoppingcart.options.models import  Options
 import pdb,os
 from django.views.decorators.csrf import requires_csrf_token
 from django.core.files.storage import FileSystemStorage
@@ -9,7 +9,8 @@ from PIL import Image
 tab_id = 100;
 
 def update_value(field_id, tab_id, newstep=''):
-   item = get_object_or_404(AppschedulerOptions,tab_id=int(tab_id), key = field_id)
+   item = get_object_or_404(Options,tab_id=int(tab_id), \
+   	key = field_id,app_name="appointmentscheduler")
    item.value = newstep;
    print(newstep);
    item.save()
@@ -32,7 +33,7 @@ def Company(request):
 		    original = Image.open(companylogo)
 		except:
 			return render(request,templatename, {"error" : "Upload valid image"})
-		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+		item = Options.objects.filter(tab_id=tab_id)
 		companylogoname = item[11].value;
 		uploaded_file_url = fs.url(companylogoname)
 		if uploaded_file_url:
@@ -46,7 +47,8 @@ def Company(request):
 			newstep = request.POST[field.strip()]
 			update_value(field, tab_id , newstep.strip() )
 
-	items = list(AppschedulerOptions.objects.filter(tab_id=tab_id).values('id','key', 'value'))
+	items = list(Options.objects.filter(tab_id=tab_id,app_name="appointmentscheduler"\
+		).values('id','key', 'value'))
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -90,7 +92,8 @@ def Company(request):
 
 def GetInvoiceCompanyvalues():
 
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id, app_name="appointmentscheduler"\
+		).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item

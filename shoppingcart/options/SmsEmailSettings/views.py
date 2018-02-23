@@ -1,43 +1,30 @@
 from twilio.rest import Client
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response, HttpResponseRedirect,get_object_or_404
-from django.http import JsonResponse
-import datetime, pdb
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect, csrf_exempt
-from django.core import serializers
-from PIL import Image
-import io
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.core.files import File
-from base64 import decodestring
-from django.http import JsonResponse
-import datetime,pdb,os,json,re,pytz
+from django.shortcuts import render, get_object_or_404
+import pdb,os,json,re,pytz
 from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie,csrf_exempt
-from django.forms.models import model_to_dict
-from django.db.models.fields import DateField, TimeField
-from django.db.models.fields.related import ForeignKey, OneToOneField
-from django.forms.models import model_to_dict
 import configparser
 from django.conf import settings
 import smtplib
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from appointmentscheduler.models import AppschedulerOptions, SmsSentStatus
+from appointmentscheduler.models import  SmsSentStatus
+from shoppingcart.options.models import  Options
+
 
 config = configparser.ConfigParser()
 config.read(settings.DOTENV_FILE)
 
 def update_value(tab_id, field, newstep):
-   item = get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), key = field )
+   item = get_object_or_404( Options,  tab_id=int(tab_id), key = field )
    item.value = newstep;
    item.save()
 
 @csrf_exempt
 def SendMail(request):
 	tab_id = 5;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -93,7 +80,7 @@ def EmailConfig(request):
 			newstep = request.POST[field.strip()]
 			update_value(tab_id , field.strip() , newstep.strip())
 
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -132,7 +119,7 @@ def SendSMS(request):
 	Message = request.POST['Message']
 	print(Message);
 	tab_id = 101;
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item
@@ -151,7 +138,7 @@ def SendSMS(request):
 def SMSConfig(request):
 	tab_id = 101;
 	message=None
-	Options  = AppschedulerOptions.objects.all() # use filter() when you have sth to filter ;)
+	Options  = Options.objects.all() # use filter() when you have sth to filter ;)
 	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
 	# you can remove the preview assignment (form =request.POST)
 	SMSConfigdata = dict()
@@ -162,7 +149,7 @@ def SMSConfig(request):
 			if field.strip()!= "csrfmiddlewaretoken":
 				update_value(field, tab_id , newstep.strip() )
 
-	items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+	items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
 	items_dict = dict()
 	for item in items:
 		items_dict[item['key']] = item

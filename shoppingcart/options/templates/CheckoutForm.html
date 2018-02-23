@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% load get_item %}
+
+{% block title %}
+{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="CheckoutForm">
+	<h2 align="center">Checkout Form Options</h2>
+   {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+<div class="table1">
+
+    <form role="form" method="POST" action="/shoppingcart/options/CheckoutFormOptions/">{% csrf_token %}
+	<table>
+         <tr>
+				<th>Option</th>
+				<th class="value">Value</th>
+				<th></th>
+		</tr>
+
+    <tr>
+		<td>Name(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_name_id }}">
+    {% for entry in items.sc_sb_nameList %}
+    	<option {% if entry == items.sc_sb_name_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Country(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_country_id }}">
+    {% for entry in items.sc_sb_countryList %}
+    	<option {% if entry == items.sc_sb_country_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+  <tr>
+		<td>City(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_city_id }}">
+    {% for entry in items.sc_sb_cityList %}
+    	<option {% if entry == items.sc_sb_city_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+	<tr>
+		<td>State(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_state_id }}">
+    {% for entry in items.sc_sb_stateList %}
+    	<option {% if entry == items.sc_sb_state_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+ 	<tr>
+		<td>Zip(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_zip_id }}">
+    {% for entry in items.sc_sb_zipList %}
+    	<option {% if entry == items.sc_sb_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+	<tr>
+		<td>Address 1(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_address_1_id }}">
+    {% for entry in items.sc_sb_address_1List %}
+    	<option {% if entry == items.sc_sb_address_1_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Address 2(Billing Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sb_address_2_id }}">
+    {% for entry in items.sc_sb_address_2List %}
+    	<option {% if entry == items.sc_sb_address_2_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+
+    <tr>
+		<td>Name(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_name_id }}">
+    {% for entry in items.sc_sd_nameList %}
+    	<option {% if entry == items.sc_sd_name_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Country(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_country_id }}">
+    {% for entry in items.sc_sd_countryList %}
+    	<option {% if entry == items.sc_sd_country_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+  <tr>
+		<td>City(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_city_id }}">
+    {% for entry in items.sc_sd_cityList %}
+    	<option {% if entry == items.sc_sd_city_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+	<tr>
+		<td>State(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_state_id }}">
+    {% for entry in items.sc_sd_stateList %}
+    	<option {% if entry == items.sc_sd_state_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+ 	<tr>
+		<td>Zip(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_zip_id }}">
+    {% for entry in items.sc_sd_zipList %}
+    	<option {% if entry == items.sc_sd_zip_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+	<tr>
+		<td>Address 1(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_address_1_id }}">
+    {% for entry in items.sc_sd_address_1List %}
+    	<option {% if entry == items.sc_sd_address_1_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Address 2(Shipping Details)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_sd_address_2_id }}">
+    {% for entry in items.sc_sd_address_2List %}
+    	<option {% if entry == items.sc_sd_address_2_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Name(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_name_id }}">
+    {% for entry in items.sc_cl_nameList %}
+    	<option {% if entry == items.sc_cl_name_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Phone(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_phone_id }}">
+    {% for entry in items.sc_cl_phoneList %}
+    	<option {% if entry == items.sc_cl_phone_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Website(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_website_id }}">
+    {% for entry in items.sc_cl_websiteList %}
+    	<option {% if entry == items.sc_cl_website_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Notes(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_notes_id }}">
+    {% for entry in items.sc_cl_notesList %}
+    	<option {% if entry == items.sc_cl_notes_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Captcha(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_captcha_id }}">
+    {% for entry in items.sc_cl_captchaList %}
+    	<option {% if entry == items.sc_cl_captcha_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+    <tr>
+		<td>Terms(Client)</td>
+		<td>
+<select class="selectpicker" name="{{ items.sc_cl_terms_id }}">
+    {% for entry in items.sc_cl_termsList %}
+    	<option {% if entry == items.sc_cl_terms_selected %}  selected {% endif %} value="{{ entry }}">{{ items.showlabels|get_item:entry }}
+    </option>
+    {% endfor %}
+</select>
+		</td>
+		<td></td>
+    </tr>
+
+ </table>
+<div class="text-center">
+	<button type="submit">Save</button>
+</div>
+    </form>
+</div>
+
+</div>
+ {% endblock %}

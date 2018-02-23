@@ -1,7 +1,7 @@
 from django.shortcuts import  render, HttpResponse,get_object_or_404
 import json
 from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie
-from appointmentscheduler.models  import AppschedulerBookings,AppschedulerInvoice,AppschedulerOptions
+from appointmentscheduler.models  import AppschedulerBookings,AppschedulerInvoice
 import pytz
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -13,6 +13,8 @@ import html
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from appointmentscheduler.views.Options.Editor import ckEditor
+from shoppingcart.options.models import  Options
+
 
 @requires_csrf_token
 def list_invoices(request):
@@ -93,7 +95,7 @@ def sendmail_invoice(request):
 		subjectmail = request.POST["subjectmail"]
 		emailbody = request.POST["mailcontent"]
 		tab_id = 5
-		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+		item = Options.objects.filter(tab_id=tab_id)
 		fromaddr = item[0].value
 		o_FromEmailPassword = item[1].value
 		booking = get_object_or_404( AppschedulerBookings,  pk=int(bookingpk) )
@@ -132,7 +134,7 @@ def sendmsg_invoice(request):
 		toNumber = str(booking.c_phone)
 
 		tab_id = 101;
-		item = AppschedulerOptions.objects.filter(tab_id=tab_id)
+		item = Options.objects.filter(tab_id=tab_id)
 		TWILIO_ACCOUNT_SID = item[0].value;
 		print(TWILIO_ACCOUNT_SID);
 		TWILIO_AUTH_TOKEN = item[1].value;

@@ -1,10 +1,9 @@
 from django.http import HttpResponse
 from django.contrib import messages
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
-from django.views.decorators.csrf import requires_csrf_token,\
-csrf_protect,csrf_exempt,ensure_csrf_cookie
+from django.shortcuts import render,  get_object_or_404
+from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie
 from django.forms.models import model_to_dict
-import pdb,os,json
+import json
 from .form import FormTemplate,FormTemplateDetails
 from .models import  SmsEmailTemplates, SmsEmailTemplatesDetails
 

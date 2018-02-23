@@ -7,9 +7,15 @@
 {% endblock %}
 
 {% block content %}
-
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 <div class="pj-multilang-wrap" data-index="1" style="display: ">
-	 <form class="form-horizontal" role="form" method="POST"  action="{% url 'appointmentschduler:terms' %}" enctype="multipart/form-data"> {% csrf_token %}
+	 <form class="form-horizontal" role="form" method="POST"  action="/shoppingcart/options/terms/" enctype="multipart/form-data"> {% csrf_token %}
 			<div class="t10">
 				<span class="inline_block pt5">Booking terms URL</span>
 			</div>

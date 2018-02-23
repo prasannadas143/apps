@@ -243,22 +243,7 @@ class AppschedulerEmployeesServices(models.Model):
 #         unique_together = (('foreign_id', 'model', 'locale', 'field'),)
 
 
-class AppschedulerOptions(models.Model):
-    # foreign_id = models.IntegerField()
-    key = models.CharField(max_length=255)
-    tab_id = models.IntegerField(blank=True, null=True)
-    value = models.TextField(blank=True, null=True)
-    app_name = models.CharField(max_length=255)
 
-    # label = models.TextField(blank=True, null=True)
-    # type = models.CharField(max_length=6)
-    # order = models.IntegerField(blank=True, null=True)
-    # is_visible = models.IntegerField(blank=True, null=True)
-    # style = models.CharField(max_length=500, blank=True, null=True)
-
-    class Meta:
-        # managed = False
-        db_table = 'appscheduler_options'
 
 
 # class AppschedulerRoles(models.Model):

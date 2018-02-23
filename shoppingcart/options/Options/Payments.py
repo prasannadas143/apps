@@ -1,11 +1,11 @@
 from django.shortcuts import render,get_object_or_404
-from appointmentscheduler.models import  *
+from shoppingcart.options.models import  Options
 import pdb
 from django.views.decorators.csrf import csrf_exempt
 
 tab_id = 7;
 def update_value(field_id, tab_id, newstep):
-   item =  get_object_or_404( AppschedulerOptions,  tab_id=int(tab_id), id = int(field_id) )
+   item =  get_object_or_404( Options,  tab_id=int(tab_id), id = int(field_id) )
    getsteps = item.value.split('::')
    # get the user you want. (connect for example) in the var "user"
    if len(getsteps) == 2 :
@@ -28,7 +28,7 @@ def PaymentOptions(request):
          update_value(field, tab_id , newstep.strip() )
       paymentdata['message'] ="opion is saved"
 
-   items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('id','key', 'value')
+   items = Options.objects.filter(tab_id=tab_id).values('id','key', 'value')
    items_dict = dict()
    for item in items:
       items_dict[item['key']] = item
@@ -71,7 +71,7 @@ def PaymentOptions(request):
 
 def getPaymentOptions():
 
-   items = AppschedulerOptions.objects.filter(tab_id=tab_id).values('key', 'value')
+   items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
    items_dict = dict()
    for item in items:
       items_dict[item['key']] = item
