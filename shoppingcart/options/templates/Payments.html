@@ -12,83 +12,76 @@
 
 <!-- Start Payments -->
 
-			<div class="Payments">
-
+<div class="Payments">
+   {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 <div class="table1">
-<form role="form" method="POST" action="{% url 'appointmentschduler:PaymentOptions' %}" onsubmit="updateform()">
+<form role="form" method="POST" action="/shoppingcart/options/PaymentOptions/" >{% csrf_token %}
 <table>
   <tr>
 							<th>Option</th>
 							<th class="value">Value</th>
   </tr>
 
-     <tr>
-							<td>Check if you want to disable payments and only collect reservation details</td>
-							<td>
-                                  <input id="o_disable_paymentsCB" type="checkbox" name={{ items.o_disable_payments_id }}  {% if items.o_disable_payments_selected == 1 %} checked {% endif %}   value="{{items.o_disable_payments_selected}}" />
-							</td>
+  <tr>
+			<td>Check if you want to disable payments and only collect order details</td>
+			<td>
+<input id="sc_disable_payments_and_collect_orders" type="checkbox" name="sc_disable_payments_and_collect_orders"  
+  {% if items.disable_payments_selected == '1' %} checked {% endif %}  />
+			</td>
 	</tr>
 
+  <tr>
+      <td>Check if you want to disable placing orders and use the cart in catalogue mode</td>
+      <td>
+<input id="sc_disable_order_and_enable_cart_catalogue" type="checkbox" name="sc_disable_order_and_enable_cart_catalogue"  
+  {% if items.enable_cart_selected == '1' %} checked {% endif %}  />
+      </td>
+  </tr>
 
+  <tr>
+		<td>Currency</td>
+		<td>
+       <select  class="selectpicker percent" name="sc_currency">
+                {% for entry in items.currency_list %}
+                  <option {% if entry == items.currency_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+                {% endfor %}
+            </select>
+		</td>
+	</tr>
 
+  <tr>
+      <td>Add insurance fee for each order</td>
+      <td>
 
-     <tr>
-							<td>Set deposit amount to be collected for each appointment</td>
-							  <td>
-                                 <span> <input  style="width: 15%;" type="text" name='{{ items.o_deposit_id }}'  value="{{items.o_deposit}}"/></span>
-                                <select  class="selectpicker percent" name="{{ items.o_deposit_type_id }}">
-                                        {% for entry in items.o_deposit_typeList %}
-                                          <option {% if entry == items.o_deposit_type_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
-                                        {% endfor %}
-                                </select>
-							  </td>
-						  </tr>
+<select  class="selectpicker percent" name="sc_insurance_fee_type">
+        {% for entry in items.fee_type_list %}
+          <option {% if entry == items.fee_type_selected %}  selected {% endif %} value="{{ entry }}">{{ entry }}</option>
+        {% endfor %}
+    </select>
 
-<tr>
-							<td>Tax amount to be collected for each appointment</td>
-							 <td>
-								<div class="input-group">
-								  <span class="input-group-addon" id="basic-addon3"><i class="fa fa-percent" aria-hidden="true"></i></span>
-                                     <input class="form-control paypal" type="number" aria-describedby="basic-addon3" placeholder="{{items.o_tax}}" name='{{ items.o_tax_id }}' value="{{items.o_tax}}" />
-								</div>
-							</td>
-						  </tr>
-
+<input id="sc_insurance_fee" type="text" name="sc_insurance_fee"  value="{{ items.fee }}"/>
+      </td>
+  </tr>
 
 </table>
-                        <div class="text-center">
-							<button type="submit">Save</button>
-						</div>
+    <div class="text-center">
+    	<button type="submit">Save</button>
+    </div>
 
 </form>
 
 </div>
-
-            </div>
-
+</div>
 
 
 
-<script type="text/javascript">
 
-    $(document).ready(function() {
-    //set initial state.
- $('#o_disable_paymentsCB').change(function() {
-        if($(this).is(":checked")) {
-         $(this).val(true);
-        }
-        else
-        {
-           $(this).val(false);
-        }
-    });
-});
 
-    //set initial state.
-    function updateform() {
-        $('#o_disable_paymentsCB').val();
-     return true ;
-  }
-</script>
 
 {% endblock %}
