@@ -1,24 +1,20 @@
 from django.shortcuts import render,get_object_or_404
-from django.views.decorators.csrf import requires_csrf_token,csrf_exempt
-from django.contrib import messages
 from shoppingcart.options.models import  Options
 import pdb
 from django.views.decorators.csrf import csrf_exempt
 
-tab_id = 103;
+tab_id = 7;
 def update_value(field_id, tab_id, newstep):
-   item =  get_object_or_404( Options,  tab_id=int(tab_id), key = field_id )
+   item =  get_object_or_404( Options,  tab_id=int(tab_id), id = int(field_id) )
    getsteps = item.value.split('::')
-   if newstep == 'on':
-      newstep = 1
    # get the user you want. (connect for example) in the var "user"
    if len(getsteps) == 2 :
       item.value = "{0}::{1}".format(getsteps[0], newstep )
    else :
-      item.value = newstep 
+      item.value = newstep ;
    item.save()
 
-@requires_csrf_token
+@csrf_exempt
 def PaymentOptions(request):
    # pdb.set_trace()
    message=None
@@ -27,60 +23,45 @@ def PaymentOptions(request):
    # you can remove the preview assignment (form =request.POST)
    paymentdata = dict()
    if request.method == 'POST':
-      request.POST._mutable = True
-      if "sc_disable_payments_and_collect_orders" not in request.POST:
-         request.POST["sc_disable_payments_and_collect_orders"] = 0
-      if "sc_disable_order_and_enable_cart_catalogue" not in request.POST:
-         request.POST["sc_disable_order_and_enable_cart_catalogue"] = 0
       for field in request.POST.keys():
-         if field == 'csrfmiddlewaretoken':
-            continue   
          newstep = request.POST[field.strip()]
-         if isinstance(newstep, str) :
-            newstep = newstep.strip()
-         update_value(field, tab_id , newstep )
-      messages.success(request, 'CheckoutForm options are updated.')
+         update_value(field, tab_id , newstep.strip() )
+      paymentdata['message'] ="opion is saved"
+
    items = Options.objects.filter(tab_id=tab_id).values('id','key', 'value')
    items_dict = dict()
    for item in items:
       items_dict[item['key']] = item
    #o_allow_authorize
-   disable_payments_dict = items_dict['sc_disable_payments_and_collect_orders']
-   disable_payments = disable_payments_dict['value'].split('::')
-   disable_payments_list = disable_payments[0].split('|')
-   disable_payments_selected = disable_payments[-1]
-   disable_payments_id = disable_payments_dict['id']
+
+   odisable_payments = items_dict['o_disable_payments']
+   o_disable_paymentsList = odisable_payments['value'].split('::')
+   o_disable_payments = o_disable_paymentsList[0].split('|')
+   o_disable_payments_selected = o_disable_paymentsList[-1]
+   o_disable_payments_id = odisable_payments['id']
 
    #o_deposit_type
-   enable_cart_dict = items_dict['sc_disable_order_and_enable_cart_catalogue']
-   enable_cart = enable_cart_dict['value'].split('::')
-   enable_cart_list = enable_cart[0].split('|')
-   enable_cart_selected = enable_cart[-1]
-   enable_cart_id = enable_cart_dict['id']
+   odeposit_type = items_dict['o_deposit_type']
+   o_deposit_typeList =  odeposit_type['value'].split('::')
+   o_deposit_type = o_deposit_typeList[0].split('|')
+   o_deposit_type_selected = o_deposit_typeList[-1]
+   o_deposit_type_id = odeposit_type['id']
 
-   currency_dict = items_dict['sc_currency']
-   currency = currency_dict['value'].split('::')
-   currency_list = currency[0].split('|')
-   currency_selected = currency[-1]
-   currency_id = currency_dict['id']
+   #o_deposit
+   odeposit = items_dict['o_deposit']
+   o_deposit = odeposit['value']
+   o_deposit_id = odeposit['id']
 
-   fee_type_dict = items_dict['sc_insurance_fee_type']
-   fee_type = fee_type_dict['value'].split('::')
-   fee_type_list = fee_type[0].split('|')
-   fee_type_selected = fee_type[-1]
-   fee_type_id = fee_type_dict['id']
+   #o_tax
+   otax = items_dict['o_tax']
+   o_tax = otax['value']
+   o_tax_id = otax['id']
 
-   fee_dict = items_dict['sc_insurance_fee']
-   fee = fee_dict['value']
-   fee_id = fee_dict['id']
 
-   items = { "disable_payments_list" : disable_payments_list, "disable_payments_selected": disable_payments_selected,
-   "enable_cart_list":enable_cart_list, "enable_cart_selected":enable_cart_selected,
-   "currency_list":currency_list,"currency_selected":currency_selected,
-   "fee_type_list" : fee_type_list, "fee_type_selected" : fee_type_selected,
-   "fee" : fee, "fee_id" : fee
-   ,"disable_payments_id":disable_payments_id,"enable_cart_id":enable_cart_id,
-   "currency_id":currency_id, "fee_type_id" : fee_type_id, "fee_id":fee_id
+   items = { "o_disable_paymentsList" : o_disable_paymentsList, "o_disable_payments_selected": o_disable_payments_selected,
+   "o_deposit_typeList":o_deposit_type, "o_deposit_type_selected":o_deposit_type_selected,
+   "o_deposit":o_deposit,"o_tax":o_tax,"o_disable_payments_id":o_disable_payments_id,"o_deposit_type_id":o_deposit_type_id,
+   "o_deposit_id":o_deposit_id,"o_tax_id":o_tax_id
    }
    paymentdata['items'] = items
    # Then, do a redirect for example
@@ -90,38 +71,32 @@ def PaymentOptions(request):
 
 def getPaymentOptions():
 
-   items = Options.objects.filter(tab_id=tab_id).values('id','key', 'value')
+   items = Options.objects.filter(tab_id=tab_id).values('key', 'value')
    items_dict = dict()
-
    for item in items:
       items_dict[item['key']] = item
    #o_allow_authorize
-   disable_payments_dict = items_dict['sc_disable_payments_and_collect_orders']
-   disable_payments = disable_payments_dict['value'].split('::')
-   disable_payments_selected = disable_payments[-1]
+
+   odisable_payments = items_dict['o_disable_payments']
+   o_disable_paymentsList = odisable_payments['value'].split('::')
+   o_disable_payments_selected = o_disable_paymentsList[-1]
 
    #o_deposit_type
-   enable_cart_dict = items_dict['sc_disable_order_and_enable_cart_catalogue']
-   enable_cart = enable_cart_dict['value'].split('::')
-   enable_cart_selected = enable_cart[-1]
+   odeposit_type = items_dict['o_deposit_type']
+   o_deposit_typeList =  odeposit_type['value'].split('::')
+   o_deposit_type_selected = o_deposit_typeList[-1]
 
-   currency_dict = items_dict['sc_currency']
-   currency = currency_dict['value'].split('::')
-   currency_selected = currency[-1]
+   #o_deposit
+   odeposit = items_dict['o_deposit']
+   o_deposit = odeposit['value']
 
-   fee_type_dict = items_dict['sc_insurance_fee_type']
-   fee_type = fee_type_dict['value'].split('::')
-   fee_type_selected = fee_type[-1]
+   #o_tax
+   otax = items_dict['o_tax']
+   o_tax = otax['value']
 
-   fee_dict = items_dict['sc_insurance_fee']
-   fee = fee_dict['value']
-   fee_id = fee_dict['id']
 
-   items = { "DISABLE_PAYMENTS_AND_COLLECT_ORDERS" : disable_payments_selected, 
-   "DISABLE_ORDER_AND_ENABLE_CART_CATALOGUE":enable_cart_selected, 
-   "CURRENCY":currency_selected,
-   "INSURANCE_FEE_TYPE" : fee_type_selected, 
-   "INSURANCE_FEE" : fee
-   
+   items = { "DISABLE_PAYMENTS": o_disable_payments_selected,
+    "DEPOSIT_TYPE":o_deposit_type_selected,
+   "DEPOSIT":o_deposit,"TAX":o_tax
    }
    return items
