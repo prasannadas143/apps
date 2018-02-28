@@ -2,8 +2,10 @@
 # Compiled source #
 ###################
 *.com
-*/migrations/*
-!*/migrations/__init__.py
+**/migrations/
+media/backup/
+media/employee/
+media/service/
 *.class
 *.dll
 *.exe
