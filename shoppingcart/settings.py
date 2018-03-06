@@ -14,6 +14,7 @@ USER_APPS += [
 	'shoppingcart.options.Backup',
 	'shoppingcart.options.SmsEmailSettings',
 	'shoppingcart.options.SmsEmailTemplates',
+	'shoppingcart.options.ShippingAndTax',
 
 ]
 
