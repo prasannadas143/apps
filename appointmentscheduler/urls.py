@@ -94,7 +94,7 @@ urlpatterns = [
 
     url(r'^employee_report/$', report.employee_report, name="employee_report"),
     url(r'^employee_report_details/$', report.employee_report_details, name="employee_report_details"),
-    url(r'^sg8ervice_report/$', report.service_report, name="service_report"),
+    url(r'^service_report/$', report.service_report, name="service_report"),
     url(r'^service_report_details/$', report.service_report_details, name="service_report_details"),
 
     url(r'^Templates/$', ckEditor.Templates, name="Templates"),
