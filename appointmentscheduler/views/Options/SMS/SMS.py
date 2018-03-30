@@ -85,7 +85,7 @@ def SendSMS(request):
 def SMSConfig(request):
 	tab_id = 101;
 	message=None
-	Options  = Options.objects.all() # use filter() when you have sth to filter ;)
+	options  = Options.objects.all() # use filter() when you have sth to filter ;)
 	# you seem to misinterpret the use of form from django and POST data. you should take a look at [Django with forms][1]
 	# you can remove the preview assignment (form =request.POST)
 	SMSConfigdata = dict()

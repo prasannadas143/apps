@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+<script>
+ $( document ).ready(function() {
+
+	data = {{ data|safe }};
+    level = 1;
+    catagories_html = "";
+	showcatagorie(data, "noarrow")
+	function showcatagorie(data, movenode) {
+        var t = document.getElementById("catagories");
+
+	    console.log( ' '.repeat( level ) + data['name'] )
+	    if (level > 2) {
+	     	data['name'] = '--'.repeat( (level-2) ) + data['name']
+	    }
+        catagories_html = '<tr name=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
+        '    + data['name'] + '</span></td><td></td>' ;
+        if (movenode == "uparrow" || movenode == "botharrow") {
+        catagories_html +=  '<td><a href=\"/shoppingcart/products/Catagories/uparrow/' + data['value'] + '/">uparrow </a></td>'  ;
+        }
+        if  (movenode == "downarrow" || movenode == "botharrow") {
+        catagories_html +=  '<td><a href=\"/shoppingcart/products/Catagories/downarrow/' + data['value'] + '/"> downarrow</a></td>'  ;
+        }
+        else {
+        catagories_html +=  '<td></td><td></td>'  ;
+        }
+         if (movenode == "uparrow" || movenode == "downarrow" ) {
+            catagories_html +=  '<td></td>'
+         }
+
+        catagories_html += '<td><a href=\"/shoppingcart/products/Catagories/EditCatagorie/' + data['value'] + '/">Edit  \
+         </a><a href=\"/shoppingcart/products/Catagories/DeleteCatagorie/'  + data['value'] + '/">Delete</a></td></tr>';
+        t.innerHTML += catagories_html
+        movenode = ""
+		for ( child in data['child'] ) {
+			level += 1
+			if (child == 0  && data['child'].length > 1) {
+			   movenode = "downarrow";
+			}
+			else if (data['child'].length > 1 && child == (data['child'].length - 1)) {
+				 movenode = "uparrow";
+            }
+            else if ( child > 0 && child < data['child'].length ) {
+        		 movenode = "botharrow"
+            }
+            else {
+                 movenode = "noarrow"
+             }
+			showcatagorie(data['child'][child], movenode)
+			level -= 1
+		}
+
+	}
+
+	});
+
+</script>
+<div class="content-middle" id="content">
+   <div class="notice-box">
+        <div class="notice-top"></div>
+        <div class="notice-middle">
+            <span class="notice-info">&nbsp;</span>
+            <span class="block bold">Category list</span><span class="block">Use arrows below to re-order your categories.</span><a href="#" class="notice-close"></a></div>
+        <div class="notice-bottom">  <input type="button" onclick="location.href='/shoppingcart/products/AddCatagorie/'"  value="Add Catagorie" />{% csrf_token %}
+</div>
+    </div>
+    <div class="b10">
+		<div id="grid" class="pj-grid">
+            <table cellpadding="0" cellspacing="0" class="pj-table" style="width: 100%;" id="catagories"><thead>
+            <tr>	<th><input type="checkbox" class="pj-table-toggle-rows"></th>
+                    <th style="width: 500px;">Name</th><th>Products</th><th> Action</th></tr>
+            </thead><tbody>
+
+            </tbody>
+            </table>
+        </div></div></div>
+
+
+
+{% endblock %}

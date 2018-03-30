@@ -1,4 +1,4 @@
-# from django.db import models
+from django.db import models
 
 # # Create your models here.
 
@@ -7,13 +7,16 @@
 # 	                    (False, 'inactive'),)
 # 	product_name = models.CharField(max_length=255, unique=True, blank=False, null=False )
 # 	product_desc = models.TextField(blank=False, null=False)
-# 	product_img = models.ImageField(upload_to = 'product', default = 'product/no-img.jpg')
-# 	product_price = models.DecimalField(max_digits=9, decimal_places=2, blank=False, null=False)
+# 	product_full_desc = models.TextField(blank=False, null=False)
+# 	product_price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
 # 	product_id = models.SmallIntegerField( blank=False, null=False, default= 0)
 
 # 	product_status = models.BooleanField(choices=PRIORITY_CHOICES,  default=True)
-# 	# emp_service = models.ManyToManyField(AppschedulerEmployees,  blank=True)
-# 	is_featured = models.BooleanField(default=False )
+# 	is_featured = models.BooleanField(choices=PRIORITY_CHOICES,default=False )
+#   is_digital = models.BooleanField(choices=PRIORITY_CHOICES,  default=False)
+# 	digital_file = models.ImageField(upload_to = 'product', default = 'product/no-img.jpg')
+#   digital_name = models.CharField(max_length=255, blank=True, null=True)
+#   digital_expire = models.TimeField(blank=True, null=True)
 
 # 	class Meta:
 # 		db_table = 'shoppingcart_products'
@@ -58,13 +61,14 @@
 #     class Meta:
 #         db_table = 'shoppingcart_attributes'
 
-# class ProductsCategories(models.Model):
+class Categories(models.Model):
 #     product_id = models.IntegerField(primary_key=True)
-#     category_id = models.IntegerField()
+    parent_id = models.IntegerField(default = 0)
+    catagorie_name = models.CharField( max_length=255, blank=False, null=False)
+    child_position =  models.IntegerField(default = 0)
 
-#     class Meta:
-#         db_table = 'shoppingcart_products_categories'
-#         unique_together = (('product_id', 'category_id'),)
+    class Meta:
+        db_table = 'shoppingcart_products_categories'
 
 
 
