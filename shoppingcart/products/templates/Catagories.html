@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+<script>
+
+function postformdata( opn, method,   nodeid) {
+        method = method || "post"; // post (set to default) or get
+
+        url = "" ;
+        if (opn == "uparrow"  ) {
+            url = "/shoppingcart/products/uparrow/" + nodeid + "/";
+        }
+        if (  opn == "downarrow" ) {
+             url = "/shoppingcart/products/downarrow/" + nodeid + "/";
+
+        }
+        // Create the form object
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", url);
+        form.innerHTML +=  "{% csrf_token %}"
+        // For each key-value pair
+        <!--for (key in dictionary) {-->
+            //alert('key: ' + key + ', value:' + dictionary[key]); // debug
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", opn);
+            hiddenField.setAttribute("value", nodeid);
+            // append the newly created control to the form
+            form.appendChild(hiddenField);
+        <!--}-->
+
+        document.body.appendChild(form); // inject the form object into the body section
+        form.submit();
+    }
+ $( document ).ready(function() {
+
+	data = {{ data|safe }};
+    level = 1;
+    catagories_html = "";
+	showcatagorie(data, "noarrow")
+	var t = document.getElementById("catagories");
+    t.innerHTML = catagories_html
+
+	    $.noConflict();
+
+
+	function showcatagorie(data, movenode) {
+       var t = document.getElementById("catagories");
+        if ( data['value'] != 1 ) {
+            console.log( ' '.repeat( level ) + data['name'] )
+            if (level > 2) {
+                data['name'] = '--'.repeat( (level-2) ) + data['name']
+            }
+            catagories_html += '<tr name=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
+            '    + data['name'] + '</span></td><td></td>' ;
+            if (movenode == "uparrow" || movenode == "botharrow") {
+                 catagories_html +=  '<td><button   onClick=\"postformdata( \'uparrow\',  \'POST\', ' + data['value'] + ');\" >uparrow </button></td>'  ;
+            }
+            else {
+                catagories_html +=  '<td></td>'
+
+            }
+            if  (movenode == "downarrow" || movenode == "botharrow") {
+            catagories_html +=  '<td><button   onClick=\"postformdata( \'downarrow\',  \'POST\', ' + data['value'] + ');\" > downarrow</button></td>'  ;
+            }
+            else {
+                catagories_html +=  '<td></td>'
+            }
+
+
+            catagories_html += '<td><a href=\"/shoppingcart/products/Catagories/EditCatagorie/' + data['value'] + '/">Edit  \
+             </a><a href=\"/shoppingcart/products/Catagories/DeleteCatagorie/'  + data['value'] + '/">Delete</a></td></tr>';
+        }
+
+        movenode = ""
+		for ( child in data['child'] ) {
+			level += 1
+			if (child == 0  && data['child'].length > 1) {
+			   movenode = "downarrow";
+			}
+			else if (data['child'].length > 1 && child == (data['child'].length - 1)) {
+				 movenode = "uparrow";
+            }
+            else if ( child > 0 && child < data['child'].length ) {
+        		 movenode = "botharrow"
+            }
+            else {
+                 movenode = "noarrow"
+             }
+			showcatagorie(data['child'][child], movenode)
+			level -= 1
+		}
+
+	}
+
+
+	});
+
+
+
+</script>
+<div class="content-middle" id="content">
+   <div class="notice-box">
+        <div class="notice-top"></div>
+        <div class="notice-middle">
+            <span class="notice-info">&nbsp;</span>
+            <span class="block bold">Category list</span><span class="block">Use arrows below to re-order your categories.</span><a href="#" class="notice-close"></a></div>
+        <div class="notice-bottom">  <input type="button" onclick="location.href='/shoppingcart/products/AddCatagorie/'"  value="Add Catagorie" />{% csrf_token %}
+</div>
+    </div>
+    <div class="b10">
+		<div id="grid" class="pj-grid">
+
+            <table  style="width: 100%;" id="catagories" class="table table-hover">
+                <thead>
+                <tr>	<th><input type="checkbox" class="pj-table-toggle-rows"></th>
+                    <th style="width: 500px;">Name</th><th>Products</th><th> Action</th></tr>
+                 </thead>
+
+
+            </table>
+        </div></div>
+
+</div>
+
+
+
+{% endblock %}
