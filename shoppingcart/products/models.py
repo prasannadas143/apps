@@ -69,6 +69,7 @@ class Categories(models.Model):
 
     class Meta:
         db_table = 'shoppingcart_products_categories'
+        ordering = ['id']
 
 
 
