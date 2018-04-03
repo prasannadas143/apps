@@ -1,22 +1,24 @@
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt,requires_csrf_token, ensure_csrf_cookie,csrf_protect
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie, csrf_protect
 from django.core.exceptions import ObjectDoesNotExist
 from ..models import Categories
 from ..forms.CatagorieForm import CategoriesForm
-import pdb,json
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+import pdb, json, operator
+
 
 @requires_csrf_token
 def AddCatagorie(request):
     root_obj = _create_root()
     if request.method == 'POST':
-    # update the  request.POST
+        # update the  request.POST
         catagorie_name = request.POST['catagorie_name']
         parentid = request.POST['parent_id']
         request.POST._mutable = True
         request.POST.clear()
         request.POST['catagorie_name'] = catagorie_name
         request.POST['parent_id'] = parentid
-        #Get the node structure  and get the position of child node
+        # Get the node structure  and get the position of child node
         graphs = _catagories_graphs()
         pn = graphs[int(parentid)]
         request.POST['child_position'] = len(pn.child) + 1
@@ -29,20 +31,55 @@ def AddCatagorie(request):
     listcatagories = Categories.objects.all()
     # use the structure to display it on dropdown in addcatagorie
     templatename = "AddCatagorie.html"
-    return render(request, templatename, {"data" : catagories })
+    return render(request, templatename, {"data": catagories})
 
-def Catagories(request):
+
+@requires_csrf_token
+def catagories(request):
     catagories = _catagories_datastructure()
-    data = {"data" : catagories }
+    data = {"data": catagories}
     templatename = "Catagories.html"
     return render(request, templatename, data)
 
+
+@requires_csrf_token
+def MoveCatagories(request, id):
+    if 'uparrow' in request.POST:
+        nodeid = int(request.POST['uparrow'])
+        uparrow = 1
+    else:
+        nodeid = int(request.POST['downarrow'])
+        uparrow = 0
+
+    categorie = get_object_or_404(Categories, id=nodeid)
+    categorie_parent_id = categorie.parent_id
+    categorie_position = categorie.child_position
+    if uparrow:
+        new_arrow_position = categorie_position - 1
+    else:
+        new_arrow_position = categorie_position + 1
+    categorie_sibling = get_object_or_404(Categories, parent_id=categorie_parent_id, child_position=new_arrow_position)
+    categorie.child_position = new_arrow_position
+    categorie_sibling.child_position = categorie_position
+    categorie.save()
+    categorie_sibling.save()
+    return HttpResponseRedirect('/shoppingcart/products/Catagories/')
+
+
 def _catagories_datastructure():
     root = get_a_root(_catagories_graphs())
-    catagorie_struct = root.toJSON()
-    catagorie_struct = json.loads(catagorie_struct)
-    catagorie_struct = catagorie_struct["child"][0]
-    return  catagorie_struct
+    catagories = root.toJSON()
+    catagories = json.loads(catagories)
+    catagories = catagories["child"][0]
+    _sort_catagories_positions(catagories)
+    return catagories
+
+
+def _sort_catagories_positions(catagories):
+    childs = catagories['child']
+    childs.sort(key=operator.itemgetter('location'))
+    for child in childs:
+        _sort_catagories_positions(child)
 
 
 def get_a_root(items):
@@ -56,8 +93,9 @@ def get_a_root(items):
     parent = items[cur_key]
     return parent
 
+
 def _catagories_graphs():
-    listcatagories = Categories.objects.values('id','parent_id', 'catagorie_name','child_position')
+    listcatagories = Categories.objects.values('id', 'parent_id', 'catagorie_name', 'child_position')
     """Map all input graphs into Node(object)'s.           
 
      Return: A hash table by value: Node(value, child, parent)              
@@ -69,7 +107,7 @@ def _catagories_graphs():
         catagorie_name = catagorie['catagorie_name']
         child_position = catagorie['child_position']
 
-        c_n = Node(child, catagorie_name,child_position)
+        c_n = Node(child, catagorie_name, child_position)
         items[child] = c_n
 
         if not parent in items:
@@ -93,13 +131,15 @@ def _create_root():
         root_obj = Categories.objects.create(id=1, parentid=0, catagorie_name="noparent", child_position=0)
     return root_obj
 
+
 def _removekey(d, key):
     r = dict(d)
     del r[key]
     return r
 
+
 class Node(object):
-    def __init__(self, value, name=None,location=None):
+    def __init__(self, value, name=None, location=None):
         self.value = value
         # List of references to Node()'s.
         self.child = []
