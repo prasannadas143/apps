@@ -162,8 +162,7 @@ def editClient(request, id=None):
 
 		# Get the field data  for fields from formparams to request.POST
 		# Assign it to request.POST
-		pdb.set_trace()
-		
+
 		addressids = _getaddress_count(formfields)
 		address_count = len( addressids )
 		for address_no in addressids:

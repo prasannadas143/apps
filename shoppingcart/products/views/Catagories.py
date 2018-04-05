@@ -1,9 +1,12 @@
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie, csrf_protect
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.contrib import messages
+from django.forms.models import model_to_dict
+from django.http import Http404
 from ..models import Categories
 from ..forms.CatagorieForm import CategoriesForm
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 import pdb, json, operator
 
 
@@ -35,7 +38,7 @@ def AddCatagorie(request):
 
 
 @requires_csrf_token
-def catagories(request):
+def listcatagories(request):
     catagories = _catagories_datastructure()
     data = {"data": catagories}
     templatename = "Catagories.html"
@@ -65,9 +68,70 @@ def MoveCatagories(request, id):
     categorie_sibling.save()
     return HttpResponseRedirect('/shoppingcart/products/Catagories/')
 
+def EditCatagory(request,id):
+
+    templatename="EditCatagory.html"
+    catagorie_obj = get_object_or_404( Categories, id=int(id) )
+    child_id = catagorie_obj.id
+    old_pi_child_ids = _catagory_child_ids(child_id)
+    if request.method == "POST":
+
+
+        # update the child_position
+        #Get the parent id , get child id and calculate child_position.
+        parent_old_id = catagorie_obj.parent_id
+        parent_new_id = int(request.POST['parent_id'])
+
+        request.POST._mutable = True
+        if parent_new_id in old_pi_child_ids:
+            return Http404
+        # Get the child position if it is new parent or old parent
+        if parent_old_id == int(parent_new_id):
+            request.POST['child_position'] = catagorie_obj.child_position
+        else:
+            categories = Categories.objects.filter(parent_id=int(parent_new_id)).values()
+            child_position = categories.count()
+            if child_position > 1 :
+                next_child_position = max(categorie['child_position'] for categorie in categories)
+            else :
+                next_child_position = child_position + 1
+            request.POST['child_position'] = next_child_position
+        categoriesform = CategoriesForm(request.POST or None ,instance=catagorie_obj)
+        # if categoriesform.errors:
+        #     contextdata['categoriesform'] = categoriesform
+        if categoriesform.is_valid():
+            categoriesform.save()
+            messages.success(request, 'Edited catgorieform successfully')
+            # return HttpResponseRedirect(reverse('shoppingcart:CountryTemplate'))
+            return HttpResponseRedirect('/shoppingcart/products/Catagories/')
+    else :
+        catagories = _catagories_datastructure()
+        selected_catagorie_dict = model_to_dict(catagorie_obj)
+        # Disable the trees  for the existing  catagorie id
+
+        return render(request, templatename, {"data": catagories, "selected_catagory" : selected_catagorie_dict, "disable_ids" : old_pi_child_ids})
+
+def _catagory_child_ids(child_id):
+    nodeids = []
+    graphs = _catagories_graphs()
+    parents_old_object = graphs[child_id]
+
+    _get_node_childrens(parents_old_object, nodeids )
+    nodeids.append( child_id )
+
+    return nodeids
+
+def _get_node_childrens( parents_old_object, nodeids):
+
+    childs = parents_old_object.child
+    for child in childs:
+        nodeids.append(child.value)
+        _get_node_childrens(child , nodeids)
+
 
 def _catagories_datastructure():
     root = get_a_root(_catagories_graphs())
+
     catagories = root.toJSON()
     catagories = json.loads(catagories)
     catagories = catagories["child"][0]
@@ -106,15 +170,19 @@ def _catagories_graphs():
         parent = catagorie['parent_id']
         catagorie_name = catagorie['catagorie_name']
         child_position = catagorie['child_position']
-
-        c_n = Node(child, catagorie_name, child_position)
-        items[child] = c_n
-
         if not parent in items:
             p_n = Node(parent)
             items[parent] = p_n
         else:
             p_n = items[parent]
+
+        if not child in items:
+            c_n = Node(child, catagorie_name, child_position)
+            items[child] = c_n
+        else:
+            c_n = items[child]
+            c_n.update(child, parent,catagorie_name, child_position)
+
         # if c_n has value for "position" field, suppose  "child 1 child 4 child 7"
         # then keep it as 7th element of parent node.
         p_n.set_child(c_n)
@@ -153,6 +221,12 @@ class Node(object):
 
     def set_child(self, child):
         self.child.append(child)
+
+    def update(self,value, parent, catagorie_name , location):
+        self.name = catagorie_name
+        self.value = value
+        self.parent = parent
+        self.location = location
 
     def set_position(self):
         pos = None
