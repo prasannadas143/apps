@@ -8,7 +8,6 @@
 
 {% block content %}
 <script>
-
 function postformdata( opn, method,   nodeid) {
         method = method || "post"; // post (set to default) or get
 
@@ -18,6 +17,14 @@ function postformdata( opn, method,   nodeid) {
         }
         if (  opn == "downarrow" ) {
              url = "/shoppingcart/products/downarrow/" + nodeid + "/";
+
+        }
+        if (opn == "DeleteCatagory") {
+            url = "/shoppingcart/products/DeleteCatagory/"
+        }
+
+        if ( opn == "deletecatagories" ) {
+            url = "/shoppingcart/products/DeleteCatagories/"
 
         }
         // Create the form object
@@ -46,19 +53,18 @@ function postformdata( opn, method,   nodeid) {
     catagories_html = "";
 	showcatagorie(data, "noarrow")
 	var t = document.getElementById("catagories");
-    t.innerHTML = catagories_html
+    t.innerHTML += catagories_html
 
 	    $.noConflict();
 
 
 	function showcatagorie(data, movenode) {
-       var t = document.getElementById("catagories");
         if ( data['value'] != 1 ) {
             console.log( ' '.repeat( level ) + data['name'] )
             if (level > 2) {
                 data['name'] = '--'.repeat( (level-2) ) + data['name']
             }
-            catagories_html += '<tr name=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
+            catagories_html += '<tr id=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
             '    + data['name'] + '</span></td><td></td>' ;
             if (movenode == "uparrow" || movenode == "botharrow") {
                  catagories_html +=  '<td><button   onClick=\"postformdata( \'uparrow\',  \'POST\', ' + data['value'] + ');\" >uparrow </button></td>'  ;
@@ -76,7 +82,7 @@ function postformdata( opn, method,   nodeid) {
 
 
             catagories_html += '<td><a href=\"/shoppingcart/products/EditCatagory/' + data['value'] + '/">Edit  \
-             </a><a href=\"/shoppingcart/products/Catagories/DeleteCatagorie/'  + data['value'] + '/">Delete</a></td></tr>';
+             </a><button   onClick=\"postformdata( \'DeleteCatagory\',  \'POST\', ' + data['value'] + ');\" > Delete</button></td></tr>';
         }
 
         movenode = ""
@@ -103,6 +109,31 @@ function postformdata( opn, method,   nodeid) {
 
 	});
 
+function deletemultirow() {
+    rows = document.getElementById('catagories').rows;
+    var result_array = new Array();
+    for(var i=0; i<rows.length; i++)
+    {
+        rowid = parseInt( rows[i].getAttribute('id') )
+        if(i == 0 ) {
+            continue;
+        }
+        selected = rows[i].childNodes[0].childNodes[0].checked ;
+        if (selected) {
+            result_array.push(rowid);
+        }
+    }
+    alert(result_array);
+      if(result_array!=""){
+        rowids = result_array.join(",");
+      }
+      else {
+          alert("no rows selected");
+      }
+      data = { "rowids":result_array, }
+     postformdata( "deletecatagories", "POST",   rowids)
+}
+
 
 
 </script>
@@ -126,6 +157,9 @@ function postformdata( opn, method,   nodeid) {
 
 
             </table>
+            <button id='multicheckbox' value='Delete Catagories' onclick="deletemultirow()" >Delete Catagories</button>
+
+
         </div></div>
 
 </div>
