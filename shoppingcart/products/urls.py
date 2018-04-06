@@ -1,7 +1,7 @@
 from django.conf.urls import url,include
 from django.contrib import admin
 from django.views.generic import TemplateView
-from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory
+from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
 
 
 urlpatterns = [
@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^Catagories/',  listcatagories, name="Catagories"),
     url(r'^uparrow/(?P<id>\d+)/$', MoveCatagories, name="uparrow"),
     url(r'^downarrow/(?P<id>\d+)/$', MoveCatagories, name="downarrow"),
+    url(r'^DeleteCatagory/$', DeleteCatagory, name="deletecatagory"),
+    url(r'^DeleteCatagories/$', DeleteCatagories, name="DeleteCatagories"),
 
 ]

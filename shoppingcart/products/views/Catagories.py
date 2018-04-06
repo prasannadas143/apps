@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie, csrf_protect
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404 , HttpResponse
 from django.contrib import messages
 from django.forms.models import model_to_dict
 from django.http import Http404
@@ -110,6 +110,36 @@ def EditCatagory(request,id):
         # Disable the trees  for the existing  catagorie id
 
         return render(request, templatename, {"data": catagories, "selected_catagory" : selected_catagorie_dict, "disable_ids" : old_pi_child_ids})
+
+def DeleteCatagory(request):
+    # old_pi_child_ids = _catagory_child_ids(child_id)
+    pdb.set_trace()
+    nodeid = request.POST['DeleteCatagory']
+    childids = _catagory_child_ids(int(nodeid))
+    for childid in childids:
+        try:
+            catagory = Categories.objects.get(pk=childid)
+        except ObjectDoesNotExist:
+            print("objet does not exist")
+        else:
+            catagory.delete()
+    return HttpResponseRedirect('/shoppingcart/products/Catagories/')
+
+def DeleteCatagories(request):
+    pdb.set_trace()
+    if 'deletecatagories' in request.POST:
+        nodeids =  request.POST['deletecatagories']
+    for nodeid in nodeids.split(','):
+        childids = _catagory_child_ids( int(nodeid) )
+        for childid in childids :
+            try:
+                catagory = Categories.objects.get(pk=childid)
+            except ObjectDoesNotExist:
+                print("objet does not exist")
+            else :
+                catagory.delete()
+
+    return HttpResponseRedirect('/shoppingcart/products/Catagories/')
 
 def _catagory_child_ids(child_id):
     nodeids = []
