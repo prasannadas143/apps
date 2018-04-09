@@ -173,6 +173,7 @@ def _sort_catagories_positions(catagories):
     childs = catagories['child']
     childs.sort(key=operator.itemgetter('location'))
     for child in childs:
+
         _sort_catagories_positions(child)
 
 
