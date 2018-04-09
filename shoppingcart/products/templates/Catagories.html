@@ -50,14 +50,12 @@ function postformdata( opn, method,   nodeid) {
 
 	data = {{ data|safe }};
     level = 1;
-    catagories_html = "";
+    catagories_html = '<thead> <tr><th><input type="checkbox" class="pj-table-toggle-rows"></th><th style="width: 500px;">Name</th><th>Products</th><th></th><th></th><th> Action</th></tr></thead>';
 	showcatagorie(data, "noarrow")
-	var t = document.getElementById("catagories");
-    t.innerHTML += catagories_html
-
-	    $.noConflict();
-
-
+	var t = $("#catagories");
+    t.html( catagories_html );
+    t.DataTable();
+});
 	function showcatagorie(data, movenode) {
         if ( data['value'] != 1 ) {
             console.log( ' '.repeat( level ) + data['name'] )
@@ -107,7 +105,7 @@ function postformdata( opn, method,   nodeid) {
 	}
 
 
-	});
+
 
 function deletemultirow() {
     rows = document.getElementById('catagories').rows;
@@ -150,10 +148,6 @@ function deletemultirow() {
 		<div id="grid" class="pj-grid">
 
             <table  style="width: 100%;" id="catagories" class="table table-hover">
-                <thead>
-                <tr>	<th><input type="checkbox" class="pj-table-toggle-rows"></th>
-                    <th style="width: 500px;">Name</th><th>Products</th><th> Action</th></tr>
-                 </thead>
 
 
             </table>
