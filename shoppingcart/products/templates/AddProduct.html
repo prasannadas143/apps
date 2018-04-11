@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+<script>
+  $( document ).ready(function() {
+	categoriename = ""
+	data = {{ data|safe }};
+    level = 1
+	showcatagorie(data)
+	$( "#checkboxes" ).append( categoriename);
+
+	function showcatagorie(data) {
+
+	    console.log( ' '.repeat( level ) + data['name'] )
+	    if (level > 2) {
+	     	data['name'] = '--'.repeat( (level-2) ) + data['name']
+	    }
+
+
+		categoriename+= "<label for=" + data['name'] +  ' > <input type="checkbox" name=' + "check" + data['value'] + " />" + data['name'] + " </label>";
+
+		for ( child in data['child'] ) {
+			level += 1
+			showcatagorie(data['child'][child])
+			level -= 1
+		}
+
+	}
+
+	});
+
+function ValidateForm(){
+
+     $('.product_name-msg').html('');
+     $('.product_desc-msg').html('');
+     $('.product_full_desc-msg').html('');
+     var isValidForm=true;
+
+    if($('.product_name').val().trim()=="")
+    {
+        isValidForm=false;
+        $('.product_name-msg').html("Please enter Product Name")
+    }
+
+    if($('.product_desc').val().trim()=="")
+    {
+        isValidForm=false;
+        $('.product_desc-msg').html("Please enter product description")
+    }
+
+    if($('.product_full_desc').val().trim()=="")
+    {
+        isValidForm=false;
+        $('.product_full_desc-msg').html("Please enter product full description")
+    }
+
+    if(isValidForm)
+    {
+         return true;
+    }
+    else
+    {
+         return false;
+    }
+
+}
+
+	var expanded = false;
+
+function showCheckboxes() {
+    var checkboxes = document.getElementById("checkboxes");
+    if (!expanded) {
+        checkboxes.style.display = "block";
+        expanded = true;
+    } else {
+        checkboxes.style.display = "none";
+        expanded = false;
+    }
+  }
+</script>
+<div>
+    <form action="/shoppingcart/products/AddProduct/" method="post" id="frmCreateProduct" class="pj-form form" onsubmit="return ValidateForm();" >{% csrf_token %}
+        <p><label class="title">Status:</label>
+        <select name="product_status" id="product_status" class="pj-form-field">
+            <option value="True">Available</option>
+            <option value="False">Hidden</option>
+
+        </select>
+        <p>
+
+<p><label for="id_product_name">Product name:</label> <input type="text" name="product_name" maxlength="255" required id="id_product_name" /></p>
+         <div class="product_name-msg red"></div>
+
+         <p><label class="title">Category:</label>
+        <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes()" >
+            <select>
+              <option>Select an option</option>
+            </select>
+            <div class="overSelect">
+
+            </div>
+        </div>
+        <div id="checkboxes"  >
+        </div>
+    </div>
+
+        <p>
+<p><label for="id_product_desc">Product desc:</label> <textarea name="product_desc" cols="40" rows="10" required id="id_product_desc">
+</textarea> <div class="product_desc-msg red"></div>
+</p>
+<p><label for="id_product_full_desc">Product full desc:</label> <textarea name="product_full_desc" cols="40" rows="10" required id="id_product_full_desc">
+</textarea> <div class="product_full_desc-msg red"></div> </p>
+<p><label for="id_is_featured">Is featured:</label>
+   <input type="checkbox" name="is_featured" value="">
+
+</p>
+    <p>
+
+        <label class="title">&nbsp;</label>
+        <input type="submit" value="Save" class="pj-button">
+        <input type="button" value="Cancel" class="pj-button" onclick="">
+    </p>
+    </form>
+  </div>
+{% endblock %}

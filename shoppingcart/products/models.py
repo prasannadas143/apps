@@ -1,45 +1,42 @@
 from django.db import models
+from django.urls import reverse
 
 # # Create your models here.
 
-# class Products(models.Model):
-# 	PRIORITY_CHOICES = ((True, 'active'),
-# 	                    (False, 'inactive'),)
-# 	product_name = models.CharField(max_length=255, unique=True, blank=False, null=False )
-# 	product_desc = models.TextField(blank=False, null=False)
-# 	product_full_desc = models.TextField(blank=False, null=False)
-# 	product_price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-# 	product_id = models.SmallIntegerField( blank=False, null=False, default= 0)
+class Products(models.Model):
+    PRIORITY_CHOICES = ((True, 'active'),
+                        (False, 'inactive'),)
+    PRODUCT_STATUS = ((True, 'Available'),
+                        (False, 'Hidden'),)
+    product_name = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    product_desc = models.TextField(blank=False, null=False)
+    product_full_desc = models.TextField(blank=False, null=False)
+    product_price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
 
-# 	product_status = models.BooleanField(choices=PRIORITY_CHOICES,  default=True)
-# 	is_featured = models.BooleanField(choices=PRIORITY_CHOICES,default=False )
-#   is_digital = models.BooleanField(choices=PRIORITY_CHOICES,  default=False)
-# 	digital_file = models.ImageField(upload_to = 'product', default = 'product/no-img.jpg')
-#   digital_name = models.CharField(max_length=255, blank=True, null=True)
-#   digital_expire = models.TimeField(blank=True, null=True)
+    product_status = models.BooleanField(choices=PRODUCT_STATUS, default=True)
+    is_featured = models.BooleanField(choices=PRIORITY_CHOICES, default=False)
 
-# 	class Meta:
-# 		db_table = 'shoppingcart_products'
-# 		ordering = ['-id']
 
-    
-# 	def __str__(self):
-# 		return self.product_name
-		
-# 	def get_absolute_url(self):
-# 		return reverse('shoppingcart_detail', args=(self.slug,))	
+    is_digital = models.NullBooleanField(choices=PRIORITY_CHOICES, blank=True, null=True)
+    digital_file = models.ImageField(upload_to='product',  blank=True, null=True)
+    digital_name = models.CharField(max_length=255, blank=True, null=True)
+    digital_expire = models.TimeField(blank=True, null=True)
 
-# 	def get_success_url(self):
-# 	    return reverse('shoppingcart-list')
+    class Meta:
+        db_table = 'shoppingcart_products'
+        ordering = ['-id']
 
-# class Categories(models.Model):
-#     parent_id = models.IntegerField(blank=True, null=True)
-#     lft = models.IntegerField(blank=True, null=True)
-#     rgt = models.IntegerField(blank=True, null=True)
-#     name = models.CharField(max_length=255, blank=True, null=True)
 
-#     class Meta:
-#         db_table = 'shoppingcart_categories'
+    def __str__(self):
+        return self.product_name
+
+    def get_absolute_url(self):
+        return '/shoppingcart/products/EditProduct/' + self.id  + '/'
+
+    def get_success_url(self):
+        return '/shoppingcart/products/listproducts/'
+
+
 
 # class Stocks(models.Model):
 #     product_id = models.IntegerField(blank=True, null=True)
@@ -66,7 +63,10 @@ class Categories(models.Model):
     parent_id = models.IntegerField(default = 0)
     catagorie_name = models.CharField( max_length=255, blank=False, null=False)
     child_position =  models.IntegerField(default = 0)
-
+    product = models.ForeignKey(
+        'Products',
+        related_name="product", blank=True, null=True
+    )
     class Meta:
         db_table = 'shoppingcart_products_categories'
         ordering = ['id']

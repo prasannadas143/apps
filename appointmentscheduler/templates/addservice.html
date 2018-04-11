@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -251,7 +251,7 @@ function validateserviceform() {
       <div class="multiselect">
         <div class="selectBox" onclick="showCheckboxes()" >
             <select>
-              <option>Select an option</option>
+              <option value="Select an option">Select an option</option>
             </select>
             <div class="overSelect">
               
