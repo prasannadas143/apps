@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
 from .views.Products import AddProduct, Products, ListProducts
+from .views.Photos import BasicUploadView, DeletePhoto
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
@@ -16,5 +17,7 @@ urlpatterns = [
 
     url(r'^AddProduct/', AddProduct, name="AddProduct"),
     url(r'^ListProducts/', ListProducts, name="ListProducts"),
+    url(r'^photos/$', BasicUploadView.as_view(), name='photos'),
+    url(r'^deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
 
 ]

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+
+{% block content %}
+<script>
+// Django CSRF framework
+$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+</script>
+{# JQUERY FILE UPLOAD SCRIPTS #}
+<script src="{% static 'js/jquery-File-Upload/js/vendor/jquery.ui.widget.js' %}"></script>
+<script src="{% static 'js/jquery-File-Upload/js/jquery.iframe-transport.js' %}"></script>
+<script src="{% static 'js/jquery-File-Upload/js/jquery.fileupload.js' %}"></script>
+<script>
+$(function () {
+  /* 1. OPEN THE FILE EXPLORER WINDOW */
+  $(".js-upload-photos").click(function () {
+    $("#fileupload").click();
+  });
+
+  /* 2. INITIALIZE THE FILE UPLOAD COMPONENT */
+  $("#fileupload").fileupload({
+    dataType: 'json',
+    done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
+      if (data.result.is_valid) {
+        $("#gallery tbody").prepend(
+          "<tr><td><a href='" + data.result.url + "'>  <img src=" +  data.result.url    +  ' height="100" width="100" align="left"  >' + "</a></td></tr>"
+        )
+      }
+    }
+  });
+
+});
+
+function deletephoto( event,id ) {
+
+  alert(id);
+  alert(  jQuery("[name=csrfmiddlewaretoken]").val() )
+  event.preventDefault();
+  $.ajax({
+              url: "/shoppingcart/products/deletephoto/" + id  + "/",
+              method: 'POST',
+        }).success(function (data, textStatus, jqXHR) {
+               $("#" + id).remove();
+
+          }).error(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR)
+   });
+}
+</script>
+{# 1. BUTTON TO TRIGGER THE ACTION #}
+<button type="button" class="btn btn-primary js-upload-photos">
+  <span class="glyphicon glyphicon-cloud-upload"></span> Upload photos
+</button>{% csrf_token %}
+
+{# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
+<input id="fileupload" type="file" name="file" multiple
+       style="display: none;"
+       data-url="/shoppingcart/products/photos/"
+       data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+
+{# 3. TABLE TO DISPLAY THE UPLOADED PHOTOS #}
+<div>Photo</div>
+{% for photo in photos %}
+        <div id="{{ photo.id }}"><a href="{{ photo.file.url }}"> <img src="{{ photo.file.url }}"   height="100" width="100" align="left" > <button type="button" onclick="deletephoto( event, {{  photo.id }} )">Delete</button></a></div>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}
