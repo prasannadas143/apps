@@ -71,8 +71,14 @@ class Categories(models.Model):
         db_table = 'shoppingcart_products_categories'
         ordering = ['id']
 
+class Photo(models.Model):
+    title = models.CharField(max_length=255, blank=True)
+    file = models.ImageField(upload_to='shoppingcart_products_photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
-
+    class Meta:
+        db_table = 'shoppingcart_products_photos'
+        ordering = ['id']
 
 # class StocksAttributes(models.Model):
 #     stock_id = models.IntegerField(blank=True, null=True)
