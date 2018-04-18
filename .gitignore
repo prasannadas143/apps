@@ -6,7 +6,7 @@
 media/backup/
 media/employee/
 media/service/
-media/service/
+media/product/
 media/shoppingcart_products_photos/
 *.class
 *.dll
