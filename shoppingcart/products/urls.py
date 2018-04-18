@@ -2,8 +2,9 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
-from .views.Products import AddProduct, Products, ListProducts
+from .views.Products import AddProduct, Products, ListProducts, ProductDetail
 from .views.Photos import BasicUploadView, DeletePhoto
+from .views.Digital import digital
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
@@ -18,6 +19,9 @@ urlpatterns = [
     url(r'^AddProduct/', AddProduct, name="AddProduct"),
     url(r'^ListProducts/', ListProducts, name="ListProducts"),
     url(r'^photos/$', BasicUploadView.as_view(), name='photos'),
+    url(r'^(?P<id>\d+)/Digital/$', digital, name='digital'),
+    url(r'^(?P<id>\d+)/$', ProductDetail, name="ProductDetail"),
+
     url(r'^deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
 
 ]

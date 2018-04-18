@@ -17,7 +17,6 @@ def AddProduct(request):
         # update the  request.POST
 
         # Get the node structure  and get the position of child node
-        pdb.set_trace()
         request.POST._mutable = True
 
         if 'is_featured' in  request.POST:
@@ -46,6 +45,19 @@ def AddProduct(request):
 
 @requires_csrf_token
 def ListProducts(request):
-    data = {"data": "products"}
+    products = Products.objects.all()
+    data = {"products": products}
     templatename = "Products.html"
     return render(request, templatename, data)
+
+
+@requires_csrf_token
+def ProductDetail(request, id):
+    templatename = "ProductDetail.html"
+    product=get_object_or_404( Products,pk=id )
+    catagories = _catagories_datastructure()
+    # DON'T USE
+    related_catagories =  get_object_or_404(Products, pk=int(id)).product.select_related().values('id')
+    catagorieids = [catagory['id'] for catagory in related_catagories]
+
+    return render(request, templatename, {"product": product , "data" : catagories, "catagorieids" : catagorieids })
