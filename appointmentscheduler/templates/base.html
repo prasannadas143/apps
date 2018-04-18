@@ -88,12 +88,25 @@
             </div>
         </nav>
      </div>
+ <div>
+ {% block header1 %}
 
+ {% endblock %}
+ </div>
+
+ <div>
+ {% block header2 %}
+
+ {% endblock %}
+ </div>
 {% block content %}
 {% endblock %}
- {% block javascript %}
-     {% endblock %}
+
 
   </div>
+<script>
+ {% block javascript %}
+ {% endblock %}
+ </script>
 </body>
 </html>

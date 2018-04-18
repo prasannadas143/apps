@@ -7,5 +7,22 @@
 {% endblock %}
 
 {% block content %}
+<table>
+    <tr>
+        <th> Product Name </th>
+
+    </tr>
+
+    {% for product in products %}
+      <tr>
+        <td>  <a href="/shoppingcart/products/{{ product.id }}/">{{ product.product_name }}</a>
+            {% include "ProductBase.html" with id=product.id  %}
+
+        </td>
+
+    </tr>
+    {% endfor %}
+
+</table>
 
 {% endblock %}

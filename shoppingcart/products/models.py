@@ -20,7 +20,7 @@ class Products(models.Model):
     is_digital = models.NullBooleanField(choices=PRIORITY_CHOICES, blank=True, null=True)
     digital_file = models.ImageField(upload_to='product',  blank=True, null=True)
     digital_name = models.CharField(max_length=255, blank=True, null=True)
-    digital_expire = models.TimeField(blank=True, null=True)
+    digital_expire = models.CharField( max_length=255,blank=True, null=True)
 
     class Meta:
         db_table = 'shoppingcart_products'

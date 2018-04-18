@@ -21,9 +21,11 @@
 	    if (level > 2) {
 	     	data['name'] = '--'.repeat( (level-2) ) + data['name']
 	    }
+        if ( data['name'] !=  "noparent" ) {
 
+		    categoriename+= "<label for=" + data['name'] +  ' > <input type="checkbox" name=' + "check" + data['value'] + " />" + data['name'] + " </label>";
+        }
 
-		categoriename+= "<label for=" + data['name'] +  ' > <input type="checkbox" name=' + "check" + data['value'] + " />" + data['name'] + " </label>";
 
 		for ( child in data['child'] ) {
 			level += 1

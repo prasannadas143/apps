@@ -1,0 +1,135 @@
+{% extends "ProductsBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block header2 %}
+   {% include "ProductBase.html" with id=product.id  %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div id="tabs-1" >
+    <div class="notice-box">
+	<div class="notice-top"></div>
+        <div class="notice-middle">
+                <span class="notice-info">&nbsp;</span>
+                <span class="block bold">Details</span>
+            <span class="block">Enter product details below. You can assign a product to one or more categories (change categories under Options page, Categories tab) and to make it featured.</span>
+            <a href="#" class="notice-close"></a>
+        </div>
+        <div class="notice-bottom"></div>
+    </div>
+
+        <p><label class="title">Status</label>
+            <select name="status" id="status" >
+                <option value="1" {% if product.product_status == True  %} selected {% endif %}  >Available</option>
+                <option value="2" {% if product.product_status == False  %} selected {% endif %}>Hidden</option>
+            </select></p>
+            <p>
+                <label class="title">Product name</label>
+                <span class="inline_block">
+                    <input type="text" name="product_name" value={{ product.product_name }} >
+                </span>
+            </p>
+        <p><label class="title">Category:</label>
+            <div class="multiselect">
+                <div class="selectBox" id="selectBox" onclick="showCheckboxes()" >
+                    <select>
+                        <option>Select an option</option>
+                    </select>
+                    <div class="overSelect">
+
+                    </div>
+                </div>
+                <div id="checkboxes"  >
+                </div>
+            </div>
+
+        <p>
+            <label class="title">Short description</label>
+            <span class="inline_block">
+                <textarea name="product_desc" > {{ product.product_desc }} </textarea>
+            </span>
+         </p>
+         <p>
+                <label class="title">Full description</label>
+                <span class="block overflow">
+                    <textarea> {{ product.product_full_desc }} </textarea>
+                </span>
+            </p>
+        <p><label class="title">Is featured</label>
+            <span class="left">
+                <input type="checkbox" name="is_featured" id="is_featured" value="{{ product.is_featured }}" {% if product.is_featured == True  %} checked {% endif %}>
+            </span></p>
+        <p>
+            <label class="title">&nbsp;</label>
+            <input type="submit" value="Save" class="pj-button">
+            <input type="button" value="Cancel" class="pj-button" onclick="">
+        </p>
+    </div>
+
+<script>
+
+var expanded = false;
+function showCheckboxes() {
+    var checkboxes = document.getElementById("checkboxes");
+    if (!expanded) {
+        checkboxes.style.display = "block";
+        expanded = true;
+    } else {
+        checkboxes.style.display = "none";
+        expanded = false;
+    }
+ }
+
+$( document ).ready(function() {
+	categoriename = ""
+	data = {{ data|safe }};
+	catagorieids = {{ catagorieids|safe }};
+    level = 1
+	showcatagorie(data)
+	selectbox = document.getElementById("selectBox");
+
+	$( "#checkboxes" ).append( categoriename);
+
+
+    var countChecked = function() {
+       var n = $( "input:checkbox[name^='check']:checked" ).length;
+       selectbox.children[0].children[0].innerHTML =  n + " selected"
+    };
+    countChecked();
+
+  $("input:checkbox[name^='check']").on( "click", countChecked );
+
+  function showcatagorie(data) {
+
+        console.log( ' '.repeat( level ) + data['name'] )
+        if (level > 2) {
+            data['name'] = '--'.repeat( (level-2) ) + data['name']
+        }
+         if ( data['name'] !=  "noparent" ) {
+
+
+		    categoriename+= "<label for=" + data['name'] +  ' > <input type="checkbox" name=' + "check" + data['value']
+            if ( catagorieids.indexOf( data['value'] ) > -1 ) {
+                categoriename+= " checked";
+            }
+             categoriename+= " />" + data['name'] + " </label>";
+        }
+        for ( child in data['child'] ) {
+            level += 1
+            showcatagorie(data['child'][child])
+            level -= 1
+        }
+
+    }
+
+	});
+
+</script>
+{% endblock %}
