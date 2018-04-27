@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+
+{% block content %}
+<script>
+
+function delattrname() {
+   	element_id = event.srcElement.id ;
+    var regex = /\d+$/g;
+    var matches = element_id.match(regex);
+    if( matches.length ) {
+        match = matches[0];
+    }
+    $("#attribute" + match ).remove();
+
+}
+
+var i = {{ attributes_cnt }}
+
+function AddNewAttributeSet() {
+	<!--var h = document.createElement("H1")-->
+	<!--var t = document.createTextNode("Attributes");     // Create a text node-->
+	<!--h.appendChild(t);-->
+	i += 1
+	var addform = document.getElementById("attributes" );
+    var attributesdiv = document.createElement("div");
+	attributesdiv.setAttribute("id", "attribute" + i);
+	attributesdiv.setAttribute("name", "attribute" + i);
+	attributesdiv.setAttribute("class", "boxaddress" );
+  	<!--attributesdiv.appendChild(h);-->
+	addform.appendChild(attributesdiv);
+
+    id = "para_attr_name" + i
+    para = createpara( id)
+    label = " Attribute  Set name :";
+	placeholder = "Attribute Name";
+	id = "attr_name_" + i;
+	txt = addtext(label, placeholder,id);
+	para.appendChild( txt );
+    attributesdiv.appendChild( para );
+
+	id =  'attr_name_delete' + i;
+	label = "" ;
+	innerhtml =  "Delete attribute Name";
+	button = createbutton( id, label, innerhtml )
+    button.onclick = delattrname
+    para.appendChild( button );
+    attributesdiv.appendChild( para );
+
+    j = 1
+    id = "para_attr_value" + i
+    para = createpara( id)
+    label = "Attribute  value:";
+	placeholder = "Attribute  value";
+	id = "attr_name_" + i + "_value_"	+ j;
+	span_txt = addtext(label, placeholder,id);
+    para.appendChild( span_txt );
+    attributesdiv.appendChild( para );
+
+
+   	<!--button.onclick = delattrvalue;-->
+
+	id =  'addattrvalue' + i;
+	label = "" ;
+	innerhtml =  "Add attribute value";
+	button = createbutton( id, label, innerhtml );
+	button.onclick = addattrvalue;
+  	attributesdiv.appendChild( button );
+
+}
+
+function addattrvalue() {
+   parent_node = this.parentNode
+  if ( ! parent_node ) {
+  	parent_node =	event.target.parentNode;
+  }
+    parent_node_id = parent_node.id ;
+    var regex = /\d+$/g;
+    var matches = parent_node_id.match(regex);
+    if( matches.length ) {
+        attr_name_cnt = matches[0];
+    }
+    paranode = parent_node.childNodes[2]
+    txtnodes = paranode.childNodes;
+    attr_value_cnt = paranode.childNodes.length + 1;
+    label = "";
+	placeholder = "Attribute  value";
+	id = "attr_name_" + attr_name_cnt + "_value_"	+ attr_value_cnt;
+	span_txt = addtext(label, placeholder,id);
+	id = "para_attr_value" + attr_name_cnt
+	para = document.getElementById( id );
+    para.appendChild( span_txt );
+
+    btnid =  'attr_name_' + attr_name_cnt + "_value_delete_" + attr_value_cnt ;
+	label = "" ;
+	innerhtml =  "Delete attribute value";
+	button = createbutton( btnid, label, innerhtml )
+	button.onclick = delattrvalue;
+    span_txt.appendChild( button );
+}
+
+function delattrvalue() {
+  parentelement = this.parentNode
+  if ( ! parentelement ) {
+  	parentelement =	event.target.parentNode;
+  }
+
+  	txtvalue = parentelement.children[1].value;
+  if ( txtvalue ) {
+    var txt;
+    if (    confirm("Do you want to delete ")   ) {
+       parentelement.remove();
+    }
+  }
+  else {
+    parentelement.remove();
+  }
+
+}
+
+function createpara( id ) {
+
+	var para_attr = document.createElement('p');
+	para_attr.setAttribute('name',id );
+	para_attr.setAttribute('id', id );
+	para_attr.innerHTML = "";
+    return para_attr;
+}
+
+function createbutton( id, label, innerhtml ) {
+
+	var addbutton = document.createElement('button');
+	addbutton.setAttribute('type', "button");
+	addbutton.setAttribute('name', id );
+	addbutton.setAttribute('id', id );
+	addbutton.innerHTML = innerhtml;
+    return addbutton;
+}
+
+function addtext(label, placeholder,id) {
+	var addrform = document.getElementById("attribute" + i);
+
+	var r = document.createElement('span');
+	var statelabel = document.createElement("label");
+	statelabel.innerHTML = label;
+	var y = document.createElement("INPUT");
+	y.setAttribute("type", "text");
+	y.setAttribute("placeholder", placeholder);
+	y.setAttribute("id", id );
+	y.setAttribute("name", id );
+	y.setAttribute("required",true);
+
+	r.appendChild(statelabel);
+	r.appendChild(y);
+    return r;
+}
+
+
+
+
+</script>
+
+
+<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="/shoppingcart/products/{{ productid }}/Attributes/" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
+<div class="boxaddresses" id="attributes">
+
+    {%  for attrdetail in attrsdetails   %}
+		<div class="boxaddress" id="attribute{{ attrdetail.attr_name_cnt }}" name="attribute{{ attrdetail.attr_name_cnt }}">
+
+       <p name="para_attr_name{{ attrdetail.attr_name_cnt }}" id="para_attr_name{{ attrdetail.attr_name_cnt }}">
+	    <span>
+		    <label> Attribute  Set name :</label>
+		    <input type="text" placeholder="Attribute Name" id="attr_name_{{ attrdetail.attr_name_cnt }}" name="attr_name_{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" required="true" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
+	    </span>
+	    <button type="button" name="attr_name_delete{{ attrdetail.attr_name_cnt }}" id="attr_name_delete{{ attrdetail.attr_name_cnt }}" onclick="delattrname()">Delete attribute Name</button>
+	    </p>
+    	<p name="para_attr_value{{ attrdetail.attr_name_cnt }}" id="para_attr_value{{ attrdetail.attr_name_cnt }}">
+
+            {% for attr_value in attrdetail.attr_values  %}
+        	<span>
+        		{% if  forloop.first  %}
+        		    <label>Attribute  value:</label>
+                {% else %}
+    				<label></label>
+                {% endif %}
+
+        		<input type="text" placeholder="Attribute  value" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" value="{{  attr_value }}" required="true">
+
+        		{% if not forloop.first  %}
+			        <button type="button" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" onclick="delattrvalue()">Delete attribute value</button>
+                {% endif %}
+
+	        </span>
+            {% endfor %}
+        </p>
+			<button type="button" name="addattrvalue{{ attrdetail.attr_name_cnt }}" id="addattrvalue{{ attrdetail.attr_name_cnt }}" onclick="addattrvalue()">Add attribute value</button>
+				</div>
+
+    {% endfor %}
+
+</div>
+<button type="button" name="Add_new_attribute_set" value="Add new attribute set"  onclick="AddNewAttributeSet()">Add new attribute set </button>
+<input type="submit" value="Save Attributes">
+
+</form>
+{% endblock %}

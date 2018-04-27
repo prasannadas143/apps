@@ -48,15 +48,16 @@ class Products(models.Model):
 #         db_table = 'shoppingcart_stocks'
 
 
-# class Attributes(models.Model):
-#     product_id = models.IntegerField(blank=True, null=True)
-#     parent_id = models.IntegerField(blank=True, null=True)
-#     order_group = models.IntegerField(blank=True, null=True)
-#     order_item = models.IntegerField(blank=True, null=True)
-#     hash = models.CharField(max_length=32, blank=True, null=True)
+class Attributes(models.Model):
+    attributes_product = models.ForeignKey(
+        'Products',
+        related_name="attributes_product", blank=True, null=True
+    )
+    attr_name = models.CharField(max_length=32, blank=False, null=False)
+    attr_value = models.CharField(max_length=32, blank=False, null=False)
 
-#     class Meta:
-#         db_table = 'shoppingcart_attributes'
+    class Meta:
+        db_table = 'shoppingcart_attributes'
 
 class Categories(models.Model):
 #     product_id = models.IntegerField(primary_key=True)

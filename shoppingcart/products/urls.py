@@ -5,7 +5,7 @@ from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCa
 from .views.Products import AddProduct, Products, ListProducts, ProductDetail
 from .views.Photos import BasicUploadView, DeletePhoto
 from .views.Digital import digital
-
+from .views.Attributes import attributes
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^AddCatagorie/', AddCatagorie, name="AddCatagorie"),
@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^photos/$', BasicUploadView.as_view(), name='photos'),
     url(r'^(?P<id>\d+)/Digital/$', digital, name='digital'),
     url(r'^(?P<id>\d+)/$', ProductDetail, name="ProductDetail"),
+    url(r'^(?P<id>\d+)/Attributes/', attributes, name="Attributes"),
 
     url(r'^deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
 
