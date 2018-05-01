@@ -12,9 +12,25 @@ from .Catagories import _catagories_datastructure
 from ..forms.AttributesForm import AttributesForm
 
 @requires_csrf_token
+def delAttributeName(request, id):
+    attr_name  = request.POST['attribute']
+    if attr_name :
+        attr_objects = Attributes.objects.filter( attr_name = attr_name)
+        for attr_object in attr_objects :
+            attr_object.delete()
+    return HttpResponse(status=204)
+
+@requires_csrf_token
+def delAttribute( request, id) :
+    attr_id = request.POST['attribute_id']
+    if attr_id :
+        attr_objects = get_object_or_404( Attributes, id = int( attr_id ) )
+        attr_objects.delete()
+    return HttpResponse(status=204)
+
+@requires_csrf_token
 def attributes(request, id):
     if request.POST:
-        pdb.set_trace()
         formparams = request.POST.dict()
         fieldsname = list(request.POST.keys())
         request.POST._mutable = True
@@ -28,12 +44,19 @@ def attributes(request, id):
             request.POST['attr_name'] = formparams[attr_name]
             for fieldname in  _getfieldsname(fieldsname, fldname):
                 request.POST['attr_value'] = formparams[fieldname]
-                attributesform = AttributesForm(request.POST or None)
+                fieldname = fieldname + "_edit"
+                if fieldname in formparams :
+                    attribute_id = formparams[fieldname]
+                    attribute_instance = get_object_or_404(  Attributes , id = int( attribute_id ))
+                    attributesform = AttributesForm(request.POST or None , instance=attribute_instance )
+                else :
+                    attributesform = AttributesForm(request.POST or None)
+
                 if attributesform.is_valid():
                     attributesobj = attributesform.save(commit=False)
                     attributesobj.attributes_product = pd
                     attributesobj.save()
-    attributes = Attributes.objects.filter( attributes_product__id = id ).order_by('id', 'attr_name')
+    attributes = Attributes.objects.filter( attributes_product__id = id ).order_by( 'attr_name', 'id' )
     attrs = []
     for attribute in attributes :
         attr = dict()
@@ -65,7 +88,6 @@ def _getfieldsname(fieldsname, pattern):
 
         m = re.search(my_regex, fieldname)
 
-        # if the string ends in digits m will be a Match object, or None otherwise.
         if m is not None:
             fieldname = m.group()
             attr_names.append(fieldname)
@@ -78,8 +100,8 @@ def _attrsdetails( attrs ):
     cnt = 0
 
     attr_datas = list()
-    attr_data = dict()
     attr_values = list()
+    attr_ids = list()
     attr_name_cnt = 1
 
     attr_new_name = None
@@ -98,16 +120,18 @@ def _attrsdetails( attrs ):
             flag = 1
 
         attr_values.append(attr_value)
+        attr_ids.append(attr_id)
 
         if flag or (cnt == len(attrs) - 1):
             attr_data = dict()
             attr_data['attr_name_cnt'] = attr_name_cnt
-            attr_data['attr_id'] = attr_id
+            attr_data['attr_ids'] = attr_ids
             attr_data['attr_value_cnt'] = len(attr_values)
             attr_data['attr_name_value'] = attr_name
             attr_data['attr_values'] = attr_values
             attr_datas.append(attr_data)
             attr_values = []
+            attr_ids = []
             attr_name_cnt += 1
             flag = 0
 

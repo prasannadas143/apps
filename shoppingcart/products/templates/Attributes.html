@@ -2,6 +2,7 @@
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
+{% load ZipList %}
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
@@ -9,15 +10,71 @@
 
 {% block content %}
 <script>
-
-function delattrname() {
-   	element_id = event.srcElement.id ;
-    var regex = /\d+$/g;
-    var matches = element_id.match(regex);
-    if( matches.length ) {
-        match = matches[0];
+// Django CSRF framework
+$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
-    $("#attribute" + match ).remove();
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+function delattrname() {
+   	srcelement = event.srcElement ;
+    uri = srcelement.baseURI
+    var re = /\/shoppingcart\/products\/\d+\//i;
+    var found = uri.match(re);
+    url = found[0];
+   	element_id = srcelement.id ;
+    attribute_value = srcelement.value;
+    $.ajax({
+          url: url + "delAttributeName/",
+          data: {
+           "attribute" :    attribute_value
+           },
+          method: 'POST',
+      }).success(function (data, textStatus, jqXHR) {
+
+        var regex = /\d+$/g;
+        var matches = element_id.match(regex);
+
+        if( matches.length ) {
+            match = matches[0];
+        }
+        $("#attribute" + match ).remove();
+
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR);
+      });
+
 
 }
 
@@ -86,9 +143,10 @@ function addattrvalue() {
     if( matches.length ) {
         attr_name_cnt = matches[0];
     }
-    paranode = parent_node.childNodes[2]
-    txtnodes = paranode.childNodes;
-    attr_value_cnt = paranode.childNodes.length + 1;
+    <!--paranode = parent_node.childNodes;-->
+    <!--txtnodes = paranode[3].childNodes;-->
+    spannodes = parent_node.getElementsByTagName("span") ;
+    attr_value_cnt = spannodes.length ;
     label = "";
 	placeholder = "Attribute  value";
 	id = "attr_name_" + attr_name_cnt + "_value_"	+ attr_value_cnt;
@@ -111,11 +169,33 @@ function delattrvalue() {
   	parentelement =	event.target.parentNode;
   }
 
-  	txtvalue = parentelement.children[1].value;
+
+  	srcelement = event.srcElement ;
+    uri = srcelement.baseURI
+    var re = /\/shoppingcart\/products\/\d+\//i;
+    var found = uri.match(re);
+    url = found[0];
+    txtvalue = parentelement.children[1].value;
+  	attr_id = parentelement.children[3].value;
+
   if ( txtvalue ) {
     var txt;
-    if (    confirm("Do you want to delete ")   ) {
-       parentelement.remove();
+    if (    confirm("Do you want to delete attribute " + txtvalue )   ) {
+
+        $.ajax({
+          url: url + "delAttribute/",
+          data: {
+           "attribute_id" :    attr_id
+           },
+          method: 'POST',
+      }).success(function (data, textStatus, jqXHR) {
+
+               parentelement.remove();
+
+
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR);
+      });
     }
   }
   else {
@@ -178,11 +258,11 @@ function addtext(label, placeholder,id) {
 		    <label> Attribute  Set name :</label>
 		    <input type="text" placeholder="Attribute Name" id="attr_name_{{ attrdetail.attr_name_cnt }}" name="attr_name_{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" required="true" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
 	    </span>
-	    <button type="button" name="attr_name_delete{{ attrdetail.attr_name_cnt }}" id="attr_name_delete{{ attrdetail.attr_name_cnt }}" onclick="delattrname()">Delete attribute Name</button>
+	    <button type="button" name="attr_name_delete{{ attrdetail.attr_name_cnt }}" id="attr_name_delete{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" onclick="delattrname()">Delete attribute Name</button>
 	    </p>
     	<p name="para_attr_value{{ attrdetail.attr_name_cnt }}" id="para_attr_value{{ attrdetail.attr_name_cnt }}">
 
-            {% for attr_value in attrdetail.attr_values  %}
+            {% for attr_value,attr_id in attrdetail.attr_values|ZipList:attrdetail.attr_ids  %}
         	<span>
         		{% if  forloop.first  %}
         		    <label>Attribute  value:</label>
@@ -196,8 +276,13 @@ function addtext(label, placeholder,id) {
 			        <button type="button" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" onclick="delattrvalue()">Delete attribute value</button>
                 {% endif %}
 
+				<input type="hidden" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}_edit" value="{{ attr_id }}">
+
 	        </span>
+
             {% endfor %}
+
+
         </p>
 			<button type="button" name="addattrvalue{{ attrdetail.attr_name_cnt }}" id="addattrvalue{{ attrdetail.attr_name_cnt }}" onclick="addattrvalue()">Add attribute value</button>
 				</div>
