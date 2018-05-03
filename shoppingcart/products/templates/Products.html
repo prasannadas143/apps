@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "ProductsBase.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -15,8 +15,7 @@
 
     {% for product in products %}
       <tr>
-        <td>  <a href="/shoppingcart/products/{{ product.id }}/">{{ product.product_name }}</a>
-            {% include "ProductBase.html" with id=product.id  %}
+        <td>  <a href="/shoppingcart/Products/{{ product.id }}/">{{ product.product_name }}</a>
 
         </td>
 

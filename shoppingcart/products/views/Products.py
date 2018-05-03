@@ -10,6 +10,10 @@ from ..forms.ProductsForm import ProductsForm
 from ..models import Products, Categories
 from .Catagories import _catagories_datastructure
 
+@requires_csrf_token
+def Product(request, id):
+    templatename = "Product.html"
+    return render(request, templatename , { "id" : id} )
 
 @requires_csrf_token
 def AddProduct(request):

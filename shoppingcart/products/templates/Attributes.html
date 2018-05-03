@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "ProductsBase.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -6,7 +6,10 @@
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
+{% block header2 %}
+   {% include "ProductBase.html" with id=productid  %}
 
+{% endblock %}
 
 {% block content %}
 <script>
