@@ -54,9 +54,9 @@ def attributes(request, id):
 
                 if attributesform.is_valid():
                     attributesobj = attributesform.save(commit=False)
-                    attributesobj.attributes_product = pd
+                    attributesobj.attribute_product = pd
                     attributesobj.save()
-    attributes = Attributes.objects.filter( attributes_product__id = id ).order_by( 'attr_name', 'id' )
+    attributes = Attributes.objects.filter( attribute_product__id = id ).order_by( 'attr_name', 'id' )
     attrs = []
     for attribute in attributes :
         attr = dict()

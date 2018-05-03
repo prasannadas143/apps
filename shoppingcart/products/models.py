@@ -38,24 +38,17 @@ class Products(models.Model):
 
 
 
-# class Stocks(models.Model):
-#     product_id = models.IntegerField(blank=True, null=True)
-#     image_id = models.IntegerField(blank=True, null=True)
-#     qty = models.IntegerField(blank=True, null=True)
-#     price = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
 
-#     class Meta:
-#         db_table = 'shoppingcart_stocks'
 
 
 class Attributes(models.Model):
-    attributes_product = models.ForeignKey(
-        'Products',
-        related_name="attributes_product", blank=True, null=True
-    )
+
     attr_name = models.CharField(max_length=32, blank=False, null=False)
     attr_value = models.CharField(max_length=32, blank=False, null=False)
-
+    attribute_product = models.ForeignKey(
+        'Products',  blank=True, null=True,
+        related_name="attribute_product" , on_delete=models.CASCADE
+    )
     class Meta:
         db_table = 'shoppingcart_attributes'
 
@@ -76,10 +69,23 @@ class Photo(models.Model):
     title = models.CharField(max_length=255, blank=True)
     file = models.ImageField(upload_to='shoppingcart_products_photos/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
+    photo_product = models.ForeignKey(
+        'Products',  blank=True, null=True,
+        related_name="photo_product", on_delete=models.CASCADE
+    )
     class Meta:
         db_table = 'shoppingcart_products_photos'
         ordering = ['id']
+
+class Stocks(models.Model):
+    qty = models.IntegerField( blank=False, null=False )
+    price = models.DecimalField( blank=False, null=False, decimal_places=2, max_digits=12 )
+    image_id = models.ForeignKey( Photo, blank=True, null=True )
+    stock_product = models.ForeignKey(Products, blank=True, null=True, on_delete=models.CASCADE )
+    stock_attribute = models.ManyToManyField(Attributes, through= "attributes")
+
+    class Meta:
+        db_table = 'shoppingcart_stocks'
 
 # class StocksAttributes(models.Model):
 #     stock_id = models.IntegerField(blank=True, null=True)

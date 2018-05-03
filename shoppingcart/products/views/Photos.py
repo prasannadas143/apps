@@ -7,13 +7,15 @@ from ..models import Photo
 import pdb
 
 class BasicUploadView(View):
-    def get(self, request):
+    def get(self, request, id):
         photos_list = Photo.objects.all()
         contextdata = _imageattributes(photos_list)
         contextdata['photos'] = photos_list
+        contextdata['productid'] = id
+
         return render( self.request, 'photos.html', contextdata )
 
-    def post(self, request):
+    def post(self, request,id):
         form = PhotoForm(self.request.POST, self.request.FILES)
         if form.is_valid():
             photo = form.save()
@@ -38,7 +40,7 @@ def _imageattributes(photos_list=None):
     img_attrs = {  "image_count" : image_count, "filesizes" : filesizes }
     return img_attrs
 
-def DeletePhoto(request, id):
+def DeletePhoto(request,productid , id):
     """ Delete service """
     photo_instance = get_object_or_404(Photo, pk=int(id))
     photo_instance.delete()

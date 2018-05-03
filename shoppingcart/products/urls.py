@@ -2,7 +2,7 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
-from .views.Products import AddProduct, Products, ListProducts, ProductDetail
+from .views.Products import AddProduct, Products, ListProducts, ProductDetail, Product
 from .views.Photos import BasicUploadView, DeletePhoto
 from .views.Digital import digital
 from .views.Attributes import attributes, delAttributeName, delAttribute
@@ -18,13 +18,15 @@ urlpatterns = [
 
     url(r'^AddProduct/', AddProduct, name="AddProduct"),
     url(r'^ListProducts/', ListProducts, name="ListProducts"),
-    url(r'^photos/$', BasicUploadView.as_view(), name='photos'),
+    url(r'(?P<id>\d+)/$', Product, name="Product"),
+
+    url(r'^(?P<id>\d+)/photos/$', BasicUploadView.as_view(), name='photos'),
     url(r'^(?P<id>\d+)/Digital/$', digital, name='digital'),
-    url(r'^(?P<id>\d+)/$', ProductDetail, name="ProductDetail"),
+    url(r'^(?P<id>\d+)/ProductDetail/$', ProductDetail, name="ProductDetail"),
     url(r'^(?P<id>\d+)/Attributes/', attributes, name="Attributes"),
     url(r'^(?P<id>\d+)/delAttributeName/$', delAttributeName, name="delAttributeName"),
     url(r'^(?P<id>\d+)/delAttribute/$', delAttribute, name="delAttribute"),
 
-    url(r'^deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
+    url(r'^(?P<productid>\d+)/deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
 
 ]

@@ -4,7 +4,7 @@ from shoppingcart.clients import urls as clients
 
 urlpatterns = [
 
-    url(r'^products/', include('shoppingcart.products.urls')),
+    url(r'^Products/', include('shoppingcart.products.urls')),
     url(r'^clients/', include('shoppingcart.clients.urls')),
     url(r'^orders/', include('shoppingcart.orders.urls')),
     url(r'^dashboard/', include('shoppingcart.dashboard.urls')),
