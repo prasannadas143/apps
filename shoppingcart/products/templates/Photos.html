@@ -94,7 +94,7 @@ function deletephoto( event,id ) {
 
   event.preventDefault();
   $.ajax({
-              url: "/shoppingcart/products/{{productid}}/deletephoto/" + id  + "/",
+              url: "/shoppingcart/Products/{{productid}}/deletephoto/" + id  + "/",
               method: 'POST',
         }).success(function (data, textStatus, jqXHR) {
                   images = document.getElementById("images")
@@ -125,7 +125,7 @@ function deletephoto( event,id ) {
 {# 2. FILE INPUT TO BE USED BY THE PLUG-IN #}
 <input id="fileupload" type="file" name="file" multiple
        style="display: none;"
-       data-url="/shoppingcart/products/{{productid}}/photos/"
+       data-url="/shoppingcart/Products/{{productid}}/photos/"
        data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
 
 {# 3. TABLE TO DISPLAY THE UPLOADED PHOTOS #}

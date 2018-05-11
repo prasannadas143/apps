@@ -3,7 +3,7 @@ from django.views import View
 from django.shortcuts import  render,HttpResponse, get_object_or_404
 
 from ..forms.PhotosForm import PhotoForm
-from ..models import Photo
+from ..models import Photo, Products
 import pdb
 
 class BasicUploadView(View):
@@ -17,8 +17,11 @@ class BasicUploadView(View):
 
     def post(self, request,id):
         form = PhotoForm(self.request.POST, self.request.FILES)
+        pd = get_object_or_404(Products , id= id)
         if form.is_valid():
-            photo = form.save()
+            photo = form.save(commit= False)
+            photo.photo_product = pd
+            photo.save()
             contextdata = _imageattributes()
 
             contextdata['is_valid'] =  True

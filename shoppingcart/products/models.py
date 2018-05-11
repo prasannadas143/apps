@@ -80,12 +80,13 @@ class Photo(models.Model):
 class Stocks(models.Model):
     qty = models.IntegerField( blank=False, null=False )
     price = models.DecimalField( blank=False, null=False, decimal_places=2, max_digits=12 )
-    image_id = models.ForeignKey( Photo, blank=True, null=True )
+    image = models.ForeignKey( Photo, blank=True, null=True )
     stock_product = models.ForeignKey(Products, blank=True, null=True, on_delete=models.CASCADE )
-    stock_attribute = models.ManyToManyField(Attributes, through= "attributes")
+    stock_attribute = models.ManyToManyField(Attributes,  blank=True, null=True)
 
     class Meta:
         db_table = 'shoppingcart_stocks'
+        ordering = ['id']
 
 # class StocksAttributes(models.Model):
 #     stock_id = models.IntegerField(blank=True, null=True)
