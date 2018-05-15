@@ -120,10 +120,19 @@
               </div>
 
         </div>
+         <div class="boxaddress" >
 
+             <span> Image </span>
+
+            {% for attr_name in attributes  %}
+                <span>{{ attr_name.attr_name }}</span>
+            {% endfor %}
+            <span> Quantity </span>
+            <span> Price </span>
+         </div>
         </div>
-         {% if addcombination == 1 %}
-            <input type="button" value="AddCombination" class="pj-button" onclick="AddCombination()" >
+         {% if showattributes == 1 %}
+            <input type="button" value="AddCombination" class="pj-button" onclick="AddStockrow()" >
         {% endif %}
          <p>
             <label class="title">&nbsp;</label>
@@ -177,6 +186,7 @@ var stockdetails = {{ stockdetails | js }};
 var stock_cnt = {{ stock_cnt }};
 var i = 1 ;
 var showattributes = {{ showattributes |js }};
+var attributes = {{ attributes|js }} ;
 
 function delstock() {
 
@@ -216,8 +226,8 @@ function browseimage() {
           method: 'POST',
       }).success(function (data, textStatus, jqXHR) {
             for (var photo in data) {
-             console.log(data[photo].imageid);
-             console.log( data[photo].imageurl );
+             <!--console.log(data[photo].imageid);-->
+             <!--console.log( data[photo].imageurl );-->
              img  = addimgelement("" , data[photo].imageid ) ;
              img.src = data[photo].imageurl;
              img.onclick = addimagtostock
@@ -237,6 +247,7 @@ function addHiddenField( fieldName, fieldValue){
 	   var hiddenelement = document.createElement("input");
 	   hiddenelement.type = "hidden";
 	   hiddenelement.name = fieldName;
+	   hiddenelement.id = fieldName;
 	   hiddenelement.value = fieldValue;
        return hiddenelement ;
 }
@@ -244,20 +255,25 @@ function addHiddenField( fieldName, fieldValue){
 function addimagtostock() {
 
     srcelementid = event.srcElement.id ;
-   	imageid = clickedimage.id
+   	clickedimageid = clickedimage.id
     parentnode = clickedimage.parentNode;
     parentnode.removeChild(clickedimage);
-    img  = addimgelement("" , imageid ) ;
+    img  = addimgelement("" , clickedimageid ) ;
     img.src = event.srcElement.src;
     img.onclick = browseimage;
+    imageid = img.id
     parentnode.insertBefore(img, parentnode.childNodes[0]);
 	var re = /img_(\d+)/i;
     var found = imageid.match(re);
-    imagecnt = found[1];
-    fieldName = "img_hd_" + imagecnt
+    rowid = found[1];
+    fieldName = "img_hd_" + rowid
     fieldValue = srcelementid
-    hd = addHiddenField( fieldName, fieldValue );
-    parentnode.appendChild(hd);
+    img.name = fieldValue;
+    hd = document.getElementById( fieldName );
+    if(hd == null || hd == '') {
+        hd = addHiddenField( fieldName, fieldValue );
+    }
+    hd.value = fieldValue;
     modal.style.display = "none";
     modalbody.empty()
 }
@@ -340,14 +356,14 @@ function AddStockrow() {
 
         <!-- Get Stock Div-->
         var stockrow = document.createElement("div");
-        stockrow.setAttribute("id", "stock" + i);
-        stockrow.setAttribute("name", "stock" + i);
+        stockrow.setAttribute("id", "stock_" + i);
+        stockrow.setAttribute("name", "stock_" + i);
         stockrow.setAttribute("class", "boxaddress" );
         stocksrow.appendChild(stockrow);
 	 <!--<div class="Alpha3-msg red"></div>-->
 
         <!-- Create Stock Para-->
-        id = "para_stock_name" + i
+        id = "para_stock_name_" + i
         divtag = creatediv( id);
 
         msgbox = "_msg"
@@ -374,7 +390,11 @@ function AddStockrow() {
         namefield = "img_" + i + msgbox;
         msgtag = addmessagediv( namefield , msgbox );
         divtag.appendChild( msgtag );
+        for (at in attributes) {
+            dropdown = createdropdown(i, attributes[at]);
+            divtag.appendChild( dropdown );
 
+        }
         <!-- Create Qty data-->
         label = "";
         placeholder = "Quantity ";
@@ -412,6 +432,28 @@ function AddStockrow() {
         return stockrow;
  }
 
+function createdropdown( i, attribute ) {
+
+	dropdown_attr_name  = attribute['attr_name'] + "_" + i
+	var select = document.createElement("select");
+	select.id = dropdown_attr_name;
+	select.name= dropdown_attr_name;
+	attr_values  = attribute['attrvalues'];
+
+	for (atv in attr_values) {
+
+		var option = document.createElement("option");
+		attr_value = attr_values[atv]
+		option.value = attr_value['attrid'] ;
+		option.text = attr_value['attr_value'] ;
+		<!--console.log( attr_value['attr_value'] );-->
+		<!--option.selected="";-->
+		<!--option.innerHTML= "";-->
+		select.appendChild(option);
+
+	}
+    return select;
+}
 
 function ValidateForm() {
    var divElem = document.getElementById("stocks");
@@ -424,26 +466,50 @@ function ValidateForm() {
 }
 
  function CreateStockRow() {
-     stockrow = AddStockrow();
-    if ( stock_cnt) {
-        var qty = document.getElementById("qty_1");
-        var price = document.getElementById("price_1");
-        var img = document.getElementById("img_1");
-        qty.value = stockdetails[0]["qty"] ;
-        price.value = stockdetails[0]["price"];
-        stockid = stockdetails[0]["id"];
-        img.src = stockdetails[0]["imagepath"]
-        fieldName = "img" + i
-        fieldValue = stockdetails[0]["imageid"];
-        hd = addHiddenField( fieldName, fieldValue );
-        stockrow.appendChild(hd);
-        fieldName = "stockid" + i
-        fieldValue = stockid;
-        hsid = addHiddenField( fieldName, fieldValue );
-        stockrow.appendChild(hsid);
+
+    for ( stock_cnt in stockdetails ) {
+        stockrow = AddStockrow();
+        stockrowid = stockrow.id
+        var re = /stock_(\d+)/i;
+        var found = stockrowid.match(re);
+        rowid = found[1];
+        stockid = stockdetails[ stock_cnt ]['id']
+        if ( stockid) {
+            var qty = document.getElementById("qty_" + rowid);
+            var price = document.getElementById("price_" + rowid);
+            var img = document.getElementById("img_" + rowid );
+            qty.value = stockdetails[ stock_cnt ]["qty"] ;
+            price.value = stockdetails[ stock_cnt ]["price"];
+            img.src = stockdetails[ stock_cnt ]["imagepath"]
+            fieldName = "img_hd_" + rowid
+            fieldValue = stockdetails[ stock_cnt ]["imageid"];
+            hd = addHiddenField( fieldName, fieldValue );
+            stockrow.appendChild(hd);
+            fieldName = "stockid_" + rowid
+            fieldValue = stockid;
+            hsid = addHiddenField( fieldName, fieldValue );
+            stockrow.appendChild(hsid);
+            stock_attribute_details = stockdetails[ stock_cnt ][ "stock_attribute_details" ]
+            for ( st_at_cnt in stock_attribute_details ) {
+                stock_attribute_id =  stock_attribute_details[ st_at_cnt ]["attributeid"] ;
+                <!--stock_attribute_value =  stock_attribute_details[ st_at_cnt ]["stock_attr_value"] ;-->
+                attr_name = stock_attribute_details[ st_at_cnt ]["stock_attr_name"]
+                attr_name_field = attr_name + "_" + rowid ;
+                var attr_dropdown = document.getElementById( attr_name_field );
+                for (var di = 0; di < attr_dropdown.length; di++)
+                {   attr_index = attr_dropdown.options[di]
+                    if ( attr_index.value == stock_attribute_id.toString() ) {
+                        attr_index.selected="true";
+
+                    }
+                }
+            }
+
+        }
+        stockid = ""
+        i+=1 ;
     }
-    i+=1 ;
- }
+}
 
  $(document).ready(function(){
 

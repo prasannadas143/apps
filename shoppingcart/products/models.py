@@ -51,6 +51,8 @@ class Attributes(models.Model):
     )
     class Meta:
         db_table = 'shoppingcart_attributes'
+        ordering = ['id']
+
 
 class Categories(models.Model):
 #     product_id = models.IntegerField(primary_key=True)
