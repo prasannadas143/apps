@@ -17,6 +17,8 @@ def delAttributeName(request, id):
     if attr_name :
         attr_objects = Attributes.objects.filter( attr_name = attr_name)
         for attr_object in attr_objects :
+            pdb.set_trace()
+            attr_object.stocks_set.clear()
             attr_object.delete()
     return HttpResponse(status=204)
 
@@ -25,6 +27,8 @@ def delAttribute( request, id) :
     attr_id = request.POST['attribute_id']
     if attr_id :
         attr_objects = get_object_or_404( Attributes, id = int( attr_id ) )
+        pdb.set_trace()
+        attr_objects.stocks_set.clear()
         attr_objects.delete()
     return HttpResponse(status=204)
 

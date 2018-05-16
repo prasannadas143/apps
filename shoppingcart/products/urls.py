@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
 from .views.Products import AddProduct, Products, ListProducts, ProductDetail, Product
-from .views.Stock import InStock, listimages
+from .views.Stock import InStock, listimages, deletestock
 from .views.Photos import BasicUploadView, DeletePhoto
 from .views.Digital import digital
 from .views.Attributes import attributes, delAttributeName, delAttribute
@@ -29,6 +29,9 @@ urlpatterns = [
     url(r'^(?P<id>\d+)/delAttributeName/$', delAttributeName, name="delAttributeName"),
     url(r'^(?P<id>\d+)/delAttribute/$', delAttribute, name="delAttribute"),
     url(r'^(?P<id>\d+)/listimages/$', listimages, name='listimages'),
+    url(r'^(?P<id>\d+)/deletestock/$', deletestock, name='deletestock'),
+
+
 
     url(r'^(?P<productid>\d+)/deletephoto/(?P<id>\d+)/$', DeletePhoto, name='DeletePhoto'),
 
