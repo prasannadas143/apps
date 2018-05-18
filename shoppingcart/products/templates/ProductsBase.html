@@ -1,21 +1,20 @@
-{% extends "base.html" %}
+{% extends "ShoppingcartBase.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
 {% block title %}Dashboard{% endblock %}
- {% block header1 %}
+ {% block header2 %}
 
-<div>
-    <span><a href="/shoppingcart/Products/ListProducts/">Products</a></span>
-    <span><a href="">Stock</a></span>
-    <span><a href="/shoppingcart/Products/Catagories/">Categories</a></span>
-</div>
+        <!-- Start sub menu -->
+    <div class="menu Products-menu">
+        <div>
+            <button type="button" class="btn btn-default" onclick="window.location.href='/shoppingcart/Products/ListProducts/'">Produtcs</button>
+            <button type="button" class="btn btn-default" onclick="window.location.href='Stock.html'">Stock</button>
+            <button type="button" class="btn btn-default active" onclick="window.location.href='/shoppingcart/Products/Catagories/'">categories</button>
 
-{% endblock %}
-
-{% block content %}
-
-
-
+        </div>
+    </div>
+    <!-- End sub menu -->
 
 {% endblock %}
+

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "ProductsBase.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -13,18 +13,18 @@ function postformdata( opn, method,   nodeid) {
 
         url = "" ;
         if (opn == "uparrow"  ) {
-            url = "/shoppingcart/products/uparrow/" + nodeid + "/";
+            url = "/shoppingcart/Products/uparrow/" + nodeid + "/";
         }
         if (  opn == "downarrow" ) {
-             url = "/shoppingcart/products/downarrow/" + nodeid + "/";
+             url = "/shoppingcart/Products/downarrow/" + nodeid + "/";
 
         }
         if (opn == "DeleteCatagory") {
-            url = "/shoppingcart/products/DeleteCatagory/"
+            url = "/shoppingcart/Products/DeleteCatagory/"
         }
 
         if ( opn == "deletecatagories" ) {
-            url = "/shoppingcart/products/DeleteCatagories/"
+            url = "/shoppingcart/Products/DeleteCatagories/"
 
         }
         // Create the form object
@@ -50,11 +50,12 @@ function postformdata( opn, method,   nodeid) {
 
 	data = {{ data|safe }};
     level = 1;
-    catagories_html = '<thead> <tr><th><input type="checkbox" class="pj-table-toggle-rows"></th><th style="width: 500px;">Name</th><th>Products</th><th></th><th></th><th> Action</th></tr></thead>';
+    catagories_html = '<thead> <tr><th><input type="checkbox"  aria-label="..."></th><th>Name</th><th>Products</th><th></th><th></th><th> Action</th></tr></thead>';
 	showcatagorie(data, "noarrow")
 	var t = $("#catagories");
     t.html( catagories_html );
     t.DataTable();
+    $(".search").append('<i class="fa fa-search" aria-hidden="true"></i>');
 });
 	function showcatagorie(data, movenode) {
         if ( data['value'] != 1 ) {
@@ -62,8 +63,8 @@ function postformdata( opn, method,   nodeid) {
             if (level > 2) {
                 data['name'] = '--'.repeat( (level-2) ) + data['name']
             }
-            catagories_html += '<tr id=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
-            '    + data['name'] + '</span></td><td></td>' ;
+            catagories_html += '<tr id=' + data['value'] + '><td><input type=\"checkbox\" name=\"record\"   aria-label=\"...\"></td><td>' + data['name'] + '</td><td> \
+            <input type="text" value="01"></td>' ;
             if (movenode == "uparrow" || movenode == "botharrow") {
                  catagories_html +=  '<td><button   onClick=\"postformdata( \'uparrow\',  \'POST\', ' + data['value'] + ');\" >uparrow </button></td>'  ;
             }
@@ -79,8 +80,10 @@ function postformdata( opn, method,   nodeid) {
             }
 
 
-            catagories_html += '<td><a href=\"/shoppingcart/products/EditCatagory/' + data['value'] + '/">Edit  \
-             </a><button   onClick=\"postformdata( \'DeleteCatagory\',  \'POST\', ' + data['value'] + ');\" > Delete</button></td></tr>';
+            catagories_html += '<td><a href=\"/shoppingcart/Products/EditCatagory/' + data['value'] + '/"><span class=\"icons\"> \
+			    <i class=\"fa fa-pencil-square-o fa-lg\" aria-hidden=\"true\"></i> </span>  \
+             </a><button   onClick=\"postformdata( \'DeleteCatagory\',  \'POST\', ' + data['value'] + ');\" > <span class=\"icons\"> \
+			   <i class=\"fas fa-trash-alt fa-lg\"></i> </span></button></td></tr>';
         }
 
         movenode = ""
@@ -121,42 +124,53 @@ function deletemultirow() {
             result_array.push(rowid);
         }
     }
-    alert(result_array);
       if(result_array!=""){
         rowids = result_array.join(",");
       }
       else {
           alert("no rows selected");
+          return false ;
       }
       data = { "rowids":result_array, }
      postformdata( "deletecatagories", "POST",   rowids)
 }
 
+function triggerdelete(  ) {
+    var selectedValue = event.srcElement
+
+    if ( selectedValue.value == "delete" ) {
+        deletemultirow();
+    }
+}
 
 
 </script>
-<div class="content-middle" id="content">
-   <div class="notice-box">
-        <div class="notice-top"></div>
-        <div class="notice-middle">
-            <span class="notice-info">&nbsp;</span>
-            <span class="block bold">Category list</span><span class="block">Use arrows below to re-order your categories.</span><a href="#" class="notice-close"></a></div>
-        <div class="notice-bottom">  <input type="button" onclick="location.href='/shoppingcart/products/AddCatagorie/'"  value="Add Catagorie" />{% csrf_token %}
-</div>
-    </div>
-    <div class="b10">
-		<div id="grid" class="pj-grid">
 
-            <table  style="width: 100%;" id="catagories" class="table table-hover">
+    <div class="menu Products-page-menu">
+        <div>
+            <form>
+                <button class="btn btn-default add" onclick="location.href='/shoppingcart/Products/AddCatagorie/'"  value="Add Catagorie" >Add category</button>{% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+
+    <div class="Products-page-category">
+
+        <div class="table1">
+
+            <table  style="width: 100%;" id="catagories" class=" table-hover   stripe">
 
 
             </table>
-            <button id='multicheckbox' value='Delete Catagories' onclick="deletemultirow()" >Delete Catagories</button>
-
-
-        </div></div>
-
-</div>
+            <div class="tfoot">
+                <select class="selectpicker" id="DeleteAction" onchange="triggerdelete()" >
+                      <option value="Online">Choose Action </option>
+                      <option value="delete" >Delete Selected </option>
+                  </select>
+            </div>
+        </div>
+    </div>
 
 
 

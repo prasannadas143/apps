@@ -24,11 +24,11 @@ def InStock(request, id):
     showattributes = 0
     attributes = Attributes.objects.filter(attribute_product=productobj).order_by('attr_name').values()
     listattributes = getattributes(attributes)
-    if productobj.is_digital:
+    if not productobj.is_digital:
         if attributes.exists():
             showattributes = 1
-    columnnames = [ attribute['attr_name'] for attribute in listattributes ]
-    print(columnnames)
+            columnnames = [ attribute['attr_name'] for attribute in listattributes ]
+            print(columnnames)
     if request.POST:
 
         formparams = request.POST.dict()
@@ -123,8 +123,7 @@ def getattributes( attributes ):
         attribute_name.setdefault("attrvalues", []).append(
             {'attrid': attribute['id'], 'attr_value': attribute['attr_value']})
         attr_old_name = attr_name
-
-    attributes_struct.append(attribute_name)
+        attributes_struct.append(attribute_name)
     return attributes_struct
 
 def listimages(request , id):
