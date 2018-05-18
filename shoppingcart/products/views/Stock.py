@@ -112,7 +112,7 @@ def getattributes( attributes ):
     attr_values = []
     attributes_struct = []
     attribute_name = dict()
-
+    pdb.set_trace()
     for attribute in attributes:
         attr_name = attribute['attr_name']
         if attr_old_name != attr_name:
@@ -123,7 +123,7 @@ def getattributes( attributes ):
         attribute_name.setdefault("attrvalues", []).append(
             {'attrid': attribute['id'], 'attr_value': attribute['attr_value']})
         attr_old_name = attr_name
-        attributes_struct.append(attribute_name)
+    attributes_struct.append(attribute_name)
     return attributes_struct
 
 def listimages(request , id):

@@ -28,6 +28,8 @@ class BasicUploadView(View):
             contextdata['name'] = photo.file.name
             contextdata['url'] = photo.file.url
             contextdata['id'] = photo.id
+            contextdata['productid'] = id
+
         else:
             contextdata = {'is_valid': False}
         return JsonResponse(contextdata)
