@@ -1,4 +1,4 @@
-{% extends "Product.html" %}
+{% extends "ProductsBase.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -6,7 +6,10 @@
 {% block extraHeader %}
 {% endblock %}
 {% load js %}
+{% block header3 %}
+   {% include "ProductBase.html" with id=id  %}
 
+{% endblock %}
 {% block content %}
 <style type="text/css">
 	.red{
@@ -496,6 +499,7 @@ function ValidateForm() {
     stock_length = stockdetails.length;
     if ( stock_length == 0 ) {
         AddStockrow( );
+
     }
     for ( stock_cnt in stockdetails ) {
         stockid = stockdetails[ stock_cnt ]["id"]

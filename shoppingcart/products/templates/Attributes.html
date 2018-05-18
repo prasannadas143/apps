@@ -6,7 +6,7 @@
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
-{% block header2 %}
+{% block header3 %}
    {% include "ProductBase.html" with id=productid  %}
 
 {% endblock %}
@@ -53,7 +53,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 function delattrname() {
    	srcelement = event.srcElement ;
     uri = srcelement.baseURI
-    var re = /\/shoppingcart\/products\/\d+\//i;
+    var re = /\/shoppingcart\/Products\/\d+\//i;
     var found = uri.match(re);
     url = found[0];
    	element_id = srcelement.id ;
@@ -175,7 +175,7 @@ function delattrvalue() {
 
   	srcelement = event.srcElement ;
     uri = srcelement.baseURI
-    var re = /\/shoppingcart\/products\/\d+\//i;
+    var re = /\/shoppingcart\/Products\/\d+\//i;
     var found = uri.match(re);
     url = found[0];
     txtvalue = parentelement.children[1].value;
@@ -250,7 +250,7 @@ function addtext(label, placeholder,id) {
 </script>
 
 
-<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="/shoppingcart/products/{{ productid }}/Attributes/" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
+<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="/shoppingcart/Products/{{ productid }}/Attributes/" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
 <div class="boxaddresses" id="attributes">
 
     {%  for attrdetail in attrsdetails   %}
