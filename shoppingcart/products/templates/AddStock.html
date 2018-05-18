@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "Product.html" %}
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
@@ -199,11 +199,11 @@ function delstock() {
     console.log( stockhtmlid );
 
     $.ajax({
-              url: "/shoppingcart/Products/" + productid + "/deletestock/" ,
-              method: 'POST',
-              data :
+            url: "/shoppingcart/Products/" + productid + "/deletestock/" ,
+            method: 'POST',
+            data :
               { stock_id : delete_stock_id },
-        }).success(function (data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {
 
                 var re = /stock_delete_(\d+)/i;
                 var found = stockhtmlid.match(re);
@@ -211,9 +211,10 @@ function delstock() {
                 stockid =  "stock_" +  stockid
                $("#" + stockid).remove();
                i -= 1
-
-          }).error(function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR)
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+            }
    });
 
 }
@@ -249,7 +250,7 @@ function browseimage() {
           url: url + "listimages/",
 
           method: 'POST',
-      }).success(function (data, textStatus, jqXHR) {
+      success:function (data, textStatus, jqXHR) {
             for (var photo in data) {
              <!--console.log(data[photo].imageid);-->
              <!--console.log( data[photo].imageurl );-->
@@ -260,11 +261,11 @@ function browseimage() {
              modalbody.append(img);
             }
 
-
-
-      }).error(function (jqXHR, textStatus, errorThrown) {
+       },
+      error:function (jqXHR, textStatus, errorThrown) {
           console.log(jqXHR);
-      });
+      }
+    });
 
 }
 
@@ -492,7 +493,10 @@ function ValidateForm() {
 }
 
  function CreateStockRow() {
-
+    stock_length = stockdetails.length;
+    if ( stock_length == 0 ) {
+        AddStockrow( );
+    }
     for ( stock_cnt in stockdetails ) {
         stockid = stockdetails[ stock_cnt ]["id"]
         stockrow = AddStockrow( stockid );
