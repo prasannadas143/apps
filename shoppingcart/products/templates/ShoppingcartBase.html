@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block header1 %}
+
+<div class="nav">
+    <div class="btn-group" role="group" aria-label="...">
+      <button type="button" class="btn btn-default app" onclick="window.location.href='#'">
+      <img src="CSS/Photos/shopping-cart-icon.png">Shopping Cart</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='#'">Dashboard</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='#'">Feeds</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='Order.html'">Orders</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='Customers.html'">Customers</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='Products.html'">Products</button>
+      <button type="button" class="btn btn-default" onclick="window.location.href='Promotions.html'">Promotions</button>
+      <button type="button" class="btn btn-default settings active" onclick="window.location.href='General.html'">Reports</button>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block content %}
+
+{% endblock %}

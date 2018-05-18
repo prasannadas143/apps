@@ -10,6 +10,12 @@ from ..forms.StockForm import StockForm
 from ..models import Stocks,Products,Photo, Attributes
 
 
+def deletestock(request, id ):
+    stockid  = int( request.POST['stock_id'] )
+    stockobj = get_object_or_404(Stocks, id=stockid)
+    stockobj.stock_attribute.clear()
+    stockobj.delete()
+    return HttpResponse(status = 204)
 
 @requires_csrf_token
 def InStock(request, id):
@@ -18,11 +24,11 @@ def InStock(request, id):
     showattributes = 0
     attributes = Attributes.objects.filter(attribute_product=productobj).order_by('attr_name').values()
     listattributes = getattributes(attributes)
-    if productobj.is_digital:
+    if not productobj.is_digital:
         if attributes.exists():
             showattributes = 1
-    columnnames = [ attribute['attr_name'] for attribute in listattributes ]
-    print(columnnames)
+            columnnames = [ attribute['attr_name'] for attribute in listattributes ]
+            print(columnnames)
     if request.POST:
 
         formparams = request.POST.dict()
@@ -36,7 +42,6 @@ def InStock(request, id):
             if row_fields is None :
                 continue
             stock_attributes = []
-
             if isinstance(row_fields, list) and len(row_fields):
                 stockid = ""
                 for row_field in row_fields:
@@ -65,7 +70,7 @@ def InStock(request, id):
                     so.image = photoobj
                     so.stock_product = productobj
                     so.save()
-                    stock_attributes_cnt = stockobj.stock_attribute.count()
+                    stock_attributes_cnt = so.stock_attribute.count()
                     if stock_attributes_cnt:
                         stockobj.stock_attribute.clear()
                     for stock_attribute in stock_attributes:
@@ -75,32 +80,31 @@ def InStock(request, id):
     stockobjs = Stocks.objects.filter( stock_product = productobj )
 
     stockdetails = []
-    stock_cnt = stockobjs.count()
-    if stock_cnt:
-        for stockobj in stockobjs:
-            stockdetail = dict()
-            stockdetail['id'] =stockobj.id
-            stockdetail['qty'] = stockobj.qty
-            stockdetail['price'] = str( stockobj.price )
-            imageid = stockobj.image.id
-            photoobj = get_object_or_404( Photo, id=imageid )
-            stockdetail['imagepath'] = photoobj.file.url
-            stockdetail['imageid'] = imageid
-            stock_attributes = stockobj.stock_attribute.all()
-            stock_attribute_details = list()
-            for stock_attribute in stock_attributes :
-                stock_attribute_detail = dict()
-                stock_attribute_id = stock_attribute.id
-                stock_attribute_obj = get_object_or_404( Attributes , id=stock_attribute_id )
-                stock_attribute_detail['attributeid'] = stock_attribute_id
-                stock_attribute_detail['stock_attr_value'] = stock_attribute_obj.attr_value
-                stock_attribute_detail['stock_attr_name'] = stock_attribute_obj.attr_name
 
-                stock_attribute_details.append( stock_attribute_detail )
-            stockdetail['stock_attribute_details'] = stock_attribute_details
-            stockdetails.append( stockdetail )
+    for stockobj in stockobjs:
+        stockdetail = dict()
+        stockdetail['id'] =stockobj.id
+        stockdetail['qty'] = stockobj.qty
+        stockdetail['price'] = str( stockobj.price )
+        imageid = stockobj.image.id
+        photoobj = get_object_or_404( Photo, id=imageid )
+        stockdetail['imagepath'] = photoobj.file.url
+        stockdetail['imageid'] = imageid
+        stock_attributes = stockobj.stock_attribute.all()
+        stock_attribute_details = list()
+        for stock_attribute in stock_attributes :
+            stock_attribute_detail = dict()
+            stock_attribute_id = stock_attribute.id
+            stock_attribute_obj = get_object_or_404( Attributes , id=stock_attribute_id )
+            stock_attribute_detail['attributeid'] = stock_attribute_id
+            stock_attribute_detail['stock_attr_value'] = stock_attribute_obj.attr_value
+            stock_attribute_detail['stock_attr_name'] = stock_attribute_obj.attr_name
+
+            stock_attribute_details.append( stock_attribute_detail )
+        stockdetail['stock_attribute_details'] = stock_attribute_details
+        stockdetails.append( stockdetail )
     templatename = "AddStock.html"
-    return render(request, templatename, {"id": id,  "stockdetails" : stockdetails , "showattributes" : showattributes, "stock_cnt" : stock_cnt , "attributes" : listattributes})
+    return render(request, templatename, {"id": id,  "stockdetails" : stockdetails , "showattributes" : showattributes, "attributes" : listattributes})
 
 def getattributes( attributes ):
 
@@ -119,8 +123,7 @@ def getattributes( attributes ):
         attribute_name.setdefault("attrvalues", []).append(
             {'attrid': attribute['id'], 'attr_value': attribute['attr_value']})
         attr_old_name = attr_name
-
-    attributes_struct.append(attribute_name)
+        attributes_struct.append(attribute_name)
     return attributes_struct
 
 def listimages(request , id):

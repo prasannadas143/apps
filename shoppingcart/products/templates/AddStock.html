@@ -183,13 +183,38 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 });
 var stockdetails = {{ stockdetails | js }};
-var stock_cnt = {{ stock_cnt }};
 var i = 1 ;
 var showattributes = {{ showattributes |js }};
 var attributes = {{ attributes|js }} ;
 
 function delstock() {
+    srcelement = event.srcElement ;
+    uri = srcelement.baseURI
+    stockhtmlid = srcelement.id
+    delete_stock_id  = srcelement.value;
+    var re = /\/shoppingcart\/products\/(\d+)\//i;
+    var found = uri.match(re);
+    productid = found[1];
+    console.log( productid );
+    console.log( stockhtmlid );
 
+    $.ajax({
+              url: "/shoppingcart/Products/" + productid + "/deletestock/" ,
+              method: 'POST',
+              data :
+              { stock_id : delete_stock_id },
+        }).success(function (data, textStatus, jqXHR) {
+
+                var re = /stock_delete_(\d+)/i;
+                var found = stockhtmlid.match(re);
+                stockid = found[1];
+                stockid =  "stock_" +  stockid
+               $("#" + stockid).remove();
+               i -= 1
+
+          }).error(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR)
+   });
 
 }
 
@@ -272,6 +297,7 @@ function addimagtostock() {
     hd = document.getElementById( fieldName );
     if(hd == null || hd == '') {
         hd = addHiddenField( fieldName, fieldValue );
+        parentnode.appendChild( hd );
     }
     hd.value = fieldValue;
     modal.style.display = "none";
@@ -347,7 +373,7 @@ function addimg(label,id) {
     y.appendChild(im_btn);
 	return y;
 }
-function AddStockrow() {
+function AddStockrow( stockid = null) {
         if( i == 0) {
          i=1;
          }
@@ -370,7 +396,7 @@ function AddStockrow() {
 
         <!-- Create Image File-->
 
-        if( stock_cnt ) {
+        if( stockid ) {
 
             imgid = "img_" + i ;
             img  = addimgelement("" , imgid ) ;
@@ -421,14 +447,14 @@ function AddStockrow() {
         divtag.appendChild( msgtag );
 
 
-        id =  'stock_delete' + i;
+        id =  'stock_delete_' + i;
         label = "" ;
         innerhtml =  "Delete";
         button = createbutton( id, label, innerhtml )
         button.onclick = delstock;
         divtag.appendChild( button );
         stockrow.appendChild( divtag );
-
+        i+=1 ;
         return stockrow;
  }
 
@@ -468,7 +494,8 @@ function ValidateForm() {
  function CreateStockRow() {
 
     for ( stock_cnt in stockdetails ) {
-        stockrow = AddStockrow();
+        stockid = stockdetails[ stock_cnt ]["id"]
+        stockrow = AddStockrow( stockid );
         stockrowid = stockrow.id
         var re = /stock_(\d+)/i;
         var found = stockrowid.match(re);
@@ -485,11 +512,14 @@ function ValidateForm() {
             fieldValue = stockdetails[ stock_cnt ]["imageid"];
             hd = addHiddenField( fieldName, fieldValue );
             stockrow.appendChild(hd);
-            fieldName = "stockid_" + rowid
+            fieldName = "stockid_" + rowid ;
             fieldValue = stockid;
             hsid = addHiddenField( fieldName, fieldValue );
             stockrow.appendChild(hsid);
             stock_attribute_details = stockdetails[ stock_cnt ][ "stock_attribute_details" ]
+            delete_id = "stock_delete_" + rowid ;
+            var stock_delete = document.getElementById( delete_id );
+            stock_delete.value  = stockid ;
             for ( st_at_cnt in stock_attribute_details ) {
                 stock_attribute_id =  stock_attribute_details[ st_at_cnt ]["attributeid"] ;
                 <!--stock_attribute_value =  stock_attribute_details[ st_at_cnt ]["stock_attr_value"] ;-->
@@ -507,7 +537,7 @@ function ValidateForm() {
 
         }
         stockid = ""
-        i+=1 ;
+
     }
 }
 
