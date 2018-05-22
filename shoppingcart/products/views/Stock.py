@@ -112,7 +112,6 @@ def getattributes( attributes ):
     attr_values = []
     attributes_struct = []
     attribute_name = dict()
-    pdb.set_trace()
     for attribute in attributes:
         attr_name = attribute['attr_name']
         if attr_old_name != attr_name:
