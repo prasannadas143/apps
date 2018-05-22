@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
 from .views.Products import AddProduct, Products, ListProducts, ProductDetail, Product
 from .views.Stock import InStock, listimages, deletestock
+from .views.Stocks import listStock, deletestocks
 from .views.Photos import BasicUploadView, DeletePhoto
 from .views.Digital import digital
 from .views.Attributes import attributes, delAttributeName, delAttribute
@@ -19,6 +20,12 @@ urlpatterns = [
 
     url(r'^AddProduct/', AddProduct, name="AddProduct"),
     url(r'^ListProducts/', ListProducts, name="ListProducts"),
+    url(r'^Stocks/', TemplateView.as_view(template_name='Stocks.html'), name="Stocks"),
+    url(r'^ListStocks/', listStock , name="ListStocks"),
+    url(r'^deletestocks/', deletestocks, name="deletestocks"),
+
+
+
     url(r'(?P<id>\d+)/$', Product, name="Product"),
     url(r'(?P<id>\d+)/InStock/$', InStock, name="AddStock"),
 

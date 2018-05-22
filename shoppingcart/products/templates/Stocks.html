@@ -1,0 +1,209 @@
+{% extends "ProductsBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% load js %}
+{% block content %}
+
+			<!-- Start Services page -->
+<div class="Products-page">
+    <div class="table1">
+    <table id="datatables"  class="display">
+        <thead>
+        <tr>
+            <th><input type="checkbox" aria-label="..."></th>
+            <th>image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+        </thead>
+
+    </table>
+
+   <div class="tfoot">
+    <select class="selectpicker" id="DeleteAction" onchange="triggerdelete()" >
+          <option value="Online">Choose Action </option>
+          <option value="delete" >Delete Selected </option>
+      </select>
+</div>
+    </div></div>
+
+<script type="text/javascript">
+
+var getfilter = "all";
+var rows_selected = [];
+draw_datatable();
+
+
+table ;
+function draw_datatable() {
+
+
+
+   table = $('#datatables').DataTable({
+
+        "processing": true,
+        "ajax": {
+            "url": "/shoppingcart/Products/ListStocks/",
+            "type": "GET"
+        },
+
+        "createdRow": function( row, data, dataIndex ) {
+                        $(row).attr('id', data.id);
+
+          },
+
+        "columnDefs": [
+
+            {
+              'targets': 0,
+              'orderable': false,
+              'className': 'dt-body-justify',
+              "data": null,
+              render: function ( data, type, row ) {
+                return  '<input type="checkbox" name="id[]" value="">'
+               }
+            },
+            {
+             'targets': 1,
+              'orderable': false,
+              'className': 'dt-body-justify',
+              render:function(data, type, full) {
+                return '<td><img src=' + full.imagepath + '></td>' ;
+
+              }
+            },
+
+            {
+             'targets': 2,
+              'searchable': true,
+              'orderable': false,
+              'className': 'dt-body-justify',
+              render:function(data, type, full) {
+                stock_name = "";
+                product_name = full.product_name ;
+                product_id = full.product_id ;
+                stock_id = full.id ;
+                product_name = "<b>" + product_name + "</b></br>";
+                stock_name += '<a href=' + '/shoppingcart/Products/' + full.product_id +  '/InStock/' +  ">" + product_name + '</a>'
+                attribute_details = full.stock_attribute_details
+                for ( i in attribute_details ) {
+
+                    if (  i == 0 ) {
+                     stock_name += "( ";
+                    }
+                    attr_name = attribute_details[i].stock_attr_name ;
+                    attr_value = attribute_details[i].stock_attr_value ;
+                    stock_name += attr_name + ": " + attr_value ;
+                    if ( i  == ( attribute_details.length -1) ) {
+                      stock_name += " )";
+                    }
+                    else {
+                        stock_name += ", " ;
+                    }
+                }
+                return '<td>' + stock_name + '</td>' ;
+
+              }
+            },
+
+           {
+             'targets': 3,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+              render:function(data, type, full) {
+                return '<td>' + full.price + '</td>';
+
+              }
+            },
+           {
+             'targets': 4,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+              render:function(data, type, full) {
+                return '<td>' + full.qty + '</td>';
+
+              }
+            },
+
+
+
+        ],
+            'rowCallback': function(row, data, dataIndex){
+             // Get row ID
+             var rowId = data[0];
+
+             // If row ID is in the list of selected row IDs
+               if($.inArray(rowId, rows_selected) !== -1){
+                  $(row).find('input[type="checkbox"]').prop('checked', true);
+
+               }
+            }
+      });
+}
+
+
+function postformdata( opn, method,   nodeid) {
+        method = method || "post"; // post (set to default) or get
+
+        url = "" ;
+        if ( opn == "deletestocks" ) {
+            url = "/shoppingcart/Products/deletestocks/";
+        }
+        // Create the form object
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", url);
+        form.innerHTML +=  "{% csrf_token %}"
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", opn);
+        hiddenField.setAttribute("value", nodeid);
+        // append the newly created control to the form
+        form.appendChild(hiddenField);
+
+        document.body.appendChild(form); // inject the form object into the body section
+        form.submit();
+    }
+
+function deletemultirow() {
+    rows = document.getElementById('datatables').rows;
+    var result_array = new Array();
+    for(var i=0; i<rows.length; i++)
+    {
+        rowid = parseInt( rows[i].getAttribute('id') )
+        if(i == 0 ) {
+            continue;
+        }
+        selected = rows[i].childNodes[0].childNodes[0].checked ;
+        if (selected) {
+            result_array.push(rowid);
+        }
+    }
+      if(result_array!=""){
+        rowids = result_array.join(",");
+      }
+      else {
+          alert("no rows selected");
+          return false ;
+      }
+      data = { "rowids":result_array, }
+     postformdata( "deletestocks", "POST",   rowids)
+}
+
+function triggerdelete(  ) {
+    var selectedValue = event.srcElement
+
+    if ( selectedValue.value == "delete" ) {
+        deletemultirow();
+    }
+}
+
+</script>
+{% endblock %}
