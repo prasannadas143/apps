@@ -36,7 +36,10 @@
                     <input type="text" name="product_name" value={{ product.product_name }} >
                 </span>
             </p>
-        <p><label class="title">Category:</label>
+        {% if catagories|length > 1 %}
+<!-- printing some html here -->
+
+            <p><label class="title">Category:</label>
             <div class="multiselect">
                 <div class="selectBox" id="selectBox" onclick="showCheckboxes()" >
                     <select>
@@ -49,7 +52,7 @@
                 <div id="checkboxes"  >
                 </div>
             </div>
-
+            {% endif %}
         <p>
             <label class="title">Short description</label>
             <span class="inline_block">
@@ -93,18 +96,18 @@ $( document ).ready(function() {
 	catagorieids = {{ catagorieids|safe }};
     level = 1
 	showcatagorie(data)
+
 	selectbox = document.getElementById("selectBox");
-
 	$( "#checkboxes" ).append( categoriename);
-
-
     var countChecked = function() {
        var n = $( "input:checkbox[name^='check']:checked" ).length;
        selectbox.children[0].children[0].innerHTML =  n + " selected"
     };
-    countChecked();
-
+    {% if catagories|length > 1 %}
+        countChecked();
+    {% endif %}
   $("input:checkbox[name^='check']").on( "click", countChecked );
+
 
   function showcatagorie(data) {
 

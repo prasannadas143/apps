@@ -3,6 +3,15 @@ from django.urls import reverse
 
 # # Create your models here.
 
+class Categories(models.Model):
+#     product_id = models.IntegerField(primary_key=True)
+    parent_id = models.IntegerField(default = 0)
+    catagorie_name = models.CharField( max_length=255, blank=False, null=False)
+    child_position =  models.IntegerField(default = 0)
+    class Meta:
+        db_table = 'shoppingcart_products_categories'
+        ordering = ['id']
+
 class Products(models.Model):
     PRIORITY_CHOICES = ((True, 'active'),
                         (False, 'inactive'),)
@@ -21,6 +30,7 @@ class Products(models.Model):
     digital_file = models.ImageField(upload_to='product',  blank=True, null=True)
     digital_name = models.CharField(max_length=255, blank=True, null=True)
     digital_expire = models.CharField( max_length=255,blank=True, null=True)
+    categories = models.ForeignKey(Categories, related_name="categories", blank=True, null=True )
 
     class Meta:
         db_table = 'shoppingcart_products'
@@ -34,7 +44,7 @@ class Products(models.Model):
         return '/shoppingcart/products/EditProduct/' + self.id  + '/'
 
     def get_success_url(self):
-        return '/shoppingcart/products/listproducts/'
+        return '/shoppingcart/Products/ShowProducts/'
 
 
 
@@ -54,18 +64,7 @@ class Attributes(models.Model):
         ordering = ['id']
 
 
-class Categories(models.Model):
-#     product_id = models.IntegerField(primary_key=True)
-    parent_id = models.IntegerField(default = 0)
-    catagorie_name = models.CharField( max_length=255, blank=False, null=False)
-    child_position =  models.IntegerField(default = 0)
-    product = models.ForeignKey(
-        'Products',
-        related_name="product", blank=True, null=True
-    )
-    class Meta:
-        db_table = 'shoppingcart_products_categories'
-        ordering = ['id']
+
 
 class Photo(models.Model):
     title = models.CharField(max_length=255, blank=True)

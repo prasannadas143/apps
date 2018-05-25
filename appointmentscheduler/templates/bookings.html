@@ -222,7 +222,7 @@ function draw_datatable() {
             }
       });
 }
-    let id = 0;
+  let id = 0;
 
    // Handle click on "Select all" control
    $('#select-all-records').on('click', function(){
@@ -319,32 +319,32 @@ $('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
    });
  
  
-   $("#multicheckbox").on('click',function(){
-      var ids = $.map(table.rows('.selected').data(), function (item) {
-            return item.bookingid;
-        });
-      if(ids!=""){
-        rowids = ids.join(",");
-      }
-      else {
-          alert("no rows selected");
-     }
-       $.ajax({
-                url: "{% url 'appointmentschduler:delete_bookings' %}",
-                method: 'POST',
-                data : {
-                        "rowids":rowids,
-                      },
-          }).success(function (data, textStatus, jqXHR) {
-                $.each(ids, function( index, value ) {
-                  table.row( '#' + value ).remove().draw();
+$("#multicheckbox").on('click',function(){
+  var ids = $.map(table.rows('.selected').data(), function (item) {
+        return item.bookingid;
+    });
+  if(ids!=""){
+    rowids = ids.join(",");
+  }
+  else {
+      alert("no rows selected");
+ }
+   $.ajax({
+            url: "{% url 'appointmentschduler:delete_bookings' %}",
+            method: 'POST',
+            data : {
+                    "rowids":rowids,
+                  },
+      }).success(function (data, textStatus, jqXHR) {
+            $.each(ids, function( index, value ) {
+              table.row( '#' + value ).remove().draw();
 
-                });
-            }).error(function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR)
-          });    
-   
-   });
+            });
+        }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+      });
+
+});
  
 
 
@@ -384,19 +384,19 @@ $('#datatables tbody').on('click', 'button', function () {
 
 });
 
-    $('#confirm').on('click', '#delete', function (e) {
+$('#confirm').on('click', '#delete', function (e) {
 
-        $.ajax({
-              url: "/appointmentschduler/deletebooking/" + id + "/",
-              method: 'POST'
-          }).success(function (data, textStatus, jqXHR) {
+    $.ajax({
+          url: "/appointmentschduler/deletebooking/" + id + "/",
+          method: 'POST'
+      }).success(function (data, textStatus, jqXHR) {
 
-               table.row( '#' + id ).remove().draw();
+           table.row( '#' + id ).remove().draw();
 
-          }).error(function (jqXHR, textStatus, errorThrown) {
-              console.log(jqXHR)
-          });         
-  });
+      }).error(function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+      });
+});
 
 
 

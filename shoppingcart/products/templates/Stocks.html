@@ -9,7 +9,7 @@
 {% block content %}
 
 			<!-- Start Services page -->
-<div class="Products-page">
+<div class="Stock-page">
     <div class="table1">
     <table id="datatables"  class="display">
         <thead>
@@ -73,7 +73,7 @@ function draw_datatable() {
               'orderable': false,
               'className': 'dt-body-justify',
               render:function(data, type, full) {
-                return '<td><img src=' + full.imagepath + '></td>' ;
+                return '<td><img src=' + full.imagepath + ' alt="Smiley face" height="42" width="42"></td>' ;
 
               }
             },
@@ -117,7 +117,7 @@ function draw_datatable() {
               'orderable': true,
               'className': 'dt-body-center',
               render:function(data, type, full) {
-                return '<td>' + full.price + '</td>';
+                return '<td>' + full.qty + '</td>';
 
               }
             },
@@ -127,7 +127,7 @@ function draw_datatable() {
               'orderable': true,
               'className': 'dt-body-center',
               render:function(data, type, full) {
-                return '<td>' + full.qty + '</td>';
+                return '<td>' + full.price + '</td>';
 
               }
             },
