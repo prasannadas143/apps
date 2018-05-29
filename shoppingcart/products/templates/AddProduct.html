@@ -87,7 +87,7 @@ function showCheckboxes() {
   }
 </script>
 <div>
-    <form action="/shoppingcart/products/AddProduct/" method="post" id="frmCreateProduct" class="pj-form form" onsubmit="return ValidateForm();" >{% csrf_token %}
+    <form action="/shoppingcart/Products/AddProduct/" method="post" id="frmCreateProduct" class="pj-form form" onsubmit="return ValidateForm();" >{% csrf_token %}
         <p><label class="title">Status:</label>
         <select name="product_status" id="product_status" class="pj-form-field">
             <option value="True">Available</option>
