@@ -2,7 +2,7 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from django.views.generic import TemplateView
 from .views.Catagories import listcatagories, AddCatagorie,MoveCatagories,EditCatagory, DeleteCatagory, DeleteCatagories
-from .views.Products import AddProduct, Products, ListProducts, ProductDetail, Product, DeleteProduct,DeleteProducts
+from .views.Products import AddProduct, Products, ListProducts, ProductDetail, Product, DeleteProduct,DeleteProducts, GetProductDetails, SearchProduct
 from .views.Stock import InStock, listimages, deletestock
 from .views.Stocks import listStock, deletestocks
 from .views.Photos import BasicUploadView, DeletePhoto
@@ -25,6 +25,10 @@ urlpatterns = [
     url(r'^ShowProducts/', TemplateView.as_view(template_name='Products.html'),name="ShowProducts"),
     url(r'^DeleteProduct/(?P<id>\d+)/$', DeleteProduct, name="DeleteProduct"),
     url(r'^DeleteProducts/', DeleteProducts, name="DeleteProducts"),
+    url(r'^GetProductDetails/', GetProductDetails, name="GetProductDetails"),
+    url(r'^SearchProduct/', SearchProduct, name="SearchProduct"),
+
+
 
     url(r'^(?P<id>\d+)/ProductDetail/$', ProductDetail, name="ProductDetail"),
 

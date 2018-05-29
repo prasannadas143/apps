@@ -32,6 +32,9 @@ def digital(request,id ):
             pd = productform.save()
     productid = pd.id
     contextdata = {"productid" : productid }
+    if pd.is_digital :
+        contextdata['is_digital'] = pd.is_digital
+
     if pd.digital_expire:
         ( hour, minute ) = pd.digital_expire.split(":")
         contextdata['hour'] = hour

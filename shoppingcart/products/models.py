@@ -26,11 +26,11 @@ class Products(models.Model):
     is_featured = models.BooleanField(choices=PRIORITY_CHOICES, default=False)
 
 
-    is_digital = models.NullBooleanField(choices=PRIORITY_CHOICES, blank=True, null=True)
+    is_digital = models.NullBooleanField(choices=PRIORITY_CHOICES, blank=True, default=False)
     digital_file = models.ImageField(upload_to='product',  blank=True, null=True)
     digital_name = models.CharField(max_length=255, blank=True, null=True)
     digital_expire = models.CharField( max_length=255,blank=True, null=True)
-    categories = models.ForeignKey(Categories, related_name="categories", blank=True, null=True )
+    products_categories = models.ManyToManyField(Categories, related_name="products_categories" ,blank=True, null=True )
 
     class Meta:
         db_table = 'shoppingcart_products'

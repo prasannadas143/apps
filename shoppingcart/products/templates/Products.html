@@ -8,8 +8,43 @@
 
 {% block content %}
 
+<button type="button" class="pj-button pj-button-detailed pj-button-hover" id="productsearch" onClick="toggle_productarea()">ProductSearch</button>
+    <div style="display: none" id="productsearcharea">
+		<div style="float:left">
+				<p>
+					<label class="title">Product name</label>
+					<input type="text" name="productname" id="productname" class="pj-form-field w150" >
+				</p>
 
-<div class="menu Products-page-menu">
+				<p>
+					<label class="title">Category</label>
+					<select name="category_id" id="category_id" class="pj-form-field w150">
+					<option value="">-- Choose --</option>
+				</p>
+				<p>
+					<label class="title">&nbsp;</label>
+					<input type="button" id="search" value="Search" class="pj-button">
+				</p>
+			</div>
+			<div style="float:right">
+				<p>
+					<label class="title" style="width: 110px">Status</label>
+					<select name="status" id="status" class="pj-form-field w150">
+						<option value="">-- Choose --</option>
+						<option value="1">Available</option><option value="0">Hidden</option>					</select>
+				</p>
+				<p>
+					<label class="title" style="width: 110px">This is a digital product</label>
+					<span class="left"><input type="checkbox" name="is_digital" id="is_digital" ></span>
+				</p>
+				<p>
+					<label class="title" style="width: 110px">Is featured</label>
+					<span class="left"><input type="checkbox" name="is_featured" id="is_featured"  ></span>
+				</p>
+			</div>
+			<br class="clear_both">
+        </div>
+    <div class="menu Products-page-menu">
     <div>
             <button class="btn btn-default add" id="AddProduct" type="reset" onclick="window.location.href='/shoppingcart/Products/AddProduct/'">Add Products</button>
             <div class="right">
@@ -114,9 +149,43 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 });
 
+function toggle_productarea()
+{
+    search_product_id = event.srcElement.id
+    var e = document.getElementById("productsearcharea");
+    if ( e.style.display == 'block' ) {
+        e.style.display = 'none';
+    }
+    else {
+        e.style.display = 'block';
+         $.ajax({
+                url: "/shoppingcart/Products/GetProductDetails/",
+                method: 'GET',
+
+         success : function (data, textStatus, jqXHR) {
+            catagories = data.data ;
+           for (var i in catagories) {
+              console.log(catagories[i].id);
+              console.log(catagories[i].catagorie_name);
+              $('#category_id').append($('<option/>').attr("value", catagories[i].id ).text(catagories[i].catagorie_name));
+
+
+            }
+         }, error : function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+         }
+        });
+    }
+
+}
 var getfilter = "all";
 var rows_selected = [];
 draw_datatable();
+
+
+$("#search").click(function(){
+   draw_datatable(1);
+});
 
 $("#all").click(function(){
    getfilter = "all";
@@ -139,19 +208,57 @@ $("#outofstock").click(function(){
 });
 
 table ;
-function draw_datatable() {
+function draw_datatable( search=0) {
     if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
      table.destroy();
     }
+    var productname = document.getElementById('productname');
+    if( productname ) {
+        product_value =  productname.value;
+    }
 
+    var category_dd = document.getElementById("category_id");
+    if ( category_dd ) {
+        var category_value = category_dd.options[category_dd.selectedIndex].value;
+    }
+
+
+    var status_dd = document.getElementById("status");
+    if ( status_dd ) {
+        var status_value = status_dd.options[status_dd.selectedIndex].value;
+    }
+
+    var is_digital_cb = document.getElementById("is_digital");
+    if ( is_digital_cb.checked ) {
+        is_digital_value = 1;
+    }
+    else {
+       is_digital_value = 0;
+
+    }
+
+
+    var is_featured_cb = document.getElementById("is_featured");
+    if ( is_featured_cb.checked ) {
+          is_featured_value = 1;
+    }
+    else {
+       is_featured_value = 0;
+    }
    table = $('#datatables').DataTable({
 
         "processing": true,
         "ajax": {
             "url": "/shoppingcart/Products/ListProducts/",
-            "type": "GET",
+            "type": "POST",
              "data": function(d) {
-                 d.querydata = getfilter
+                 d.querydata = getfilter,
+                 d.product = product_value,
+                d.category = category_value,
+                d.status =  status_value,
+                d.is_digital =  is_digital_value,
+                d.is_featured = is_featured_value
+                d.search = search
              },
         },
 

@@ -1,7 +1,6 @@
 {% extends "ProductsBase.html" %}
 {% load static from staticfiles %}
-{% load admin_urls %}
-{% load bootstrap3 %}
+{% load admin_urls %}{% load bootstrap3 %}
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
@@ -10,7 +9,7 @@
 
 {% endblock %}
 {% block content %}
-<form action="/shoppingcart/products/{{ productid }}/Digital/" method="post" id="adddigital"   enctype="multipart/form-data" >{% csrf_token %}
+<form action="/shoppingcart/Products/{{ productid }}/Digital/" method="post" id="adddigital"   enctype="multipart/form-data" >{% csrf_token %}
 
 <div id="tabs-2" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
 	<div class="notice-box">
@@ -22,7 +21,8 @@
 		</div>
 		<div class="notice-bottom"></div>
     </div>
-    <p><label class="title">This is a digital product</label><span class="left"><input type="checkbox" name="is_digital" id="is_digital" value="1" checked></span></p>
+    <p><label class="title">This is a digital product</label><span class="left"><input type="checkbox" name="is_digital" id="is_digital"     {% if is_digital  %} checked {% endif %}
+ ></span></p>
     <div id="boxDigitalOuter" style="display: block;">
          <p class="digitalFile"><label class="title">Browse file</label><input type="file" name="digital_file" id="digital_file"><span id="filename">{{ digital_name }}</span></p>
          <p><label class="title">Link expiration</label>
