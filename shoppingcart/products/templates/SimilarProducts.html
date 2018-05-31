@@ -1,0 +1,393 @@
+{% extends "ProductsBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+
+			<!-- Start Services page -->
+<div class="Products-page">
+    <div class="table1">
+    <table id="datatables"  class="display">
+        <thead>
+        <tr>
+            <th><input name="select_all" value="1" id="select-all-records" type="checkbox" aria-label="..." /></th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+
+    </table>
+
+   <div class="tfoot">
+        <select class="selectpicker" id="DeleteAction" onchange="triggerdelete()" >
+          <option value="Online">Choose Action </option>
+          <option value="delete" >Delete Selected </option>
+        </select>
+    </div>
+    </div></div>
+<div class="modal fade" id="confirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cancelmodal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="cnbooking">cancel booking</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+// Django CSRF framework
+$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+
+
+var rows_selected = [];
+var producturl = window.location.pathname;
+var re = /\/shoppingcart\/Products\/(\d+)\/SimilarProducts/i;
+var found = producturl.match(re);
+productid = found[1];
+draw_datatable();
+
+
+
+table ;
+function draw_datatable( ) {
+    if ( $.fn.dataTable.isDataTable( '#datatables' ) ) {
+     table.destroy();
+    }
+
+   table = $('#datatables').DataTable({
+
+        "processing": true,
+        "ajax": {
+            "url": "/shoppingcart/Products/ListSimilarProducts/",
+            "type": "POST",
+             "data": function(d) {
+                 d.productid = productid
+
+             },
+        },
+
+        "createdRow": function( row, data, dataIndex ) {
+                        $(row).attr('id', data.product_id);
+
+          },
+
+        "columnDefs": [
+
+            {
+              'targets': 0,
+              'orderable': false,
+              'className': 'dt-body-justify',
+              "data": null,
+              render: function ( data, type, row ) {
+                return  '<input type="checkbox" name="id[]" value=""  aria-label="...">'
+               }
+            },
+            {
+             'targets': 1,
+              'orderable': false,
+              'className': 'dt-body-justify',
+              render:function(data, type, full) {
+                return '<td><a href=' + '/shoppingcart/Products/' + full.product_id +  '/ProductDetail/' + '>' + full.product_name + '</a></td>' ;
+
+              }
+            },
+
+           {
+             'targets': 2,
+              'searchable': true,
+              'orderable': true,
+              'className': 'dt-body-center',
+              render:function(data, type, full) {
+                if( full.product_status ) {
+                    status = "Available";
+                }
+                else {
+                   status = "Hidden";
+               }
+                return '<td><button class=\"btn btn-default active-btn\">' + status + '</button></td>';
+              }
+           },
+
+         {
+           'targets':3,
+            "data": null,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-body-center',
+           render:function(data, type, full) {
+
+            return '<td><button  id=\"edit\"><span class=\"icons\"> \
+			    <i class=\"fa fa-pencil-square-o fa-lg\" aria-hidden=\"true\"></i> </span></button>  \
+             </a><button  id=\"delete\"> <span class=\"icons\"> \
+			   <i class=\"fas fa-trash-alt fa-lg\"></i> </span></button></td></tr>' ;
+          }
+         },
+        ],
+
+        'rowCallback': function(row, data, dataIndex){
+            // Get row ID
+            var rowId = data[0];
+
+            // If row ID is in the list of selected row IDs
+            if($.inArray(rowId, rows_selected) !== -1){
+              $(row).find('input[type="checkbox"]').prop('checked', true);
+
+            }
+        }
+      });
+}
+
+
+
+let id = 0;
+
+// Handle click on "Select all" control
+$('#select-all-records').on('click', function(){
+      // select-all-records/uncheck all checkboxes in the table
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      $('input[type="checkbox"]', rows).prop('checked', this.checked);
+});
+
+// Handle table draw event
+table.on('draw', function(){
+  // Update state of "Select all" control
+  updateDataTableSelectAllCtrl(table);
+});
+
+function updateDataTableSelectAllCtrl(table){
+   var $table             = table.table().node();
+   var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
+   var $chkbox_checked    = $('tbody input[type="checkbox"]:checked', $table);
+   var chkbox_select_all  = $('thead input[name="select_all"]', $table).get(0);
+
+   // If none of the checkboxes are checked
+   if($chkbox_checked.length == 0){
+      chkbox_select_all.checked = false;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If all of the checkboxes are checked
+   } else if ($chkbox_checked.length == $chkbox_all.length){
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If some of the checkboxes are checked
+   } else {
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = true;
+      }
+   }
+}
+
+
+  // Handle click on checkbox
+$('#datatables tbody').on('click', 'input[type="checkbox"]', function(e){
+      var $row = $(this).closest('tr');
+
+      // Get row data
+      var data = table.row($row).data();
+
+      // Get row ID
+      var rowId = data.product_id;
+
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, rows_selected);
+
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1){
+         rows_selected.push(rowId);
+
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1){
+         rows_selected.splice(index, 1);
+      }
+
+      if(this.checked){
+         $row.addClass('selected');
+      } else {
+         $row.removeClass('selected');
+      }
+
+       // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+});
+
+// Handle click on table cells with checkboxes
+$('#datatables').on('click', 'tbody td, thead th:first-child', function(e){
+    $(this).parent().find('input[type="checkbox"]').trigger('click');
+});
+
+// Handle click on "Select all" control
+$('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatables tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatables tbody input[type="checkbox"]:checked').trigger('click');
+      }
+
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+});
+
+
+function deletemultirow() {
+      var ids = $.map(table.rows('.selected').data(), function (item) {
+            return item.product_id;
+        });
+      if(ids!=""){
+        rowids = ids.join(",");
+      }
+      else {
+          alert("no rows selected");
+     }
+      $.ajax({
+                url: "/shoppingcart/Products/DeleteProducts/",
+                method: 'POST',
+                data : {
+                        "rowids":rowids,
+                      },
+      success : function (data, textStatus, jqXHR) {
+               productids = data.data ;
+
+            $.each(productids, function( index, value ) {
+              table.row( '#' + value ).remove().draw();
+
+            });
+      }, error : function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR)
+       }
+    });
+}
+
+      // FOR TESTING ONLY
+
+      // // Output form data to a console
+      // $('#example-console').text($(form).serialize());
+      // console.log("Form submission", $(form).serialize());
+
+      // Prevent actual form submission
+
+
+$('#datatables tbody').on('click', 'button', function () {
+    let data = table.row($(this).parents('tr')).data();
+    let class_name = $(this).attr('class');
+    let op_id = $(this).attr('id');
+
+    if (op_id == 'edit') {
+
+          location.href = '/shoppingcart/Products/' + data.product_id + '/ProductDetail/';
+
+
+    } else if( op_id == 'delete') {
+        // DELETE button
+        $('#modal_title').text('DELETE');
+        $("#confirm").modal();
+    }
+
+    else if( op_id == 'cancel') {
+        // DELETE button
+        $('#modal_title').text('CANCEL BOOKING');
+        $("#cancelmodal").modal();
+    }
+
+
+    id = data.product_id;
+
+});
+
+$('#confirm').on('click', '#delete', function (e) {
+
+    $.ajax({
+          url: "/shoppingcart/Products/DeleteProduct/" + id + "/",
+          method: 'POST',
+      success : function (data, textStatus, jqXHR) {
+         productids = data.data ;
+         $.each(productids, function( index, value ) {
+             table.row( '#' + value ).remove().draw();
+         });
+
+      }, error: function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR)
+       }
+      });
+});
+
+
+function triggerdelete(  ) {
+    var selectedValue = event.srcElement
+
+    if ( selectedValue.value == "delete" ) {
+        deletemultirow();
+    }
+}
+
+
+</script>
+{% endblock %}

@@ -167,6 +167,10 @@ def ProductDetail(request, id):
         else :
             request.POST['is_featured'] = bool( request.POST['is_featured']  )
 
+        if  not product.stocks_set.exists():
+            templatename = "AddStock.html"
+            return render(request, templatename)
+
         productsform = ProductsForm(request.POST or None, instance=product)
         if productsform.is_valid():
             product_obj = productsform.save()

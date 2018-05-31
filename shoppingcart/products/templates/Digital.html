@@ -9,19 +9,15 @@
 
 {% endblock %}
 {% block content %}
+<style >
+
+</style>
 <form action="/shoppingcart/Products/{{ productid }}/Digital/" method="post" id="adddigital"   enctype="multipart/form-data" >{% csrf_token %}
 
 <div id="tabs-2" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
-	<div class="notice-box">
-		<div class="notice-top"></div>
-		<div class="notice-middle">
-			<span class="notice-info">&nbsp;</span>
-			<span class="block bold">Digital product</span>
-			<span class="block">If you sell digital content (videos, mp3, images, files, etc..) you can use this page to upload the file and set various options for it. If file is too large you can upload it via FTP and under "File path" set full server path to it. Once an order for that file is made a confirmation email is sent to the customer. You can set when this link to expire so file cannot be downloaded any more.</span><a href="#" class="notice-close"></a>
-		</div>
-		<div class="notice-bottom"></div>
-    </div>
-    <p><label class="title">This is a digital product</label><span class="left"><input type="checkbox" name="is_digital" id="is_digital"     {% if is_digital  %} checked {% endif %}
+	<span class="block">If you sell digital content (videos, mp3, images, files, etc..) you can use this page to upload the file and set various options for it. If file is too large you can upload it via FTP and under "File path" set full server path to it. Once an order for that file is made a confirmation email is sent to the customer. You can set when this link to expire so file cannot be downloaded any more.</span><a href="#" class="notice-close"></a>
+</div>
+<p><label class="title">This is a digital product</label><span class="left"><input type="checkbox" name="is_digital" id="is_digital"     {% if is_digital  %} checked {% endif %}
  ></span></p>
     <div id="boxDigitalOuter" style="display: block;">
          <p class="digitalFile"><label class="title">Browse file</label><input type="file" name="digital_file" id="digital_file"><span id="filename">{{ digital_name }}</span></p>
@@ -78,39 +74,36 @@
 		</div>
 </form>
 <script>
+$( document ).ready(function() {
 
-<!--function validateform() {-->
-   <!--var radio_value = document.querySelector('input[name = "digital_choose"]:checked').value;-->
-    <!--if  (radio_value == 2) {-->
-          <!--digital_file_path =   $('#digital_file_path').val();-->
-          <!--alert(digital_file_path);-->
-          <!--var file = new File([digital_file_path], "foo.txt");-->
-          <!--var result = file.open ('r');-->
+    is_digital = "{{ is_digital|safe }}" ;
+    attribute_tab  = $("#ProductAttributes")
+    attrdata = attribute_tab[0].attributes.href.value;
+    if( is_digital == "True" ) {
+        $("#boxDigitalOuter").show();
+          attribute_tab.attr("href", "javascript:void(0)").attr("disabled", "disabled");
 
-                    <!--alert(result);-->
+     }
+    else {
+        $("#boxDigitalOuter").hide();
 
-    <!--}-->
+    }
 
-<!--}-->
+});
+
+
+
  $("#is_digital").change(function() {
     if($(this).prop('checked') == true) {
            $("#boxDigitalOuter").show()
+           attribute_tab.attr("href", "javascript:void(0)").attr("disabled", "disabled");
     } else {
            $("#boxDigitalOuter").hide()
+           attribute_tab.attr("href", attrdata ).removeAttr("disabled");
+
     }
 });
 
-<!--$('input[name^="digital_choose"]').change(function () {-->
-    <!--if (this.value == 2) {-->
-       <!--$(".digitalFile").hide();-->
-       <!--$(".digitalPath").show();-->
-
-    <!--}-->
-    <!--else{-->
-        <!--$(".digitalFile").show();-->
-       <!--$(".digitalPath").hide();-->
-    <!--}-->
-<!--});-->
 
 </script>
 {% endblock %}
