@@ -13,34 +13,33 @@
 
 {% block content %}
 
+
+
 <div id="tabs-1" >
+    <form action="/shoppingcart/Products/{{ product.id }}/ProductDetail/" method="post" id="frmCreateProduct" class="pj-form form" onsubmit="return ValidateForm();" >{% csrf_token %}
+
     <div class="notice-box">
-	<div class="notice-top"></div>
-        <div class="notice-middle">
-                <span class="notice-info">&nbsp;</span>
-                <span class="block bold">Details</span>
-            <span class="block">Enter product details below. You can assign a product to one or more categories (change categories under Options page, Categories tab) and to make it featured.</span>
-            <a href="#" class="notice-close"></a>
-        </div>
-        <div class="notice-bottom"></div>
-    </div>
+        <span class="block">Enter product details below. You can assign a product to one or more categories (change categories under Options page, Categories tab) and to make it featured.</span>
+   </div>
 
         <p><label class="title">Status</label>
             <select name="status" id="status" >
                 <option value="1" {% if product.product_status == True  %} selected {% endif %}  >Available</option>
-                <option value="2" {% if product.product_status == False  %} selected {% endif %}>Hidden</option>
+                <option value="0" {% if product.product_status == False  %} selected {% endif %}>Hidden</option>
             </select></p>
             <p>
                 <label class="title">Product name</label>
                 <span class="inline_block">
-                    <input type="text" name="product_name" value={{ product.product_name }} >
+                    <input type="text" name="product_name"  id="product_name" value={{ product.product_name }} >
+	                <div class="product_name-msg red"></div>
+
                 </span>
             </p>
-        {% if catagories|length > 1 %}
-<!-- printing some html here -->
+        {% if data|length > 1 %}
+            <!-- printing some html here -->
 
-            <p><label class="title">Category:</label>
             <div class="multiselect">
+                <p><label class="title">Category:</label>
                 <div class="selectBox" id="selectBox" onclick="showCheckboxes()" >
                     <select>
                         <option>Select an option</option>
@@ -52,17 +51,21 @@
                 <div id="checkboxes"  >
                 </div>
             </div>
-            {% endif %}
+        {% endif %}
         <p>
             <label class="title">Short description</label>
             <span class="inline_block">
-                <textarea name="product_desc" > {{ product.product_desc }} </textarea>
+                <textarea name="product_desc"  id="product_desc"> {{ product.product_desc }} </textarea>
+	                <div class="product_desc-msg red"></div>
+
             </span>
          </p>
          <p>
                 <label class="title">Full description</label>
                 <span class="block overflow">
-                    <textarea> {{ product.product_full_desc }} </textarea>
+                    <textarea id="product_full_desc" name="product_full_desc"> {{ product.product_full_desc }} </textarea>
+	                <div class="product_full_desc-msg red"></div>
+
                 </span>
             </p>
         <p><label class="title">Is featured</label>
@@ -74,7 +77,9 @@
             <input type="submit" value="Save" class="pj-button">
             <input type="button" value="Cancel" class="pj-button" onclick="">
         </p>
-    </div>
+    </form>
+</div>
+
 
 <script>
 
@@ -103,7 +108,7 @@ $( document ).ready(function() {
        var n = $( "input:checkbox[name^='check']:checked" ).length;
        selectbox.children[0].children[0].innerHTML =  n + " selected"
     };
-    {% if catagories|length > 1 %}
+    {% if catagorieids|length > 1 %}
         countChecked();
     {% endif %}
   $("input:checkbox[name^='check']").on( "click", countChecked );
@@ -134,5 +139,42 @@ $( document ).ready(function() {
 
 	});
 
+function ValidateForm(){
+
+     $('.product_name-msg').html('');
+     $('.product_desc-msg').html('');
+     $('.product_full_desc-msg').html('');
+     var isValidForm=true;
+    product_name = $('#product_name').val()
+    if( !product_name || product_name.trim()=="" )
+    {
+        isValidForm=false;
+        $('.product_name-msg').html("Please enter Product Name")
+    }
+
+    product_desc = $('#product_desc').val()
+    if( !product_desc || product_desc.trim()=="" )
+    {
+        isValidForm=false;
+        $('.product_desc-msg').html("Please enter product description")
+    }
+    product_full_desc = $('#product_full_desc').val()
+
+    if( !product_full_desc || product_full_desc.trim()=="" )
+    {
+        isValidForm=false;
+        $('.product_full_desc-msg').html("Please enter product full description")
+    }
+
+    if(isValidForm)
+    {
+         return true;
+    }
+    else
+    {
+         return false;
+    }
+
+}
 </script>
 {% endblock %}

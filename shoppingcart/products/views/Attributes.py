@@ -60,6 +60,11 @@ def attributes(request, id):
                     attributesobj = attributesform.save(commit=False)
                     attributesobj.attribute_product = pd
                     attributesobj.save()
+                    pd.is_digital = False
+                    pd.digital_file = None
+                    pd.digital_name = None
+                    pd.digital_expire = None
+                    pd.save()
     attributes = Attributes.objects.filter( attribute_product__id = id ).order_by( 'attr_name', 'id' )
     attrs = []
     for attribute in attributes :
