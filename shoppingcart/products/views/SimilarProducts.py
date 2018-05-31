@@ -16,9 +16,10 @@ def ListSimilarProducts(request):
     productid = request.POST['productid']
     productobj  = get_object_or_404( Products, id=int( productid ))
     productname = productobj.product_name
-    
+    start_product_name = productname.split()[0][:3]
+
     data = list()
-    products = Products.objects.all()
+    products = Products.objects.filter( product_name__icontains=start_product_name )
     productdetails = list()
     for product in products:
         productdetail = dict()
@@ -26,6 +27,5 @@ def ListSimilarProducts(request):
         productdetail['product_status'] = product.product_status
         productdetail['product_id'] = product.id
         productdetails.append( productdetail )
-    pdb.set_trace()
     return HttpResponse(json.dumps({"data" :productdetails }), content_type='application/json')
 

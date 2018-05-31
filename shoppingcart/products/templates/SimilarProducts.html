@@ -5,10 +5,21 @@
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
+{% block header3 %}
+   {% include "ProductBase.html" with id=productid  %}
 
+{% endblock %}
 {% block content %}
-
-			<!-- Start Services page -->
+<div class="notice-box">
+    <div class="notice-top"></div>
+    <div class="notice-middle">
+        <span class="notice-info">&nbsp;</span>
+        <span class="block bold">Similar products</span><span class="block">Select similar products which will be offered to shoppers on the current product details page. Just start typing a product name and after the 3rd character available products will be shown. Select a product and it will appear on the products details page.\
+        </span><a href="#" class="notice-close"></a>
+    </div>
+    <div class="notice-bottom"></div>
+</div>
+<!-- Start Similar Product page -->
 <div class="Products-page">
     <div class="table1">
     <table id="datatables"  class="display">
