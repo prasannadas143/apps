@@ -12,7 +12,168 @@
 {% endblock %}
 
 {% block content %}
+<style type="text/css">
+	.red{
+		color: Red;
+	}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    -webkit-animation-name: fadeIn; /* Fade in the background */
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s
+}
+
+/* Modal Content */
+.modal-content {
+    position: fixed;
+    bottom: 0;
+    background-color: #fefefe;
+    width: 100%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideIn;
+    animation-duration: 0.4s
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+/* Add Animation */
+@-webkit-keyframes slideIn {
+    from {bottom: -300px; opacity: 0}
+    to {bottom: 0; opacity: 1}
+}
+
+@keyframes slideIn {
+    from {bottom: -300px; opacity: 0}
+    to {bottom: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+</style>
+
+
+
+<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="/shoppingcart/Products/{{ productid }}/Attributes/" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
+<div class="boxaddresses" id="attributes">
+
+    {%  for attrdetail in attrsdetails   %}
+		<div class="boxaddress" id="attribute{{ attrdetail.attr_name_cnt }}" name="attribute{{ attrdetail.attr_name_cnt }}">
+
+       <p name="para_attr_name{{ attrdetail.attr_name_cnt }}" id="para_attr_name{{ attrdetail.attr_name_cnt }}">
+	    <span>
+		    <label> Attribute  Set name :</label>
+		    <input type="text" placeholder="Attribute Name" id="attr_name_{{ attrdetail.attr_name_cnt }}" name="attr_name_{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" required="true" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
+	    </span>
+	    <button type="button" name="attr_name_delete{{ attrdetail.attr_name_cnt }}" id="attr_name_delete{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" onclick="delattrname()">Delete attribute Name</button>
+	    </p>
+    	<p name="para_attr_value{{ attrdetail.attr_name_cnt }}" id="para_attr_value{{ attrdetail.attr_name_cnt }}">
+
+            {% for attr_value,attr_id in attrdetail.attr_values|ZipList:attrdetail.attr_ids  %}
+        	<span>
+        		{% if  forloop.first  %}
+        		    <label>Attribute  value:</label>
+                {% else %}
+    				<label></label>
+                {% endif %}
+
+        		<input type="text" placeholder="Attribute  value" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" value="{{  attr_value }}" required="true">
+
+        		{% if not forloop.first  %}
+			        <button type="button" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" onclick="delattrvalue()">Delete attribute value</button>
+                {% endif %}
+
+				<input type="hidden" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}_edit" value="{{ attr_id }}">
+
+	        </span>
+
+            {% endfor %}
+
+
+        </p>
+			<button type="button" name="addattrvalue{{ attrdetail.attr_name_cnt }}" id="addattrvalue{{ attrdetail.attr_name_cnt }}" onclick="addattrvalue()">Add attribute value</button>
+				</div>
+
+    {% endfor %}
+
+</div>
+<button type="button" name="Add_new_attribute_set" value="Add new attribute set"  onclick="AddNewAttributeSet()">Add new attribute set </button>
+<button id="copy_attributes" type="button" value="copy_attributes" >Copy attributes from similar product</button>
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2>Modal Header</h2>
+    </div>
+    <div class="modal-body">
+        <div id="productsdiv"> <table id="showproducts" class="table table-striped table-bordered table-hover"    cellspacing="0" width="50%" >
+            <tbody></tbody></table>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+      <h3>Modal Footer</h3>
+    </div>
+  </div>
+
+</div>
+<input type="submit" value="Save Attributes">
+
+</form>
+
 <script>
+
 // Django CSRF framework
 $(document).ajaxSend(function(event, xhr, settings) {
     function getCookie(name) {
@@ -50,6 +211,81 @@ $(document).ajaxSend(function(event, xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
     }
 });
+
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("copy_attributes");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+    modal.style.display = "block";
+    // if table contains rows and then clear the table, then do ajax call and fill it with list of product info.
+    ShowProducts();
+
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+function CopyAttributes() {
+  srcelement = event.srcElement;
+  baseuri = srcelement.baseURI;
+  var re = /\/shoppingcart\/Products\/(\d+)\/Attributes/i;
+  var found = baseuri.match(re);
+  productid = found[1];
+  srcproductid = srcelement.id;
+   $.ajax({
+            method:'post',
+            url:"/shoppingcart/Products/GetProductAttributes/",
+            data: {
+                "srcproductid" :    srcproductid
+            },
+            success:function(response){
+                // console.log(response);
+                productlist =eval(response);
+            }
+   });
+}
+
+function ShowProducts() {
+
+   $.ajax({
+            method:'get',
+            url:"/shoppingcart/Products/getallProducts/",
+
+            success:function(response){
+                // console.log(response);
+                productlist =eval(response);
+                rows_count =  $("#showproducts").rows;
+                if(rows_count) {
+                    $("#showproducts tbody").empty()
+                }
+                var trHTML = '';
+
+                $.each(response.data, function (i, item) {
+      trHTML += '<tr><td>' + item.product_name + '</td><td>' + '<button id=' + item.product_id + ' onclick="CopyAttributes()">Copy</button>' +  '</td></tr>';
+                });
+
+                $('#showproducts tbody').append(trHTML);
+            }
+      });
+}
+
+
 function delattrname() {
    	srcelement = event.srcElement ;
     uri = srcelement.baseURI
@@ -248,55 +484,4 @@ function addtext(label, placeholder,id) {
 
 
 </script>
-
-
-<form class="form pj-form"   name="addClientForm" id="addClientForm" ng-app="ServiceMod" autocomplete="off" enctype="multipart/form-data" novalidate="novalidate" action="/shoppingcart/Products/{{ productid }}/Attributes/" method="post"   onsubmit="return validateclientform()"   > {% csrf_token %}
-<div class="boxaddresses" id="attributes">
-
-    {%  for attrdetail in attrsdetails   %}
-		<div class="boxaddress" id="attribute{{ attrdetail.attr_name_cnt }}" name="attribute{{ attrdetail.attr_name_cnt }}">
-
-       <p name="para_attr_name{{ attrdetail.attr_name_cnt }}" id="para_attr_name{{ attrdetail.attr_name_cnt }}">
-	    <span>
-		    <label> Attribute  Set name :</label>
-		    <input type="text" placeholder="Attribute Name" id="attr_name_{{ attrdetail.attr_name_cnt }}" name="attr_name_{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" required="true" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;">
-	    </span>
-	    <button type="button" name="attr_name_delete{{ attrdetail.attr_name_cnt }}" id="attr_name_delete{{ attrdetail.attr_name_cnt }}" value="{{ attrdetail.attr_name_value }}" onclick="delattrname()">Delete attribute Name</button>
-	    </p>
-    	<p name="para_attr_value{{ attrdetail.attr_name_cnt }}" id="para_attr_value{{ attrdetail.attr_name_cnt }}">
-
-            {% for attr_value,attr_id in attrdetail.attr_values|ZipList:attrdetail.attr_ids  %}
-        	<span>
-        		{% if  forloop.first  %}
-        		    <label>Attribute  value:</label>
-                {% else %}
-    				<label></label>
-                {% endif %}
-
-        		<input type="text" placeholder="Attribute  value" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}" value="{{  attr_value }}" required="true">
-
-        		{% if not forloop.first  %}
-			        <button type="button" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" id="attr_name_{{ attrdetail.attr_name_cnt }}_value_delete_{{ forloop.counter }}" onclick="delattrvalue()">Delete attribute value</button>
-                {% endif %}
-
-				<input type="hidden" name="attr_name_{{ attrdetail.attr_name_cnt }}_value_{{ forloop.counter }}_edit" value="{{ attr_id }}">
-
-	        </span>
-
-            {% endfor %}
-
-
-        </p>
-			<button type="button" name="addattrvalue{{ attrdetail.attr_name_cnt }}" id="addattrvalue{{ attrdetail.attr_name_cnt }}" onclick="addattrvalue()">Add attribute value</button>
-				</div>
-
-    {% endfor %}
-
-</div>
-<button type="button" name="Add_new_attribute_set" value="Add new attribute set"  onclick="AddNewAttributeSet()">Add new attribute set </button>
-<button type="button" name="Add_new_attribute_set" value="copy_attributes"  onclick="">Copy attributes from similar product </button>
-
-<input type="submit" value="Save Attributes">
-
-</form>
 {% endblock %}

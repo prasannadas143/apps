@@ -147,3 +147,31 @@ def _attrsdetails( attrs ):
         cnt += 1
 
     return attr_datas
+
+def getallProducts(request):
+    data = list()
+    products = Products.objects.all()
+    productdetails = list()
+    for product in products:
+        productdetail = dict()
+        productdetail['product_name'] = product.product_name
+        productdetail['product_id'] = product.id
+        productdetails.append(productdetail)
+    return HttpResponse(json.dumps({"data": productdetails}), content_type='application/json')
+
+def GetProductAttributes( request ):
+    srcproductid = int( request.POST['srcproductid'] )
+    attributes = Attributes.objects.filter(attribute_product__id=srcproductid).order_by('attr_name', 'id')
+    attrs = []
+    for attribute in attributes:
+        attr = dict()
+        attr['attr_name'] = attribute.attr_name
+        attr['attr_value'] = attribute.attr_value
+        attr['attr_id'] = attribute.id
+        attrs.append(attr)
+    attrsdetails = _attrsdetails(attrs)
+    pdb.set_trace()
+    attributes_cnt = len(attrsdetails)
+    if not attributes_cnt:
+        attributes_cnt = 0
+    return HttpResponse(json.dumps({"data": attrsdetails}), content_type='application/json')

@@ -7,8 +7,8 @@ from .views.Stock import InStock, listimages, deletestock
 from .views.Stocks import listStock, deletestocks
 from .views.Photos import BasicUploadView, DeletePhoto
 from .views.Digital import digital
-from .views.Attributes import attributes, delAttributeName, delAttribute
-from .views.SimilarProducts import ListSimilarProducts
+from .views.Attributes import attributes, delAttributeName, delAttribute, getallProducts, GetProductAttributes
+from .views.SimilarProducts import ListSimilarProducts, SimilarProducts
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -29,10 +29,15 @@ urlpatterns = [
     url(r'^GetProductDetails/', GetProductDetails, name="GetProductDetails"),
     url(r'^SearchProduct/', SearchProduct, name="SearchProduct"),
     url(r'^(?P<id>\d+)/ProductDetail/$', ProductDetail, name="ProductDetail"),
+    url(r'^getallProducts/', getallProducts, name="getallProducts"),
+    url(r'^GetProductAttributes/', GetProductAttributes, name="GetProductAttributes"),
 
-    url(r'^(?P<id>\d+)/SimilarProducts/', TemplateView.as_view(template_name='SimilarProducts.html'),name="SimilarProducts"),
+
+
+    url(r'^(?P<id>\d+)/SimilarProducts/',SimilarProducts,name="SimilarProducts"),
     url(r'^ListSimilarProducts/', ListSimilarProducts, name="ListSimilarProducts"),
-
+    url(r'^(?P<id>\d+)/Extras/', TemplateView.as_view(template_name='Extras.html'),
+        name="Extras"),
 
     url(r'^Stocks/', TemplateView.as_view(template_name='Stocks.html'), name="Stocks"),
     url(r'^ListStocks/', listStock , name="ListStocks"),
