@@ -12,6 +12,11 @@ from .Catagories import _catagories_datastructure
 from django.db.models import Q
 
 @requires_csrf_token
+def SimilarProducts(request,id):
+    templatename = "SimilarProducts.html"
+    return render(request, templatename, {"productid" : id} )
+
+@requires_csrf_token
 def ListSimilarProducts(request):
     productid = request.POST['productid']
     productobj  = get_object_or_404( Products, id=int( productid ))
