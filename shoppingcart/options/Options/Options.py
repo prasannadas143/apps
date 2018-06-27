@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404
-from shoppingcart.options.models import  Options
+from ..models import  Options
 from django.views.decorators.csrf import csrf_exempt
 
 tab_id = 3

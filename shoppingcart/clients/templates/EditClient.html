@@ -2,7 +2,6 @@
 {% load static from staticfiles %}
 {% load admin_urls %}
 {% load bootstrap3 %}
-{% load debug_tags %}
 {% block title %}Dashboard{% endblock %}
 {% block extraHeader %}
 {% endblock %}
@@ -213,7 +212,7 @@ function addcheckbox(label, id) {
 	radiobutton.name = id ;
 	radiobutton.id = id + i  ;
 	radiobutton.value = id + i ;
-
+	radiobutton.checked = true;
 	r.appendChild(radiobuttonlabel);
 	r.appendChild(radiobutton);
 	para.appendChild(r);

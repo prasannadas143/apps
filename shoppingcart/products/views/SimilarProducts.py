@@ -20,17 +20,23 @@ def SimilarProducts(request,id):
 def ListSimilarProducts(request):
     productid = request.POST['productid']
     productobj  = get_object_or_404( Products, id=int( productid ))
-    productname = productobj.product_name
-    start_product_name = productname.split()[0][:3]
-
-    data = list()
-    products = Products.objects.filter( product_name__icontains=start_product_name )
     productdetails = list()
-    for product in products:
+
+    catagories = productobj.products_categories.all()
+    list_products = dict()
+    for catagorie in catagories :
+        ct_products = catagorie.products_categories.all()
+        for ct_product in ct_products :
+            list_products[ct_product.id] = ct_product
+
+    for productid in list_products:
+        product = list_products[ productid ]
         productdetail = dict()
+
         productdetail['product_name'] = product.product_name
         productdetail['product_status'] = product.product_status
         productdetail['product_id'] = product.id
         productdetails.append( productdetail )
-    return HttpResponse(json.dumps({"data" :productdetails }), content_type='application/json')
+
+    return HttpResponse(json.dumps({ "data" :productdetails }), content_type='application/json')
 

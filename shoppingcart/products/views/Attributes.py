@@ -77,6 +77,7 @@ def attributes(request, id):
     attributes_cnt = len(attrsdetails)
     if not attributes_cnt :
         attributes_cnt = 0
+    pdb.set_trace()
     templatename = "Attributes.html"
     return render(request, templatename , {"productid" : id, "attrsdetails" : attrsdetails, "attributes_cnt" : attributes_cnt } )
 
