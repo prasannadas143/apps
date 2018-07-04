@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from shoppingcart.clients import views as clients
+from ..clients import views as clients
 
 urlpatterns = [
 	

@@ -1,0 +1,174 @@
+{% extends "ProductsBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+
+{% block content %}
+<script>
+function postformdata( opn, method,   nodeid) {
+        method = method || "post"; // post (set to default) or get
+
+        url = "" ;
+        if (opn == "uparrow"  ) {
+            url = "/shoppingcart/products/uparrow/" + nodeid + "/";
+        }
+        if (  opn == "downarrow" ) {
+             url = "/shoppingcart/products/downarrow/" + nodeid + "/";
+
+        }
+        if (opn == "DeleteCatagory") {
+            url = "/shoppingcart/products/DeleteCatagory/"
+        }
+
+        if ( opn == "deletecatagories" ) {
+            url = "/shoppingcart/products/DeleteCatagories/"
+
+        }
+        // Create the form object
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", url);
+        form.innerHTML +=  "{% csrf_token %}"
+        // For each key-value pair
+        <!--for (key in dictionary) {-->
+            //alert('key: ' + key + ', value:' + dictionary[key]); // debug
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", opn);
+            hiddenField.setAttribute("value", nodeid);
+            // append the newly created control to the form
+            form.appendChild(hiddenField);
+        <!--}-->
+
+        document.body.appendChild(form); // inject the form object into the body section
+        form.submit();
+    }
+ $( document ).ready(function() {
+
+	data = {{ data|safe }};
+    level = 1;
+    catagories_html = '<thead> <tr><th><input type="checkbox" class="pj-table-toggle-rows"></th><th style="width: 500px;">Name</th><th>Products</th><th></th><th></th><th> Action</th></tr></thead>';
+	showcatagorie(data, "noarrow")
+	var t = $("#catagories");
+    t.html( catagories_html );
+    t.DataTable();
+});
+	function showcatagorie(data, movenode) {
+        if ( data['value'] != 1 ) {
+            console.log( ' '.repeat( level ) + data['name'] )
+            if (level > 2) {
+                data['name'] = '--'.repeat( (level-2) ) + data['name']
+            }
+            catagories_html += '<tr id=' + data['value'] + '><td><input type="checkbox" name="record" value=""></td><td> <span class="pj-table-cell-label"> \
+            '    + data['name'] + '</span></td><td></td>' ;
+            if (movenode == "uparrow" || movenode == "botharrow") {
+                 catagories_html +=  '<td><button   onClick=\"postformdata( \'uparrow\',  \'POST\', ' + data['value'] + ');\" >uparrow </button></td>'  ;
+            }
+            else {
+                catagories_html +=  '<td></td>'
+
+            }
+            if  (movenode == "downarrow" || movenode == "botharrow") {
+            catagories_html +=  '<td><button   onClick=\"postformdata( \'downarrow\',  \'POST\', ' + data['value'] + ');\" > downarrow</button></td>'  ;
+            }
+            else {
+                catagories_html +=  '<td></td>'
+            }
+
+
+            catagories_html += '<td><a href=\"/shoppingcart/products/EditCatagory/' + data['value'] + '/">Edit  \
+             </a><button   onClick=\"postformdata( \'DeleteCatagory\',  \'POST\', ' + data['value'] + ');\" > Delete</button></td></tr>';
+        }
+
+        movenode = ""
+		for ( child in data['child'] ) {
+			level += 1
+			if (child == 0  && data['child'].length > 1) {
+			   movenode = "downarrow";
+			}
+			else if (data['child'].length > 1 && child == (data['child'].length - 1)) {
+				 movenode = "uparrow";
+            }
+            else if ( child > 0 && child < data['child'].length ) {
+        		 movenode = "botharrow"
+            }
+            else {
+                 movenode = "noarrow"
+             }
+			showcatagorie(data['child'][child], movenode)
+			level -= 1
+		}
+
+	}
+
+
+
+
+function deletemultirow() {
+    rows = document.getElementById('catagories').rows;
+    var result_array = new Array();
+    for(var i=0; i<rows.length; i++)
+    {
+        rowid = parseInt( rows[i].getAttribute('id') )
+        if(i == 0 ) {
+            continue;
+        }
+        selected = rows[i].childNodes[0].childNodes[0].checked ;
+        if (selected) {
+            result_array.push(rowid);
+        }
+    }
+    alert(result_array);
+      if(result_array!=""){
+        rowids = result_array.join(",");
+      }
+      else {
+          alert("no rows selected");
+      }
+      data = { "rowids":result_array, }
+     postformdata( "deletecatagories", "POST",   rowids)
+}
+
+
+
+</script>
+
+    <div class="menu Products-page-menu">
+        <div>
+            <form>
+                <button class="btn btn-default add" onclick="location.href='/shoppingcart/products/AddCatagorie/'"  value="Add Catagorie" >Add category</button>{% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+
+    <div class="Products-page-category">
+
+        <div class="table1">
+
+            <table  style="width: 100%;" id="catagories" class="table table-hover">
+
+
+            </table>
+            <button id='multicheckbox' value='Delete Catagories' onclick="deletemultirow()" >Delete Catagories</button>
+            	<div class="tfoot">
+                    <select class="selectpicker">
+                              <option class="Online">Choose Action </option>
+                              <option class="Online">Delete Selected </option>
+
+                      </select>
+                    <div class="icons">
+                        <i class="fa fa-chevron-left fa-lg" aria-hidden="true"></i>
+                        <i class="fa fa-chevron-right fa-lg" aria-hidden="true"></i>
+                    </div>
+                    <p>Total items: 6 / 344</p>
+                </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

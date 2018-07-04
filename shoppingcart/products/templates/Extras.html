@@ -1,0 +1,321 @@
+{% extends "ProductsBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block extraHeader %}
+{% endblock %}
+{% block header3 %}
+   {% include "ProductBase.html" with id=productid  %}
+
+{% endblock %}
+{% block content %}
+
+<div class="boxaddresses" id="ExtrasItems">
+
+</div>
+
+<div class="h30">
+	<button type="button" id="Add_Extra" onclick="AddExtra()">Add extra</button>
+	OR	<a href="/1527736935_523/index.php" class="btn btn-default">Copy extras from another product</a>
+</div>
+<input type="submit" value="Save" class="pj-button">
+<input type="button" value="Cancel" class="pj-button" onclick="">			</div>
+<script>
+
+var i = 0;
+
+function adddropdown(label, placeholder,id) {
+
+   var dd = document.createElement("select");
+	dd.name = "extra_type_" + i;
+	dd.id = "extra_type_" + i;
+	dd.onchange=changeFunc
+	      var option = document.createElement("option");
+   option.text = "Single";
+   option.value = 1;
+   dd.add(option);
+   var option = document.createElement("option");
+   option.text = "Multiple";
+   option.value = 2;
+   dd.add(option);
+   return dd;
+
+}
+
+function changeFunc() {
+	srcelement =  event.srcElement;
+	if ( srcelement.value == "2" ) {
+		AddMultiple()
+	}
+	else if ( srcelement.value == "1" ) {
+		AddSingle()
+	}
+
+}
+
+function AddSingle( ) {
+	var extraitemdiv = $("#ExtraItem" + i);
+	extraitemdiv.html("");
+
+    id = "para_item_name" + i
+    para = createpara( id)
+
+ 	label = "Extra type";
+	placeholder = "";
+	id = "extra_type_" + i;
+	dropdown = adddropdown(label, placeholder,id);
+	dropdown.value = "1"
+
+	para.appendChild( dropdown );
+
+    label = "Name";
+	placeholder = "";
+	id = "item_name_" + i;
+	txt = addtext(label, placeholder,id);
+	para.appendChild( txt );
+
+	label = "Price";
+	placeholder = "";
+	id = "item_price_" + i;
+	txt = addtext(label, placeholder,id);
+	para.appendChild( txt );
+
+    id =  'item_name_delete' + i;
+	label = "" ;
+	innerhtml =  "Delete item";
+	button = createbutton( id, label, innerhtml );
+    button.onclick = DeleteItem;
+    para.appendChild( button );
+	extraitemdiv.append( para );
+ }
+
+function DeleteExtraItem() {
+	buttonobj = event.srcElement
+	srcelementid = buttonobj.id;
+	var re = /item_name_delete_(\d+)_Extra_(\d+)/i;
+	var found = srcelementid.match(re);
+	if ( found ) {
+		extraitem_cnt = found[2];
+		item_cnt = found[1];
+	}
+	namemode = $("#item_name_" + item_cnt + "_Extra_" + extraitem_cnt)
+	namemode[0].parentNode.remove();
+	pricenode = $("#item_price_" + item_cnt + "_Extra_" + extraitem_cnt )
+	pricenode[0].parentNode.remove();
+	buttonobj.remove()
+}
+
+function AddMultiple(  ) {
+	var extraitemdiv = $("#ExtraItem" + i);
+	extraitemdiv.html("");
+
+    id = "para_item_name" + i
+    para = createpara( id)
+	extraitemdiv.append( para );
+
+ 	label = "";
+	placeholder = "";
+	id = "extra_type_" + i;
+	dropdown = adddropdown(label, placeholder,id);
+	dropdown.value = "2"
+	para.appendChild( dropdown );
+
+    label = "Title";
+	placeholder = "";
+	id = "item_title_" + i;
+	txt = addtext(label, placeholder,id);
+	para.appendChild( txt );
+
+    id =  'item_name_delete' + i;
+	label = "" ;
+	innerhtml =  "Delete Title";
+	button = createbutton( id, label, innerhtml );
+    button.onclick = DeleteItem;
+    para.appendChild( button );
+
+	var extraitemnamesdiv = document.createElement("div");
+	extraitemnamesdiv.setAttribute("id", "ExtraItemNames" + i);
+	extraitemnamesdiv.setAttribute("name", "ExtraItemNames" + i);
+	extraitemnamesdiv.setAttribute("class", "boxaddress" );
+	para.appendChild( extraitemnamesdiv );
+
+	extraitem_cnt = GetExtraItemCount( extraitemnamesdiv );
+
+   	label = "Name";
+	placeholder = "";
+	id = "item_name_" + i + "_Extra_" + extraitem_cnt;
+	txt = addtext(label, placeholder,id);
+	extraitemnamesdiv.appendChild( txt );
+
+	label = "Price";
+	placeholder = "";
+	id = "item_price_" + i + "_Extra_" + extraitem_cnt;;
+	txt = addtext(label, placeholder,id);
+	extraitemnamesdiv.appendChild( txt );
+
+	id =  'item_name_delete_' + i + "_Extra_" + extraitem_cnt;;
+	label = "" ;
+	innerhtml =  "Delete Extra item";
+	button = createbutton( id, label, innerhtml );
+    button.onclick = DeleteExtraItem;
+    extraitemnamesdiv.appendChild( button );
+
+   	id =  'item_add_extra_item' + i;
+	label = "" ;
+	innerhtml =  "Add Extra item";
+	button = createbutton( id, label, innerhtml );
+    button.onclick = AddExtraItem;
+    para.appendChild( button );
+
+}
+
+function GetExtraItemCount( para ) {
+	srcelementid = para.id ;
+	parentobj = $("#" + srcelementid);
+	textelements = parentobj.find("input");
+	item_cnt = 1;
+	textelements.each(function (index, value){
+		var inputid = $(this).attr('id');
+		var re = /item_name_(\d+)_Extra_(\d+)/i;
+		var found = inputid.match(re);
+		if ( found ) {
+			item_cnt = found[2];
+			return item_cnt ;
+		}
+  	});
+  	return item_cnt ;
+
+}
+
+
+
+function AddExtraItem() {
+	parentobj = event.srcElement.parentNode;
+	extra_item_cnt = GetExtraItemCount( parentobj );
+	extra_item_cnt = 	Number( extra_item_cnt ) + 1 ;
+
+	parentobj = parentobj.find("div")[0];
+
+	label = "Name";
+	placeholder = "";
+	id = "item_name_" + i + "_Extra_" + extra_item_cnt;
+	txt = addtext(label, placeholder,id);
+	parentobj.innerHTML += "</br>"
+	parentobj.appendChild( txt );
+
+	label = "Price";
+	placeholder = "";
+	id = "item_price_" + i + "_Extra_" + extra_item_cnt;
+	txt = addtext(label, placeholder,id);
+	parentobj.appendChild( txt );
+
+	id =  'item_name_delete_' + i + "_Extra_" + extra_item_cnt;;
+	label = "" ;
+	innerhtml =  "Delete Extra item";
+	button = createbutton( id, label, innerhtml );
+    button.onclick = DeleteExtraItem;
+    parentobj.appendChild( button );
+	console.log( extra_item_cnt );
+}
+
+function DeleteItem() {
+	srcelement = event.srcElement;
+	item_id = srcelement.id ;
+	var re = /item_name_delete(\d+)/i;
+  	var found = item_id.match(re);
+  	item_cnt = found[1];
+	$("#ExtraItem" + item_cnt).remove();
+	i = i - 1 ;
+}
+
+
+
+
+function AddExtra() {
+
+	i += 1
+	var extraitems = document.getElementById("ExtrasItems" );
+	var extraitemdiv = document.createElement("div");
+	extraitemdiv.setAttribute("id", "ExtraItem" + i);
+	extraitemdiv.setAttribute("name", "ExtraItem" + i);
+	extraitemdiv.setAttribute("class", "boxaddress" );
+	extraitems.appendChild(extraitemdiv);
+	AddSingle( )
+
+}
+
+
+
+
+
+
+function addattrvalue() {
+   parent_node = this.parentNode
+  if ( ! parent_node ) {
+  	parent_node =	event.target.parentNode;
+  }
+    parent_node_id = parent_node.id ;
+    var regex = /\d+$/g;
+    var matches = parent_node_id.match(regex);
+    if( matches.length ) {
+        attr_name_cnt = matches[0];
+    }
+    <!--paranode = parent_node.childNodes;-->
+    <!--txtnodes = paranode[3].childNodes;-->
+    spannodes = parent_node.getElementsByTagName("span") ;
+    attr_value_cnt = spannodes.length ;
+    label = "";
+	placeholder = "Attribute  value";
+	id = "attr_name_" + attr_name_cnt + "_value_"	+ attr_value_cnt;
+	span_txt = addtext(label, placeholder,id);
+	id = "para_attr_value" + attr_name_cnt
+	para = document.getElementById( id );
+    para.appendChild( span_txt );
+
+    btnid =  'attr_name_' + attr_name_cnt + "_value_delete_" + attr_value_cnt ;
+	label = "" ;
+	innerhtml =  "Delete attribute value";
+	button = createbutton( btnid, label, innerhtml )
+	button.onclick = delattrvalue;
+    span_txt.appendChild( button );
+}
+
+
+function createpara( id ) {
+
+	var para_attr = document.createElement('p');
+	para_attr.setAttribute('name',id );
+	para_attr.setAttribute('id', id );
+	para_attr.innerHTML = "";
+    return para_attr;
+}
+
+function createbutton( id, label, innerhtml ) {
+
+	var addbutton = document.createElement('button');
+	addbutton.setAttribute('type', "button");
+	addbutton.setAttribute('name', id );
+	addbutton.setAttribute('id', id );
+	addbutton.innerHTML = innerhtml;
+    return addbutton;
+}
+
+function addtext(label, placeholder,id) {
+
+	var r = document.createElement('span');
+	var statelabel = document.createElement("label");
+	statelabel.innerHTML = label;
+	var y = document.createElement("INPUT");
+	y.setAttribute("type", "text");
+	y.setAttribute("placeholder", placeholder);
+	y.setAttribute("id", id );
+	y.setAttribute("name", id );
+	y.setAttribute("required",true);
+
+	r.appendChild(statelabel);
+	r.appendChild(y);
+    return r;
+}
+</script>
+{% endblock %}

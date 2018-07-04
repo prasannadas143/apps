@@ -277,7 +277,7 @@ function ShowProducts() {
                 var trHTML = '';
 
                 $.each(response.data, function (i, item) {
-      trHTML += '<tr><td>' + item.product_name + '</td><td>' + '<button id=' + item.product_id + ' onclick="CopyAttributes()">Copy</button>' +  '</td></tr>';
+                    trHTML += '<tr><td>' + item.product_name + '</td><td>' + '<button id=' + item.product_id + ' onclick="CopyAttributes()">Copy</button>' +  '</td></tr>';
                 });
 
                 $('#showproducts tbody').append(trHTML);

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+{% block javascript %}
+
+{% endblock %}
+ {% block content %}
+<script>
+// Django CSRF framework
+$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function sameOrigin(url) {
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+
+<!--function listproducts() {-->
+ $.ajax(
+    {
+        type:"GET",
+        url: "/shoppingcart/Orders/ListOrderProducts/",
+        success: function( data )
+        {
+
+        }
+     })
+<!--}-->
+
+  $.ajax(
+        {
+            type:"GET",
+            url: "/shoppingcart/Orders/18/ListOrderStocks/",
+
+            success: function( data )
+            {
+
+            }
+         }
+    )
+
+
+    $.ajax(
+        {
+            type:"POST",
+            url: "/shoppingcart/Orders/InsuranceShippingTaxPrice/",
+             data: {
+              price: 200,
+              location : "calcutta",
+
+            },
+            success: function( data )
+            {
+              var insurance = data.insurance;
+              var price  = data.price;
+              var shipping = data.shipping;
+              var tax = data.tax;
+              console.log(price,shipping, tax);
+            }
+         }
+    )
+
+     $.ajax(
+        {
+            type:"POST",
+            url: "/shoppingcart/Orders/getclients/",
+            success: function( data )
+            {
+
+
+            }
+         }
+    )
+
+     $.ajax(
+        {
+            type:"POST",
+            url: "/shoppingcart/Orders/clientaddress/",
+            data: {
+              clientid: 4,
+            },
+            success: function( data )
+            {
+
+
+            }
+         }
+    )
+
+
+
+</script>
+{% endblock %}

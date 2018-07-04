@@ -6,7 +6,7 @@ urlpatterns = [
 
     url(r'^Products/', include('shoppingcart.products.urls')),
     url(r'^clients/', include('shoppingcart.clients.urls')),
-    url(r'^orders/', include('shoppingcart.orders.urls')),
+    url(r'^Orders/', include('shoppingcart.orders.urls')),
     url(r'^dashboard/', include('shoppingcart.dashboard.urls')),
     url(r'^vouchers/', include('shoppingcart.vouchers.urls')),
     url(r'^report/', include('shoppingcart.report.urls')),

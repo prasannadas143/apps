@@ -1,7 +1,7 @@
 from django.db import models
 from django.core import validators
 from phonenumber_field.modelfields import PhoneNumberField
-from shoppingcart.options.countries.models import Countries
+from ..options.countries.models import Countries
 # Create your models here.
 
 class Clients(models.Model):

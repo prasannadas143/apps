@@ -1,0 +1,18 @@
+{% extends "ShoppingcartBase.html" %}
+{% load static from staticfiles %}
+{% load admin_urls %}
+{% load bootstrap3 %}
+{% block title %}Dashboard{% endblock %}
+ {% block header2 %}
+
+    <div class="menu">
+      <div class="btn-group" role="group" aria-label="...">
+          <button type="button" class="btn btn-default" onclick="window.location.href='General.html'">General</button>
+          <button type="button" class="btn btn-default" onclick="window.location.href='Payments.html'">Payments</button>
+          <button type="button" class="btn btn-default" onclick="window.location.href='Checkout-form.html'">Checkout form</button>
+          <button type="button" class="btn btn-default" onclick="window.location.href='Shipping-And-Tax.html'">Shipping &amp; Tax</button>
+          <button type="button" class="btn btn-default" onclick="window.location.href='Notifications.html'">Notifications</button>
+          <button type="button" class="btn btn-default active" onclick="window.location.href='App-Install.html'">Terms</button>
+      </div>
+  </div>
+{% endblock %}
