@@ -14,10 +14,10 @@ from decouple import Config, RepositoryEnv
 from os.path import  basename, dirname, join, abspath
 from django.contrib.messages import constants as messages
 from django.utils.crypto import get_random_string
-import configparser
+# import configparser
 from django.conf import settings
 
-config = configparser.ConfigParser()
+# config = configparser.ConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
@@ -34,7 +34,7 @@ MEDIA_URL = '/media/'
 
 DOTENV_FILE =  join(SITE_ROOT, "deploy", "env.ini") 
 # config = Config(RepositoryEnv(DOTENV_FILE))
-config.read(DOTENV_FILE)
+# config.read(DOTENV_FILE)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -97,22 +97,7 @@ INSTALLED_APPS = BUILTIN_APPS + USER_APPS
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': join(MEDIA_ROOT,"backup")  }
 
-MIDDLEWARE_CLASSES = [
 
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'appointmentscheduler.middleware.LoginRequiredMiddleware',
-    'appointmentscheduler.middleware.VisitorDetails',
-
-]
 
 # INCLUDE_REGISTER_URL = True
 # INCLUDE_AUTH_URLS = True

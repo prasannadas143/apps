@@ -1,28 +1,26 @@
 """Development settings and globals."""
-
-
 from .base import *
 from django.utils.crypto import get_random_string
 from os.path import  basename, dirname, join, abspath
-import os
-
+import os,dj_database_url
+from decouple import config, Csv
 ########## DEBUG CONFIGURATION
-DEBUG = True
+DEBUG = config('DEBUG', default=False , cast=bool)
 ########## END DEBUG CONFIGURATION
-ALLOWED_HOSTS = [ '127.0.0.1', 'localhost',]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # CSRF_COOKIE_DOMAIN = '.localhost.com'
 
 ########## EMAIL CONFIGURATION
-EMAIL_HOST = config.get('DEFAULT','EMAIL_HOST')
-EMAIL_PORT = config.get('DEFAULT','EMAIL_PORT')
-EMAIL_USE_TLS = config.get('DEFAULT','EMAIL_USE_TLS')
-EMAIL_HOST_USER = config.get('DEFAULT','EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config.get('DEFAULT','EMAIL_HOST_PASSWORD')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT',default=587)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default="")
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default="")
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = config.get('DEFAULT','EMAIL_HOST_USER')
-TWILIO_ACCOUNT_SID = config.get('DEFAULT','TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = config.get('DEFAULT','TWILIO_AUTH_TOKEN')
-TWILIO_FROM_NUMBER = config.get('DEFAULT','TWILIO_FROM_NUMBER')
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER',default="")
+TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
+TWILIO_FROM_NUMBER = config('TWILIO_FROM_NUMBER')
 
 
 ########## END EMAIL CONFIGURATION
@@ -42,19 +40,10 @@ MANAGERS = ADMINS
 
 CONN_MAX_AGE = 600  
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config.get('DEFAULT','DB_NAME'),
-        'USER': config.get('DEFAULT','DB_USER'),
-        'PASSWORD': config.get('DEFAULT','DB_PASSWORD'),
-        'HOST':  config.get('DEFAULT','DB_HOST'),
-        'PORT': config.get('DEFAULT','DB_PORT'), 
-        'DISABLE_SERVER_SIDE_CURSORS': True,
-
-    },
-
-    
-}
+    'default': dj_database_url.config(
+          default=config('DATABASE_URL')
+      )
+ }
 
 # DATABASES = {
 #     'default': {
@@ -66,6 +55,8 @@ DATABASES = {
 #         'PORT': '',
 #     }
 # }
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
@@ -103,6 +94,25 @@ INSTALLED_APPS = BUILTIN_APPS + USER_APPS
 # IPs allowed to see django-debug-toolbar output.
 INTERNAL_IPS = ('127.0.0.1',)
 ENABLE_STACKTRACES = True
+MIDDLEWARE_CLASSES = [
+
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'appointmentscheduler.middleware.LoginRequiredMiddleware',
+    'appointmentscheduler.middleware.VisitorDetails',
+
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 def custom_show_toolbar(request):
     return False
@@ -292,6 +302,8 @@ CELERY_RDB_PORT = int(os.environ.get('CELERY_RDB_PORT') or default_port)
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': '',
 }
+
+
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 SECRET_KEY = get_random_string(50, chars)
 
