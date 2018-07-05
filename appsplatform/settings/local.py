@@ -40,14 +40,14 @@ MANAGERS = ADMINS
 
 CONN_MAX_AGE = 600  
 DATABASES = {
-    # 'default': dj_database_url.config(
-    #       default=config('DATABASE_URL')
-    #   )
+    'default': dj_database_url.config(
+          default=config('DATABASE_URL')
+      )
  }
 
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+# db_from_env = dj_database_url.config(conn_max_age=500)
+# DATABASES['default'].update(db_from_env)
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
