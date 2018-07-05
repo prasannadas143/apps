@@ -40,21 +40,12 @@ MANAGERS = ADMINS
 
 CONN_MAX_AGE = 600  
 DATABASES = {
-    'default': dj_database_url.config(
-          default=config('DATABASE_URL')
-      )
+    # 'default': dj_database_url.config(
+    #       default=config('DATABASE_URL')
+    #   )
  }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'shoppingcart',
-#         'USER': 'root',
-#         'PASSWORD': 'root',
-#         'HOST': '',
-#         'PORT': '',
-#     }
-# }
+
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
