@@ -18,7 +18,7 @@ django-celery==3.2.1
 django-celery-beat==1.0.1
 django-celery-results==1.0.1
 django-debug-panel==0.8.3
-django-debug-toolbar==1.8
+django-debug-toolbar==1.11.1
 django-easy-timezones==0.8.0
 django-generate-secret-key==1.0.2
 django-mysql==2.1.0
