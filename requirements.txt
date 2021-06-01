@@ -71,7 +71,7 @@ sqlparse==0.2.4
 tornado==4.5.2
 twilio==6.7.0
 tzlocal==1.4
-urllib3==1.21.1
+urllib3==1.26.5
 vine==1.1.4
 virtualenv==16.0.0
 wget==3.2
